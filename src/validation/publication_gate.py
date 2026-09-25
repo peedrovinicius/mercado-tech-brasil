@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
-from pathlib import Path
 import json
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -241,7 +241,7 @@ def evaluate_publication_gate(
         manual_approval_valid=approval_valid,
         publishable=automatic_checks_passed and approval_valid,
         source_sha256=source_sha256,
-        generated_at_utc=datetime.now(timezone.utc).isoformat(),
+        generated_at_utc=datetime.now(UTC).isoformat(),
         checks=tuple(checks),
     )
 
@@ -279,7 +279,7 @@ def approve_competence(
         "reviewer": reviewer,
         "notes": notes,
         "source_sha256": source_sha256,
-        "approved_at_utc": datetime.now(timezone.utc).isoformat(),
+        "approved_at_utc": datetime.now(UTC).isoformat(),
     }
     approvals[yearmonth] = approval
     approvals_path.parent.mkdir(parents=True, exist_ok=True)
