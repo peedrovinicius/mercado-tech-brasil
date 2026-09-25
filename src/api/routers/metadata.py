@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+
 from fastapi import APIRouter
 
 from src.core.settings import settings
