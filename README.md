@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.6 — fundação técnica publicada**
+**v0.7 — governança de publicação em validação**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -303,3 +303,18 @@ O caminho local existe para ambientes em que o FTP do PDET é bloqueado. O arqui
 Também foi adicionado `/api/v1/provenance/latest`, permitindo que o dashboard mostre qual arquivo e hash originaram os dados exibidos.
 
 Veja [`docs/LOCAL_INGESTION.md`](docs/LOCAL_INGESTION.md) e [`docs/DOCKER.md`](docs/DOCKER.md).
+
+
+### Gate de publicação
+
+Uma competência só é considerada publicável quando passa pelos checks automáticos e por uma revisão metodológica vinculada ao SHA-256 do arquivo MOV:
+
+```bash
+python -m src.cli validate-release 202607
+python -m src.cli approve-release 202607 \
+  --reviewer "Nome do revisor" \
+  --notes "Layout, rejeições e metodologia revisados." \
+  --acknowledge-methodology-reviewed
+```
+
+Trocar o arquivo de origem invalida automaticamente a aprovação anterior. O status também fica disponível em `/api/v1/quality/publication-gate/latest`.

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0
+
+- gate de publicação por competência;
+- validação de artefatos Bronze/Gold, proveniência e aritmética;
+- limiar configurável de qualidade;
+- aprovação metodológica manual vinculada ao SHA-256 do MOV;
+- invalidação automática da aprovação quando o arquivo de origem muda;
+- comandos `validate-release` e `approve-release`;
+- endpoint `/api/v1/quality/publication-gate/latest`;
+- testes do ciclo completo de bloqueio e aprovação.
+
+
 ## 0.6.0
 
 - ingestão local auditável de TXT/.7z oficial;

@@ -20,3 +20,17 @@ def latest_quality_report() -> dict[str, object]:
 
     latest = reports[-1]
     return json.loads(latest.read_text(encoding="utf-8"))
+
+
+@router.get("/publication-gate/latest")
+def latest_publication_gate() -> dict[str, object]:
+    reports = sorted(settings.gold_path.glob("publication-gate-*.json"))
+    if not reports:
+        return {
+            "status": "not_available",
+            "publishable": False,
+            "message": "Nenhum gate de publicação foi executado ainda.",
+        }
+
+    latest = reports[-1]
+    return json.loads(latest.read_text(encoding="utf-8"))

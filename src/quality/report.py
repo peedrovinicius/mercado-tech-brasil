@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
-from pathlib import Path
 import json
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -42,7 +42,7 @@ def make_report(
         rows_valid=rows_valid,
         rows_rejected=rows_rejected,
         rejection_reasons=rejection_reasons,
-        generated_at_utc=datetime.now(timezone.utc).isoformat(),
+        generated_at_utc=datetime.now(UTC).isoformat(),
     )
 
 
