@@ -1,5 +1,5 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 from src.validation.publication_gate import approve_competence, evaluate_publication_gate
 
