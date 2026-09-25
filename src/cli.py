@@ -7,8 +7,8 @@ from src.core.settings import settings
 from src.gold.aggregate import build_gold
 from src.ingestion.archive import extract_7z
 from src.ingestion.ftp_caged import download_month
-from src.ingestion.manifest import build_manifest, write_manifest
 from src.ingestion.local import ingest_local_file
+from src.ingestion.manifest import build_manifest, write_manifest
 from src.transform.caged import transform_mov_file
 from src.validation.publication_gate import (
     approve_competence,
