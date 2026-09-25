@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
-import json
 
 import yaml
 
@@ -27,7 +27,7 @@ class TransformResult:
 
 def _load_tech_families(config_path: Path) -> set[str]:
     payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    return {str(code) for code in payload["families"].keys()}
+    return {str(code) for code in payload["families"]}
 
 
 def transform_mov_file(
