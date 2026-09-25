@@ -30,4 +30,6 @@
 4. validar códigos municipais;
 5. implementar semântica testada de FOR/EXC;
 6. reconciliar totais nacionais ajustados;
-7. iniciar frontend somente depois desses gates.
+7. validar o build completo do frontend com as dependências instaladas;
+8. conectar o dashboard aos primeiros dados oficiais validados;
+9. preparar deploy público após a reconciliação metodológica.
