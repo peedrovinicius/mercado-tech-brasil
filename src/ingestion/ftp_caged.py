@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from ftplib import FTP
 from pathlib import Path
-from typing import Iterable
 
 FTP_HOST = "ftp.mtps.gov.br"
 BASE_DIR = "pdet/microdados/NOVO CAGED"
