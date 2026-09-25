@@ -7,7 +7,6 @@ from pathlib import Path
 from src.ingestion.archive import extract_7z
 from src.ingestion.manifest import build_manifest, write_manifest
 
-
 VALID_KINDS = {"MOV", "FOR", "EXC"}
 
 
