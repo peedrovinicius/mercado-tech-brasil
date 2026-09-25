@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
-import shutil
 
 from src.ingestion.archive import extract_7z
 from src.ingestion.manifest import build_manifest, write_manifest
