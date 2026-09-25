@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
