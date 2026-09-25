@@ -166,20 +166,23 @@ mercado-tech-brasil/
 
 ## Status
 
-**Fase 1 — Data foundation**
+**v0.6 — fundação técnica publicada**
 
-- [x] arquitetura definida;
-- [x] contrato de dados inicial;
-- [x] recorte CBO versionado;
-- [x] manifesto de fontes;
-- [x] schema analítico inicial;
-- [ ] ingerir primeiro microdado real;
-- [ ] validar layout;
-- [ ] criar Silver;
-- [ ] produzir primeiros indicadores Gold;
-- [ ] carregar PostgreSQL;
-- [ ] publicar endpoints;
-- [ ] construir dashboard.
+- [x] arquitetura Bronze / Silver / Gold;
+- [x] contrato de dados e recorte CBO versionado;
+- [x] ingestão FTP + ingestão local auditável;
+- [x] SHA-256 e proveniência;
+- [x] validações e registros rejeitados;
+- [x] transformação Silver e agregações Gold implementadas;
+- [x] API FastAPI versionada com Swagger;
+- [x] frontend React + TypeScript integrado à API;
+- [x] Docker Compose para PostgreSQL + API + frontend;
+- [x] testes automatizados;
+- [ ] processar a primeira competência oficial real;
+- [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
+- [ ] carregar os agregados validados no PostgreSQL;
+- [ ] validar build completo do frontend;
+- [ ] publicar a aplicação em ambiente acessível.
 
 ## Princípios
 
