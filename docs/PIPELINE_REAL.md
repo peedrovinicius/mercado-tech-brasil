@@ -98,3 +98,34 @@ python -m src.cli extract 202607
 python -m src.cli transform 202607
 python -m src.cli gold 202607
 ```
+
+
+## 9. Gate de publicação
+
+Depois de gerar Silver e Gold, o projeto executa um gate de liberação:
+
+```bash
+python -m src.cli validate-release 202607
+```
+
+O gate verifica:
+
+- presença dos artefatos esperados;
+- manifesto MOV e SHA-256;
+- coerência da competência;
+- contagens do relatório de qualidade;
+- taxa mínima de registros válidos;
+- identidade `admissões - desligamentos = saldo`;
+- integridade da referência oficial cadastrada;
+- revisão metodológica manual vinculada ao SHA-256 atual.
+
+O mês permanece bloqueado até a revisão explícita:
+
+```bash
+python -m src.cli approve-release 202607 \
+  --reviewer "Nome do revisor" \
+  --notes "Layout, rejeições e metodologia revisados." \
+  --acknowledge-methodology-reviewed
+```
+
+Se o arquivo MOV for substituído, o SHA-256 muda e a aprovação anterior deixa de ser válida automaticamente.
