@@ -1,0 +1,37 @@
+[project]
+name = "mercado-tech-brasil"
+version = "0.6.0"
+description = "Produto de dados sobre o mercado formal de trabalho em tecnologia no Brasil."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.116,<1",
+  "uvicorn[standard]>=0.35,<1",
+  "polars>=1.30,<2",
+  "duckdb>=1.3,<2",
+  "pyarrow>=20,<22",
+  "pandas>=2.2,<3",
+  "pandera>=0.24,<1",
+  "sqlalchemy>=2.0,<3",
+  "psycopg[binary]>=3.2,<4",
+  "alembic>=1.16,<2",
+  "pydantic>=2.11,<3",
+  "python-dotenv>=1.1,<2",
+  "pyyaml>=6,<7",
+  "py7zr>=0.22,<1"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4,<9",
+  "ruff>=0.12,<1",
+  "mypy>=1.16,<2",
+  "httpx>=0.28,<1"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

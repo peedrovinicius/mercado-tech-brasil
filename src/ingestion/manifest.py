@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from hashlib import sha256
+from pathlib import Path
+import json
+
+
+@dataclass(frozen=True)
+class FileManifest:
+    source: str
+    competence: str
+    original_name: str
+    size_bytes: int
+    sha256: str
+    ingested_at_utc: str
+
+
+def build_manifest(path: Path, source: str, competence: str) -> FileManifest:
+    digest = sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    return FileManifest(
+        source=source,
+        competence=competence,
+        original_name=path.name,
+        size_bytes=path.stat().st_size,
+        sha256=digest.hexdigest(),
+        ingested_at_utc=datetime.now(timezone.utc).isoformat(),
+    )
+
+
+def write_manifest(manifest: FileManifest, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        json.dumps(asdict(manifest), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )

@@ -1,0 +1,12 @@
+{
+  "202607": {
+    "source": "Ministério do Trabalho e Emprego — Novo Caged, julho de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/agosto/mercado-formal-celetista-gera-58-568-empregos-em-julho-e-acumula-972-203-postos-no-ano/",
+    "published_at": "2026-08-28",
+    "reference_kind": "published_adjusted",
+    "admissoes": 2262888,
+    "desligamentos": 2204320,
+    "saldo": 58568,
+    "note": "Totais oficiais publicados com ajustes. Não devem ser usados como gate de MOV isolado até que a composição MOV/FOR/EXC esteja validada."
+  }
+}

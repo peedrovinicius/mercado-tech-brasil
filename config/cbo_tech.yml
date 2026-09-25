@@ -1,0 +1,10 @@
+version: 1
+name: recorte_tech_inicial
+families:
+  "2123": "Administradores de tecnologia da informação"
+  "2124": "Analistas de tecnologia da informação"
+  "3171": "Técnicos de desenvolvimento de sistemas e aplicações"
+  "3172": "Técnicos em operação e monitoração de computadores"
+notes:
+  - "O recorte é explícito e versionado."
+  - "Ampliações devem ser justificadas e testadas."

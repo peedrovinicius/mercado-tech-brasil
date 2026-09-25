@@ -1,0 +1,17 @@
+{
+  "novo_caged": {
+    "owner": "Ministério do Trabalho e Emprego",
+    "purpose": "movimentações mensais do emprego formal",
+    "official_page": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged"
+  },
+  "cbo": {
+    "owner": "Ministério do Trabalho e Emprego",
+    "purpose": "classificação oficial de ocupações",
+    "official_page": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/downloads"
+  },
+  "ibge": {
+    "owner": "Instituto Brasileiro de Geografia e Estatística",
+    "purpose": "território, população e indicadores complementares",
+    "official_page": "https://servicodados.ibge.gov.br/api/docs/"
+  }
+}
