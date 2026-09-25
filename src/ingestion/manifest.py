@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
-import json
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ def build_manifest(path: Path, source: str, competence: str) -> FileManifest:
         original_name=path.name,
         size_bytes=path.stat().st_size,
         sha256=digest.hexdigest(),
-        ingested_at_utc=datetime.now(timezone.utc).isoformat(),
+        ingested_at_utc=datetime.now(UTC).isoformat(),
     )
 
 
