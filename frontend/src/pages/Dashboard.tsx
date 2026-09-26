@@ -7,11 +7,18 @@ import { EmptyState } from '../components/EmptyState'
 import { MethodologyPanel } from '../components/MethodologyPanel'
 import { OccupationChart, UfChart } from '../components/Charts'
 import { ProvenanceCard } from '../components/ProvenanceCard'
+import { ReferenceContext } from '../components/ReferenceContext'
+import { PipelineVisual } from '../components/PipelineVisual'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
 
   const readiness = useQuery({ queryKey: ['readiness'], queryFn: api.readiness })
+  const officialReference = useQuery({
+    queryKey: ['official-reference-202607'],
+    queryFn: api.officialReferenceJuly2026,
+    retry: false,
+  })
   const overview = useQuery({
     queryKey: ['overview'],
     queryFn: api.overview,
@@ -45,6 +52,7 @@ export function Dashboard() {
 
   const isLoading = readiness.isLoading || (readiness.data?.data_loaded && overview.isLoading)
   const noData = readiness.isSuccess && readiness.data.data_loaded === false
+  const hasTechData = overview.isSuccess
 
   return (
     <main>
@@ -57,6 +65,7 @@ export function Dashboard() {
           </span>
         </a>
         <nav className="topbar__actions">
+          <a href="#contexto">Contexto</a>
           <a href="#analise">Análise</a>
           <a href="#qualidade">Qualidade</a>
           <button className="button button--secondary" onClick={() => setMethodologyOpen(true)}>
@@ -65,21 +74,53 @@ export function Dashboard() {
         </nav>
       </header>
 
-      <section className="hero" id="top">
+      <section className="hero hero--visual" id="top">
         <div className="hero__copy">
-          <p className="eyebrow">Open data · Brasil</p>
+          <div className="hero__badges">
+            <span className="status-badge status-badge--dark">Open data</span>
+            <span className="status-badge">Brasil</span>
+            <span className="status-badge">CBO v2</span>
+          </div>
           <h1>O mercado formal de tecnologia, explicado com dados verificáveis.</h1>
           <p>
             Uma aplicação de dados que transforma microdados públicos do Novo CAGED em indicadores
             auditáveis de contratação, desligamento e remuneração em ocupações de tecnologia.
           </p>
+          <div className="hero__cta-row">
+            <a className="button" href="#contexto">Explorar dados</a>
+            <button className="button button--ghost" onClick={() => setMethodologyOpen(true)}>
+              Ver metodologia
+            </button>
+          </div>
         </div>
-        <div className="hero__meta">
-          <div><span>Fonte primária</span><strong>Novo CAGED / MTE</strong></div>
-          <div><span>Atualização</span><strong>{overview.data ? formatCompetence(overview.data.competence) : 'Aguardando pipeline'}</strong></div>
-          <div><span>Rastreabilidade</span><strong>Bronze → Silver → Gold</strong></div>
+
+        <div className="hero__visual-card" aria-label="Fluxo de dados do produto">
+          <div className="hero__visual-head">
+            <span>Pipeline auditável</span>
+            <span className={hasTechData ? 'live-dot live-dot--on' : 'live-dot'} />
+          </div>
+          <div className="hero__pipeline">
+            <div><span>01</span><strong>Fonte oficial</strong><small>MTE / CBO</small></div>
+            <i>→</i>
+            <div><span>02</span><strong>Bronze</strong><small>SHA-256</small></div>
+            <i>→</i>
+            <div><span>03</span><strong>Silver</strong><small>qualidade</small></div>
+            <i>→</i>
+            <div><span>04</span><strong>Gold</strong><small>indicadores</small></div>
+          </div>
+          <div className="hero__meta hero__meta--card">
+            <div><span>Fonte primária</span><strong>Novo CAGED / MTE</strong></div>
+            <div><span>Competência tech</span><strong>{overview.data ? formatCompetence(overview.data.competence) : 'Aguardando microdados'}</strong></div>
+            <div><span>Serving</span><strong>FastAPI + PostgreSQL</strong></div>
+          </div>
         </div>
       </section>
+
+      <PipelineVisual hasTechData={hasTechData} />
+
+      {officialReference.data ? (
+        <ReferenceContext data={officialReference.data} />
+      ) : null}
 
       {isLoading ? (
         <section className="loading-grid" aria-label="Carregando indicadores">
@@ -89,13 +130,23 @@ export function Dashboard() {
 
       {noData ? (
         <EmptyState
-          title="A interface está pronta; os dados ainda não foram publicados."
-          message="O primeiro conjunto oficial precisa passar pelo pipeline e pelos gates de qualidade antes de aparecer aqui."
+          title="O dashboard tech está pronto para receber o primeiro mês oficial."
+          message="O contexto oficial do mercado formal já está visível acima. Os indicadores específicos de tecnologia só serão liberados quando o CAGEDMOV passar pelo pipeline, reconciliação e gate de publicação."
         />
       ) : null}
 
       {overview.data ? (
         <>
+          <section className="section-heading" id="analise">
+            <div>
+              <p className="eyebrow">Recorte de tecnologia</p>
+              <h2>Indicadores do mercado tech formal</h2>
+            </div>
+            <span className="section-heading__meta">
+              {formatCompetence(overview.data.competence)} · CBO v2
+            </span>
+          </section>
+
           <section className="metric-grid" aria-label="Indicadores principais">
             <MetricCard label="Admissões" value={formatNumber(overview.data.admissions)} detail="movimentações de entrada" />
             <MetricCard label="Desligamentos" value={formatNumber(overview.data.dismissals)} detail="movimentações de saída" />
@@ -108,14 +159,14 @@ export function Dashboard() {
             <MetricCard
               label="Salário mediano de admissão"
               value={formatCurrency(overview.data.salary_median_admissions)}
-              detail="somente registros válidos"
+              detail="metodologia salarial MTE"
             />
           </section>
 
-          <section className="analysis-grid" id="analise">
+          <section className="analysis-grid">
             <article className="panel panel--wide">
               <div className="panel__heading">
-                <div><p className="eyebrow">Distribuição territorial</p><h2>Admissões por UF</h2></div>
+                <div><p className="eyebrow">Distribuição territorial</p><h2>Admissões tech por UF</h2></div>
                 <span>Top 10</span>
               </div>
               {byUf.data ? <UfChart items={byUf.data.items} /> : <div className="chart-placeholder" />}
