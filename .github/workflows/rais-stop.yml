@@ -14,4 +14,4 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
-      - run: echo "cancel previous RAIS full audit"
+      - run: echo "Cancelling previous RAIS full audit to avoid wasted runner minutes."
