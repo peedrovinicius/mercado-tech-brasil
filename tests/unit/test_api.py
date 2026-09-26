@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
 
+import src.api.routers.analytics as analytics_router
+import src.api.routers.overview as overview_router
 from src.api.main import app
 
 client = TestClient(app)
@@ -22,19 +24,53 @@ def test_sources_are_exposed():
     assert "ibge" in payload
 
 
-def test_overview_refuses_to_invent_data():
+def test_published_overview_is_served():
+    response = client.get("/api/v1/indicators/overview")
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["competence"] == "202607"
+    assert payload["admissions"] == 19253
+    assert payload["dismissals"] == 18347
+    assert payload["balance"] == 906
+    assert payload["admissions"] - payload["dismissals"] == payload["balance"]
+
+
+def test_published_analytics_are_served():
+    by_uf = client.get("/api/v1/analytics/by-uf")
+    assert by_uf.status_code == 200
+    assert by_uf.json()["competence"] == "202607"
+    assert len(by_uf.json()["items"]) == 27
+
+    by_occupation = client.get("/api/v1/analytics/by-occupation")
+    assert by_occupation.status_code == 200
+    assert by_occupation.json()["competence"] == "202607"
+    assert by_occupation.json()["items"]
+
+
+def test_overview_refuses_without_published_release(monkeypatch):
+    monkeypatch.setattr(
+        overview_router,
+        "latest_published_competence",
+        lambda _gold_path: None,
+    )
+
     response = client.get("/api/v1/indicators/overview")
     assert response.status_code == 503
     assert "não publica números" in response.json()["detail"]
 
 
-def test_by_uf_refuses_to_invent_data():
-    response = client.get("/api/v1/analytics/by-uf")
-    assert response.status_code == 503
-    assert "pipeline oficial" in response.json()["detail"]
+def test_analytics_refuse_without_published_release(monkeypatch):
+    monkeypatch.setattr(
+        analytics_router,
+        "latest_published_competence",
+        lambda _gold_path: None,
+    )
 
+    by_uf = client.get("/api/v1/analytics/by-uf")
+    assert by_uf.status_code == 503
+    assert "processado, validado e aprovado" in by_uf.json()["detail"]
 
-def test_by_occupation_refuses_to_invent_data():
-    response = client.get("/api/v1/analytics/by-occupation")
-    assert response.status_code == 503
-    assert "pipeline oficial" in response.json()["detail"]
+    by_occupation = client.get("/api/v1/analytics/by-occupation")
+    assert by_occupation.status_code == 503
+    assert "processado, validado e aprovado" in by_occupation.json()["detail"]
