@@ -111,6 +111,35 @@ def _fixture(tmp_path: Path, *, approved: bool) -> tuple[Path, Path, Path, Path]
             ],
         },
     )
+    _write_json(
+        gold / f"by-municipality-{YEAR_MONTH}.json",
+        {
+            "competence": YEAR_MONTH,
+            "source": "Novo CAGED / MTE",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 2,
+                    "dismissals": 1,
+                    "balance": 1,
+                    "salary_median_admissions": 4500,
+                },
+                {
+                    "municipio_codigo_caged": "355030",
+                    "municipio_codigo_ibge": "3550308",
+                    "municipio_nome": "São Paulo",
+                    "uf": "SP",
+                    "admissions": 1,
+                    "dismissals": 0,
+                    "balance": 1,
+                    "salary_median_admissions": 6000,
+                },
+            ],
+        },
+    )
     (gold / f"market-{YEAR_MONTH}.parquet").write_bytes(b"placeholder")
     _write_json(
         gold / f"audit-national-mov-{YEAR_MONTH}.json",
