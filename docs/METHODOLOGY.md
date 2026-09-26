@@ -46,9 +46,11 @@ A correção segue:
 
 A competência base é registrada junto ao dado. Se o cache oficial do IPCA não estiver disponível para a competência, a métrica nominal continua válida e a métrica real permanece ausente.
 
-## Referência oficial de julho/2026
+## Referências oficiais
 
-O projeto versiona uma referência externa extraída do Sumário Executivo oficial do MTE para testes de reconciliação.
+O projeto versiona os totais nacionais publicados pelo MTE para cada competência da série. O MOV de cada mês precisa reconciliar admissões, desligamentos e saldo antes da aprovação.
+
+A referência detalhada de julho de 2026 também preserva dados por região, UF e remuneração para testes adicionais de fechamento.
 
 Para julho de 2026:
 
@@ -75,11 +77,13 @@ O microdado mantém o código municipal usado pelo CAGED. A camada de referênci
 
 O mapeamento usa os seis primeiros dígitos do código IBGE como chave de correspondência do código municipal presente no CAGED.
 
+Quando o CAGED informa o código residual `999999`, o produto registra o município como **Não identificado**, com UF `NI` e sem fabricar um código IBGE. O gate de publicação valida essa exceção explicitamente e exige identificação completa para os demais municípios.
+
 ## Série histórica
 
 Cada overview Gold é incorporado em `trend.json`. No backend PostgreSQL, a série é construída diretamente a partir das competências publicadas em `dataset_release`.
 
-A série contém apenas competências que passaram pelas mesmas regras de transformação e publicação aplicáveis ao período.
+A série contém apenas competências que passaram pelas mesmas regras de transformação e publicação aplicáveis ao período. De janeiro a julho de 2026, FOR e EXC são incorporados às competências de origem antes da reconstrução dos indicadores mensais.
 
 ## Escopo
 
