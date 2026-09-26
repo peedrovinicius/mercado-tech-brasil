@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.29.0
+
+- transformação Silver anual da RAIS implementada após as travas de schema e valores;
+- leitura ocorre em streaming para evitar carregar os microdados anuais completos em memória;
+- escrita Parquet usa lotes configuráveis e compressão Zstandard;
+- somente vínculos ativos em 31/12 entram no estoque anual;
+- recorte CBO tech v2 é aplicado após validação do registro;
+- vínculos inativos são contabilizados, mas não entram no Silver tech;
+- registros inválidos são preservados em Parquet de rejeições com motivo;
+- relatório anual de qualidade registra lidas, válidas, rejeitadas, ativas, inativas e tech;
+- CLI ganha comando rais-transform;
+- Gold e publicação continuam bloqueados até reconciliação anual e gate específico;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.28.0
 
 - semântica oficial de situação do vínculo em 31/12 registrada em contrato versionado;

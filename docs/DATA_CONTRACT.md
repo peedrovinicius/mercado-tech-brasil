@@ -58,3 +58,24 @@ Os nomes físicos podem mudar entre layouts. A resolução é feita por aliases 
 O relatório estrutural não autoriza o Silver. Antes da transformação, `rais-validate-layout` exige uma correspondência única para cada conceito obrigatório em todos os layouts observados.
 
 O estoque anual será calculado somente sobre vínculos classificados como ativos em 31/12. O código CBO completo será preservado e a família tech será derivada pelos quatro primeiros dígitos, usando o mesmo recorte versionado do projeto.
+
+
+### Silver RAIS anual
+
+Arquivo esperado:
+
+`data/silver/rais_tech_<ano>.parquet`
+
+| Campo | Tipo lógico | Regra |
+|---|---|---|
+| year | inteiro | ano-base validado |
+| cbo_codigo | texto | somente dígitos, mínimo 4 posições |
+| cbo_familia | texto | quatro primeiros dígitos da CBO |
+| municipio_codigo | texto | código observado no microdado, sem caracteres não numéricos |
+| uf | texto | sigla de duas letras |
+| active_3112 | booleano | sempre verdadeiro no Silver tech |
+| source_file | texto | arquivo RAIS de origem |
+
+O Silver representa apenas vínculos ativos em 31/12 pertencentes ao recorte ocupacional tech. Vínculos inativos são contabilizados na qualidade, mas não entram no Parquet tech.
+
+Registros estruturalmente inválidos são gravados em `rais_rejected_<ano>.parquet`. A geração do Silver não equivale a publicação.

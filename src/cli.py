@@ -33,6 +33,7 @@ from src.transform.caged import transform_mov_file
 from src.transform.rais_profile import profile_rais_values
 from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
+from src.transform.rais_silver import transform_rais_year
 from src.transform.rais_value_semantics import validate_value_semantics
 from src.validation.publication_gate import (
     approve_competence,
@@ -470,6 +471,51 @@ def command_rais_validate_values(year: int) -> None:
         raise SystemExit(2)
 
 
+def command_rais_transform(
+    year: int,
+    *,
+    batch_size: int,
+) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    extracted_dir = base_dir / "extracted"
+    layout_report = base_dir / "layout-report.json"
+    semantic_report = base_dir / "semantic-layout-report.json"
+    value_report = base_dir / "value-semantics-report.json"
+
+    required_reports = (
+        layout_report,
+        semantic_report,
+        value_report,
+    )
+    missing = [path for path in required_reports if not path.exists()]
+    if missing:
+        raise SystemExit(
+            "RAIS Silver bloqueada. Relatórios ausentes: "
+            + ", ".join(str(path) for path in missing)
+        )
+
+    result = transform_rais_year(
+        year=year,
+        extracted_dir=extracted_dir,
+        layout_report_path=layout_report,
+        semantic_report_path=semantic_report,
+        value_semantics_report_path=value_report,
+        cbo_config_path=settings.cbo_config_path,
+        silver_dir=settings.silver_path,
+        batch_size=batch_size,
+    )
+    print(
+        f"rais silver: lidas={result.rows_read:,} "
+        f"válidas={result.rows_valid:,} "
+        f"rejeitadas={result.rows_rejected:,} "
+        f"ativas={result.rows_active:,} "
+        f"tech={result.rows_tech:,}"
+    )
+    print(f"rais silver parquet: {result.silver_path}")
+    print(f"rais quality: {result.quality_path}")
+    print("rais gold: BLOCKED until annual reconciliation and gate")
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -655,6 +701,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Ano-base da RAIS.",
     )
 
+    rais_transform = sub.add_parser(
+        "rais-transform",
+        help="Gera Silver anual da RAIS após todas as validações semânticas.",
+    )
+    rais_transform.add_argument("year", type=int, help="Ano-base da RAIS.")
+    rais_transform.add_argument(
+        "--batch-size",
+        type=int,
+        default=50000,
+        help="Linhas por lote de escrita Parquet, entre 1000 e 500000.",
+    )
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -751,6 +809,13 @@ def main() -> None:
 
     if args.command == "rais-validate-values":
         command_rais_validate_values(args.year)
+        return
+
+    if args.command == "rais-transform":
+        command_rais_transform(
+            args.year,
+            batch_size=args.batch_size,
+        )
         return
 
     if args.command == "sync-municipalities":

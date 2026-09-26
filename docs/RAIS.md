@@ -194,6 +194,40 @@ Quando a quantidade de valores distintos de um conceito é pequena, `value-profi
 
 `silver_transform_ready=true` libera apenas a construção técnica do Silver. A publicação continua bloqueada.
 
+## Transformação Silver
+
+Quando layout e valores estiverem aprovados, a transformação anual pode ser executada:
+
+```bash
+python -m src.cli rais-transform 2025
+```
+
+A transformação lê os arquivos extraídos em streaming e escreve Parquet em lotes, evitando carregar a RAIS anual inteira em memória.
+
+São produzidos:
+
+```text
+data/silver/rais_tech_2025.parquet
+data/silver/rais_rejected_2025.parquet
+data/silver/rais_quality_2025.json
+```
+
+O Silver tech contém somente:
+
+- ano-base;
+- CBO completo;
+- família CBO;
+- código municipal observado;
+- UF;
+- confirmação de vínculo ativo em 31/12;
+- arquivo de origem.
+
+Somente vínculos ativos em 31/12 entram no estoque. Depois disso, o recorte CBO tech v2 é aplicado pelas famílias 2122, 2123, 2124, 3171 e 3172.
+
+Registros com ano divergente, situação do vínculo desconhecida, CBO inválida, município ausente ou UF inválida são preservados no Parquet de rejeições com a razão correspondente.
+
+O relatório de qualidade registra totais lidos, válidos, rejeitados, ativos, inativos e tech. Mesmo com Silver gerada, `gold_ready` e `publication_ready` permanecem falsos.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.
