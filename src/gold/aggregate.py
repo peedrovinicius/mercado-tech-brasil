@@ -368,6 +368,9 @@ def build_gold(
         ),
         "salary_real_base_competence": real_base_competence,
         "salary_eligible_admissions": salary.get("count", 0),
+        "salary_excluded_admissions": (
+            admissions - int(salary.get("count", 0) or 0)
+        ),
         "salary_methodology": {
             "minimum_wage_brl": salary_methodology.minimum_wage_brl,
             "minimum_salary_brl": salary_methodology.minimum_salary_brl,
