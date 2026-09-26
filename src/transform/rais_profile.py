@@ -90,6 +90,25 @@ def _value_profile(counter: Counter[str], blanks: int) -> dict[str, object]:
     }
 
 
+def _context_year_profile(year: int, rows: int) -> dict[str, object]:
+    value = str(year)
+    return {
+        "derived": True,
+        "strategy": "annual_context",
+        "non_blank": rows,
+        "blank": 0,
+        "distinct_in_sample": 1 if rows else 0,
+        "digits_only": rows,
+        "lengths": {str(len(value)): rows} if rows else {},
+        "observed_values": [value] if rows else [],
+        "top_values": (
+            [{"value": value, "count": rows}]
+            if rows
+            else []
+        ),
+    }
+
+
 def profile_rais_values(
     extracted_dir: Path,
     layout_report_path: Path,
@@ -109,6 +128,10 @@ def profile_rais_values(
             "O perfil de valores exige validação semântica com silver_ready=true."
         )
 
+    year = int(semantics.get("year") or 0)
+    if year < 1985 or year > 2100:
+        raise ValueError("Ano contextual RAIS inválido.")
+
     layout_files = {
         str(item.get("file")): item
         for item in layout.get("files", [])
@@ -122,16 +145,17 @@ def profile_rais_values(
     if not semantic_files:
         raise ValueError("Relatório semântico não possui arquivos validados.")
 
-    concepts = ("year", "cbo_occupation", "municipality", "uf", "active_3112")
+    physical_concepts = ("cbo_occupation", "municipality", "active_3112")
     aggregate_counters = {
         concept: Counter()
-        for concept in concepts
+        for concept in physical_concepts
     }
     aggregate_blanks = {
         concept: 0
-        for concept in concepts
+        for concept in physical_concepts
     }
     file_profiles: list[dict[str, object]] = []
+    total_rows_profiled = 0
 
     for semantic_item in semantic_files:
         filename = str(semantic_item.get("file") or "")
@@ -158,15 +182,15 @@ def profile_rais_values(
 
         resolved = {
             concept: _concept_column(semantic_item, layout_item, concept)
-            for concept in concepts
+            for concept in physical_concepts
         }
         counters = {
             concept: Counter()
-            for concept in concepts
+            for concept in physical_concepts
         }
         blanks = {
             concept: 0
-            for concept in concepts
+            for concept in physical_concepts
         }
 
         rows_profiled = 0
@@ -194,48 +218,63 @@ def profile_rais_values(
                     counters[concept][value] += 1
                     aggregate_counters[concept][value] += 1
 
+        total_rows_profiled += rows_profiled
+        concepts = {
+            concept: {
+                "column_normalized": resolved[concept][0],
+                "column_original": resolved[concept][1],
+                **_value_profile(
+                    counters[concept],
+                    blanks[concept],
+                ),
+            }
+            for concept in physical_concepts
+        }
+        concepts["year"] = _context_year_profile(year, rows_profiled)
+
         file_profiles.append(
             {
                 "file": filename,
                 "rows_profiled": rows_profiled,
                 "max_rows_per_file": max_rows_per_file,
-                "concepts": {
-                    concept: {
-                        "column_normalized": resolved[concept][0],
-                        "column_original": resolved[concept][1],
-                        **_value_profile(
-                            counters[concept],
-                            blanks[concept],
-                        ),
-                    }
-                    for concept in concepts
-                },
+                "concepts": concepts,
             }
         )
 
+    aggregate = {
+        concept: _value_profile(
+            aggregate_counters[concept],
+            aggregate_blanks[concept],
+        )
+        for concept in physical_concepts
+    }
+    aggregate["year"] = _context_year_profile(year, total_rows_profiled)
+
     payload: dict[str, object] = {
         "source": "RAIS / Ministério do Trabalho e Emprego",
-        "year": semantics.get("year"),
+        "year": year,
         "contract_version": semantics.get("contract_version"),
         "purpose": "perfil de valores antes da transformação Silver",
         "files_profiled": len(file_profiles),
         "max_rows_per_file": max_rows_per_file,
-        "concepts_profiled": list(concepts),
-        "files": file_profiles,
-        "aggregate": {
-            concept: _value_profile(
-                aggregate_counters[concept],
-                aggregate_blanks[concept],
-            )
-            for concept in concepts
+        "concepts_profiled": [
+            "year",
+            *physical_concepts,
+        ],
+        "derived_concepts": {
+            "year": "annual_context",
+            "uf": "municipality_code",
         },
+        "files": file_profiles,
+        "aggregate": aggregate,
         "profile_complete": True,
         "silver_transform_ready": False,
         "publication_ready": False,
         "note": (
             "O perfil descreve valores observados em amostra controlada. "
-            "Ele não define automaticamente quais códigos representam vínculo ativo "
-            "nem autoriza transformação ou publicação."
+            "Ano é derivado do contexto anual e UF será derivada do município. "
+            "O perfil não define automaticamente quais códigos representam vínculo "
+            "ativo nem autoriza transformação ou publicação."
         ),
     }
 

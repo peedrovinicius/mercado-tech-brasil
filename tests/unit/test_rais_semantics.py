@@ -4,22 +4,23 @@ from pathlib import Path
 from src.transform.rais_semantics import validate_layout_semantics
 
 
-CONTRACT = """version: 1
+CONTRACT = """version: 2
 dataset: rais_vinculos
 required:
-  year:
-    aliases: [ano, ano_base]
   cbo_occupation:
-    aliases: [cbo_ocupacao_2002, cbo]
+    aliases: [cbo_2002_ocupacao_codigo, cbo]
   municipality:
-    aliases: [municipio, mun_trab]
-  uf:
-    aliases: [uf, uf_trabalho]
+    aliases: [municipio_codigo, municipio]
   active_3112:
-    aliases: [vinculo_ativo_31_12, emp_em_31_12]
+    aliases: [ind_vinculo_ativo_31_12_codigo, vinculo_ativo_31_12]
+derived:
+  year:
+    strategy: annual_context
+  uf:
+    strategy: municipality_code
 optional:
   remuneration:
-    aliases: [vl_remun_dezembro_nom]
+    aliases: [vl_rem_dezembro_nom]
 """
 
 
@@ -51,12 +52,10 @@ def test_semantic_contract_marks_silver_ready_when_required_concepts_match(
     _write_layout(
         layout,
         [
-            "ano",
-            "cbo_ocupacao_2002",
-            "municipio",
-            "uf",
-            "vinculo_ativo_31_12",
-            "vl_remun_dezembro_nom",
+            "cbo_2002_ocupacao_codigo",
+            "municipio_codigo",
+            "ind_vinculo_ativo_31_12_codigo",
+            "vl_rem_dezembro_nom",
         ],
     )
     contract.write_text(CONTRACT, encoding="utf-8")
@@ -67,6 +66,8 @@ def test_semantic_contract_marks_silver_ready_when_required_concepts_match(
     assert payload["silver_ready"] is True
     assert payload["publication_ready"] is False
     assert payload["files"][0]["missing_required"] == []
+    assert payload["derived"]["year"]["strategy"] == "annual_context"
+    assert payload["derived"]["uf"]["strategy"] == "municipality_code"
 
 
 def test_semantic_contract_blocks_missing_required_concept(tmp_path: Path):
@@ -77,10 +78,8 @@ def test_semantic_contract_blocks_missing_required_concept(tmp_path: Path):
     _write_layout(
         layout,
         [
-            "ano",
-            "cbo_ocupacao_2002",
-            "municipio",
-            "uf",
+            "cbo_2002_ocupacao_codigo",
+            "municipio_codigo",
         ],
     )
     contract.write_text(CONTRACT, encoding="utf-8")
@@ -100,12 +99,10 @@ def test_semantic_contract_blocks_ambiguous_aliases(tmp_path: Path):
     _write_layout(
         layout,
         [
-            "ano",
-            "cbo_ocupacao_2002",
+            "cbo_2002_ocupacao_codigo",
             "cbo",
-            "municipio",
-            "uf",
-            "vinculo_ativo_31_12",
+            "municipio_codigo",
+            "ind_vinculo_ativo_31_12_codigo",
         ],
     )
     contract.write_text(CONTRACT, encoding="utf-8")

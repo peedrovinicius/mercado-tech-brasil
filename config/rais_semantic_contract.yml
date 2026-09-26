@@ -1,4 +1,4 @@
-version: 1
+version: 2
 dataset: rais_vinculos
 year_reference: 2025
 sources:
@@ -7,48 +7,52 @@ sources:
   cbo: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/informacoes-gerais"
 
 required:
-  year:
-    description: "Ano-base da RAIS"
-    aliases:
-      - ano
-      - ano_base
-      - ano_rais
-
   cbo_occupation:
     description: "Código de ocupação CBO 2002"
     aliases:
+      - cbo_2002_ocupacao_codigo
       - cbo_ocupacao_2002
       - cbo_2002_ocupacao
       - cbo_ocupacao
       - cbo
 
   municipality:
-    description: "Município do vínculo ou do trabalho"
+    description: "Município do estabelecimento associado ao vínculo"
     aliases:
+      - municipio_codigo
       - municipio
-      - municipio_trabalho
-      - mun_trab
       - municipio_estabelecimento
-
-  uf:
-    description: "Unidade da Federação do vínculo ou do trabalho"
-    aliases:
-      - uf
-      - uf_trabalho
-      - uf_estabelecimento
 
   active_3112:
     description: "Indicador de vínculo ativo em 31/12"
     aliases:
+      - ind_vinculo_ativo_31_12_codigo
       - vinculo_ativo_31_12
       - vinculo_ativo_3112
       - emp_em_31_12
       - emprego_em_31_12
 
+derived:
+  year:
+    description: "Ano-base derivado do diretório anual e do parâmetro do pipeline"
+    strategy: annual_context
+
+  uf:
+    description: "UF derivada do código municipal oficial"
+    strategy: municipality_code
+
 optional:
+  work_municipality:
+    description: "Município efetivo de trabalho quando informado"
+    aliases:
+      - municipio_trab_codigo
+      - municipio_trabalho
+      - mun_trab
+
   december_remuneration_nominal:
     description: "Remuneração nominal de dezembro"
     aliases:
+      - vl_rem_dezembro_nom
       - vl_remun_dezembro_nom
       - remuneracao_dezembro_nominal
       - remuneracao_dezembro
@@ -56,6 +60,7 @@ optional:
   mean_remuneration_nominal:
     description: "Remuneração média nominal"
     aliases:
+      - vl_rem_media_nom
       - vl_remun_media_nom
       - remuneracao_media_nominal
       - remuneracao_media

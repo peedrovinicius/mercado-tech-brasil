@@ -14,10 +14,13 @@ def load_semantic_contract(path: Path) -> dict[str, Any]:
 
     required = payload.get("required")
     optional = payload.get("optional")
+    derived = payload.get("derived")
     if not isinstance(required, dict) or not required:
         raise ValueError("Contrato RAIS não possui conceitos obrigatórios.")
     if optional is not None and not isinstance(optional, dict):
         raise TypeError("Conceitos opcionais RAIS inválidos.")
+    if derived is not None and not isinstance(derived, dict):
+        raise TypeError("Conceitos derivados RAIS inválidos.")
 
     return payload
 
@@ -62,6 +65,7 @@ def validate_layout_semantics(
 
     required = contract["required"]
     optional = contract.get("optional") or {}
+    derived = contract.get("derived") or {}
     files = layout.get("files") or []
     if not isinstance(files, list) or not files:
         raise ValueError("Relatório de layout RAIS não possui arquivos inspecionados.")
@@ -121,11 +125,13 @@ def validate_layout_semantics(
         "semantic_valid": all_required_valid and bool(file_results),
         "silver_ready": all_required_valid and bool(file_results),
         "publication_ready": False,
+        "derived": derived,
         "files": file_results,
         "note": (
-            "silver_ready confirma somente que os conceitos obrigatórios foram "
-            "mapeados sem ambiguidade. A publicação continua bloqueada até a "
-            "transformação, reconciliação e gate anual."
+            "silver_ready confirma somente que os conceitos físicos obrigatórios "
+            "foram mapeados sem ambiguidade. Ano e UF são derivados pelo pipeline. "
+            "A publicação continua bloqueada até transformação, reconciliação e "
+            "gate anual."
         ),
     }
 
