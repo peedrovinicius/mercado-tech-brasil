@@ -1,405 +1,218 @@
 # Mercado Tech Brasil
 
-Produto de dados open source para analisar o mercado formal de trabalho em tecnologia no Brasil usando fontes públicas oficiais.
+[![CI](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml)
+[![Frontend](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Production](https://img.shields.io/badge/production-live-2ea44f)](https://mercado-tech-brasil.onrender.com)
 
-> Objetivo: transformar microdados públicos em informação auditável sobre contratação, desligamento, remuneração, distribuição geográfica e evolução das ocupações de tecnologia.
+Plataforma open source para análise do mercado formal de trabalho em tecnologia no Brasil a partir de fontes públicas oficiais.
 
-## Por que este projeto existe
+**Produção:** https://mercado-tech-brasil.onrender.com  
+**API:** https://mercado-tech-brasil.onrender.com/docs  
+**Health:** https://mercado-tech-brasil.onrender.com/api/v1/system/health
 
-Muitos dashboards apenas exibem números. O Mercado Tech Brasil é desenhado como um **produto de dados completo**:
+## Visão geral
 
-**fonte oficial → ingestão reproduzível → validação → transformação → banco analítico → API → aplicação web**
+O projeto transforma dados públicos do trabalho formal em uma cadeia auditável de ingestão, validação, transformação, serving e visualização.
 
-Nenhum indicador final é digitado manualmente.
+O desenho prioriza três propriedades:
 
-## Fontes
+- **rastreabilidade** — cada arquivo ingerido recebe manifesto e SHA-256;
+- **reprodutibilidade** — regras de transformação, recorte CBO e metodologia são versionadas;
+- **publicação controlada** — uma competência só pode alimentar o serving após passar pelos checks automáticos e pelo gate metodológico.
 
-### Novo CAGED — MTE
-Fluxos mensais do emprego formal: admissões, desligamentos, salários e características das movimentações.
-
-### CBO — MTE
-Classificação oficial das ocupações usadas no recorte de tecnologia.
-
-### IBGE
-Território, códigos municipais e dados demográficos para indicadores normalizados.
-
-### Expansão planejada
-- RAIS: estoque anual de vínculos e análises estruturais;
-- IPCA/IBGE: salários corrigidos pela inflação;
-- QBQ/MTE: conhecimentos, habilidades e atitudes associados às ocupações.
-
-## Perguntas que a aplicação deverá responder
-
-- Onde o emprego formal em TI está crescendo?
-- Quais ocupações apresentam maior volume de admissões e saldo?
-- Como a remuneração de admissão varia entre regiões e ocupações?
-- Quais municípios concentram mais movimentações de profissionais de TI?
-- Qual a participação de ocupações de TI no mercado formal local?
-- Como os resultados mudam ao longo do tempo?
-- Como salários nominais diferem de salários reais quando ajustados pela inflação?
+A aplicação pública já apresenta o contexto oficial de julho de 2026 publicado pelo MTE. Os indicadores específicos de tecnologia permanecem bloqueados até a primeira competência de microdados passar integralmente pelo pipeline e pelo gate de publicação.
 
 ## Arquitetura
 
-```text
-Fontes oficiais
-     |
-     v
-[ BRONZE ] arquivos originais + metadados + SHA-256
-     |
-     v
-[ SILVER ] dados normalizados e validados em Parquet
-     |
-     v
-[ GOLD ] indicadores analíticos reproduzíveis
-     |
-     +--------------------+
-     |                    |
-     v                    v
- PostgreSQL             DuckDB
- serving/API       validação/análise local
-     |
-     v
- FastAPI / OpenAPI
-     |
-     v
- React + TypeScript
-```
+~~~mermaid
+flowchart LR
+    A["Fontes oficiais<br/>MTE · CBO · IBGE"] --> B["Bronze<br/>arquivo original + SHA-256"]
+    B --> C["Silver<br/>normalização + qualidade"]
+    C --> D["Gold<br/>agregados reproduzíveis"]
+    D --> E["PostgreSQL<br/>serving"]
+    D --> F["DuckDB<br/>validação local"]
+    E --> G["FastAPI<br/>/api/v1 + OpenAPI"]
+    G --> H["React + TypeScript<br/>dashboard"]
+~~~
+
+### Fluxo de publicação
+
+~~~mermaid
+flowchart LR
+    A["Microdado oficial"] --> B["Ingestão"]
+    B --> C["Validação de schema"]
+    C --> D["Rejeições auditáveis"]
+    D --> E["Agregações Gold"]
+    E --> F["Gate automático"]
+    F --> G["Revisão metodológica<br/>vinculada ao SHA-256"]
+    G --> H["PostgreSQL / API"]
+~~~
+
+## Fontes
+
+| Fonte | Uso |
+|---|---|
+| Novo CAGED — MTE | admissões, desligamentos, saldo e remuneração de admissão |
+| CBO — MTE | definição versionada das ocupações de tecnologia |
+| IBGE | base territorial e indicadores normalizados planejados |
+
+A referência oficial de julho de 2026 está versionada em **config/official_reference_202607.json**.
+
+## Recorte de tecnologia
+
+O recorte atual é ocupacional e está versionado em **config/cbo_tech.yml**.
+
+| Família CBO | Denominação |
+|---|---|
+| 2122 | Engenheiros em computação |
+| 2123 | Administradores de tecnologia da informação |
+| 2124 | Analistas de tecnologia da informação |
+| 3171 | Técnicos de desenvolvimento de sistemas e aplicações |
+| 3172 | Técnicos em operação e monitoração de computadores |
+
+A justificativa e as regras de governança do recorte estão em [docs/CBO_SCOPE.md](docs/CBO_SCOPE.md).
 
 ## Stack
 
-**Dados**
-- Python
-- Polars
-- DuckDB
-- Parquet
-- Pandera
-- PostgreSQL
+| Camada | Tecnologias |
+|---|---|
+| Dados | Python, Polars, DuckDB, Parquet, Pandera |
+| Banco | PostgreSQL, SQLAlchemy, Alembic |
+| API | FastAPI, Pydantic, OpenAPI |
+| Frontend | React, TypeScript, Vite, TanStack Query, ECharts |
+| Qualidade | Pytest, Ruff |
+| Infraestrutura | Docker, GitHub Actions, Render |
 
-**Backend**
-- FastAPI
-- SQLAlchemy
-- Alembic
-- Pydantic
-- Pytest
+## Qualidade e governança
 
-**Frontend**
-- React
-- TypeScript
-- Vite
-- TanStack Query
-- ECharts
+O pipeline implementa:
 
-**Infraestrutura**
-- Docker Compose
-- variáveis de ambiente
-- logs estruturados
-- testes automatizados
-- CI leve apenas para lint/testes
-
-## Camadas de dados
-
-### Bronze
-Cópia imutável do arquivo oficial. Cada ingestão registra fonte, competência, data de obtenção, tamanho e SHA-256.
-
-### Silver
-Tipos corrigidos, nomes normalizados, códigos territoriais/CBO tratados e registros inválidos identificados.
-
-### Gold
-Tabelas agregadas usadas diretamente pela API e pelo dashboard.
-
-## Indicadores principais
-
-- admissões;
-- desligamentos;
-- saldo;
-- salário médio e mediano de admissão;
-- salário real de admissão;
-- participação das ocupações de TI nas admissões locais;
-- admissões de TI por 100 mil habitantes;
-- evolução mensal;
-- distribuição por CBO, UF e município;
-- variação mês contra mês e ano contra ano.
-
-## Requisitos de qualidade
-
-Todo indicador publicado deve ter:
-
-1. fonte;
-2. competência/período;
-3. fórmula;
-4. regra de filtragem;
-5. teste automatizado;
-6. data de atualização.
-
-## Estrutura
-
-```text
-mercado-tech-brasil/
-├── config/
-│   ├── cbo_tech.yml
-│   └── sources.json
-├── data/
-│   ├── bronze/
-│   ├── silver/
-│   └── gold/
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── DATA_CONTRACT.md
-│   ├── METHODOLOGY.md
-│   └── ROADMAP.md
-├── frontend/
-├── sql/
-│   └── schema.sql
-├── src/
-│   ├── api/
-│   ├── core/
-│   ├── ingestion/
-│   ├── quality/
-│   └── transform/
-├── tests/
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-├── pyproject.toml
-└── README.md
-```
-
-## Status
-
-**v0.12 — deploy público preparado**
-
-- [x] arquitetura Bronze / Silver / Gold;
-- [x] contrato de dados e recorte CBO versionado;
-- [x] ingestão FTP + ingestão local auditável;
-- [x] SHA-256 e proveniência;
-- [x] validações e registros rejeitados;
-- [x] transformação Silver e agregações Gold implementadas;
-- [x] API FastAPI versionada com Swagger;
-- [x] frontend React + TypeScript integrado à API;
-- [x] Docker Compose para PostgreSQL + API + frontend;
-- [x] testes automatizados;
-- [x] referência oficial de julho/2026 por Brasil, região e UF;
-- [x] metodologia salarial do MTE reproduzida e testada;
-- [x] recorte CBO v2 revisado contra a classificação oficial do MTE;
-- [x] contexto visual oficial Brasil/Ceará e gráfico regional;
-- [x] pipeline visual e estado de espera sem dados fictícios;
-- [x] container único FastAPI + React para produção;
-- [x] blueprint Render com health check;
-- [ ] processar a primeira competência oficial real;
-- [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
-- [x] carga transacional e idempotente Gold → PostgreSQL implementada;
-- [x] API pode servir indicadores diretamente do PostgreSQL;
-- [x] migrations Alembic para a camada de serving;
-- [ ] carregar a primeira competência oficial aprovada no PostgreSQL;
-- [x] build completo do frontend validado no CI visual;
-- [ ] criar o serviço público a partir do blueprint `render.yaml`;
-
-## Princípios
-
-- dados reais, nunca números fictícios;
-- fonte oficial visível na interface;
-- metodologia reproduzível;
-- código simples antes de tecnologia desnecessária;
-- sem scraping frágil quando existe fonte pública oficial;
-- sem subir microdados brutos grandes para o Git;
-- sem workflow caro de CI para processar bases inteiras.
-
-
-## Avaliação técnica em 5 minutos
-
-Para quem está avaliando o repositório:
-
-```bash
-pip install -e ".[dev]"
-pytest -q
-uvicorn src.api.main:app --reload
-```
-
-Depois:
-
-- Swagger: `/docs`
-- Health: `/api/v1/system/health`
-- Readiness: `/api/v1/system/readiness`
-- Fontes: `/api/v1/metadata/sources`
-- Cobertura dos dados: `/api/v1/metadata/coverage`
-- Qualidade: `/api/v1/quality/latest`
-- Indicadores: `/api/v1/indicators/overview`
-
-A API **não inventa dados**. Enquanto nenhuma competência oficial tiver passado pelo pipeline, o endpoint de indicadores retorna `503` com uma explicação explícita.
-
-### O que diferencia este repositório
-
-- decisões arquiteturais justificadas em ADR;
-- qualidade e proveniência tratadas como parte do produto;
-- fonte pública exposta pela API;
+- Bronze imutável com manifesto e SHA-256;
+- detecção de mudança de layout;
+- normalização e tipagem antes das agregações;
+- registros rejeitados preservados para auditoria;
 - recorte CBO versionado;
-- testes automatizados;
-- modelo dimensional;
-- CI propositalmente leve;
-- arquitetura preparada para atualização incremental;
-- separação clara entre dados brutos e dados servidos.
+- metodologia salarial alinhada às regras publicadas pelo MTE;
+- referência externa para reconciliação;
+- gate de publicação vinculado ao hash do arquivo de origem;
+- carga PostgreSQL transacional e idempotente;
+- API que não serve uma competência não aprovada.
 
-Veja também: [`docs/RECRUITER_GUIDE.md`](docs/RECRUITER_GUIDE.md).
+Detalhes em [Metodologia](docs/METHODOLOGY.md), [Data lineage](docs/DATA_LINEAGE.md) e [Pipeline](docs/PIPELINE_REAL.md).
 
+## Estado atual
 
-## Pipeline oficial implementado
+| Componente | Estado |
+|---|---|
+| Aplicação pública | Operacional |
+| API / OpenAPI | Operacional |
+| Frontend de produção | Operacional |
+| Bronze / Silver / Gold | Implementado |
+| Gate de publicação | Implementado |
+| PostgreSQL serving | Implementado |
+| Reconciliação oficial de julho/2026 | Implementada |
+| Primeira competência tech real publicada | Em andamento |
+| Histórico multi-mês | Planejado após a primeira competência validada |
 
-A versão 0.4 já possui ingestão por competência diretamente da estrutura pública do Novo CAGED.
+A aplicação pública usa, neste momento, a referência oficial agregada do MTE para demonstrar o produto sem substituir os microdados ainda não processados.
 
-```bash
-python -m src.cli pipeline 202607
-```
+## Execução local
 
-O pipeline:
+### Backend
 
-1. descobre MOV/FOR/EXC no diretório oficial;
-2. baixa os `.7z`;
-3. preserva os arquivos na Bronze;
-4. gera SHA-256;
-5. valida o layout;
-6. separa rejeições;
-7. filtra o recorte CBO de tecnologia;
-8. grava Silver em Parquet;
-9. produz Gold agregado;
-10. gera JSON de overview consumido pela API.
-
-**Importante:** FOR/EXC já são ingeridos, mas ainda não são combinados aos indicadores publicados enquanto a lógica de ajustes não estiver validada. Isso evita resultados tecnicamente convincentes, porém metodologicamente errados.
-
-Detalhes: [`docs/PIPELINE_REAL.md`](docs/PIPELINE_REAL.md)
-
-
-### Rastreabilidade
-
-Veja [`docs/DATA_LINEAGE.md`](docs/DATA_LINEAGE.md) para acompanhar o caminho de cada dado da fonte oficial até a API.
-
-
-## Frontend profissional
-
-A interface React + TypeScript está em `frontend/` e consome somente endpoints da API.
-
-```bash
-# terminal 1
+~~~bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
 uvicorn src.api.main:app --reload
+~~~
 
-# terminal 2
+No Windows PowerShell:
+
+~~~powershell
+.\.venv\Scripts\Activate.ps1
+~~~
+
+### Frontend
+
+~~~bash
 cd frontend
 npm install
 npm run dev
-```
+~~~
 
-A primeira tela já possui estados de carregamento, API indisponível, ausência de dados publicados e dashboard real. Quando a camada Gold existir, a aplicação exibe automaticamente indicadores, ranking por UF, saldo por CBO e métricas de qualidade.
+O Vite encaminha /api/* para o backend local em localhost:8000.
 
-Nenhum número de demonstração é embutido no frontend.
+### Testes
 
+~~~bash
+ruff check src tests
+pytest -q
+cd frontend && npm run build
+~~~
 
-## v0.6 — execução resiliente
+## Pipeline
 
-A aplicação agora aceita duas rotas de ingestão do mesmo dado oficial:
+Execução automática a partir da estrutura oficial:
 
-### FTP automático
-
-```bash
+~~~bash
 python -m src.cli pipeline 202607
-```
+~~~
 
-### Arquivo oficial já baixado
+Para um arquivo oficial já disponível localmente:
 
-```bash
-python -m src.cli local-pipeline 202607 "C:\Downloads\CAGEDMOV202607.7z" --kind MOV
-```
+~~~bash
+python -m src.cli local-pipeline 202607 "/caminho/CAGEDMOV202607.7z" --kind MOV
+~~~
 
-O caminho local existe para ambientes em que o FTP do PDET é bloqueado. O arquivo continua sendo preservado na Bronze, recebe SHA-256 e segue exatamente pelas mesmas camadas Silver/Gold.
+Validação e aprovação de uma competência:
 
-Também foi adicionado `/api/v1/provenance/latest`, permitindo que o dashboard mostre qual arquivo e hash originaram os dados exibidos.
-
-Veja [`docs/LOCAL_INGESTION.md`](docs/LOCAL_INGESTION.md) e [`docs/DOCKER.md`](docs/DOCKER.md).
-
-
-### Gate de publicação
-
-Uma competência só é considerada publicável quando passa pelos checks automáticos e por uma revisão metodológica vinculada ao SHA-256 do arquivo MOV:
-
-```bash
+~~~bash
 python -m src.cli validate-release 202607
+
 python -m src.cli approve-release 202607 \
-  --reviewer "Nome do revisor" \
+  --reviewer "responsavel" \
   --notes "Layout, rejeições e metodologia revisados." \
   --acknowledge-methodology-reviewed
-```
+~~~
 
-Trocar o arquivo de origem invalida automaticamente a aprovação anterior. O status também fica disponível em `/api/v1/quality/publication-gate/latest`.
+Carga da competência aprovada no serving:
 
-
-### PostgreSQL serving layer
-
-Depois que uma competência passa pelo gate e recebe aprovação metodológica, ela pode ser carregada de forma transacional:
-
-```bash
+~~~bash
 alembic upgrade head
 python -m src.cli load-postgres 202607
-```
+~~~
 
-A carga é idempotente: repetir a mesma competência substitui somente aquele mês dentro de uma transação, sem duplicar linhas. Se a verificação pós-carga falhar, a transação é revertida.
+## Estrutura
 
-Para a API servir do banco:
+~~~text
+config/      regras, fontes e referências versionadas
+data/        camadas Bronze, Silver e Gold
+docs/        arquitetura, metodologia, lineage e operação
+frontend/    aplicação React/TypeScript
+src/         ingestão, transformação, qualidade, banco e API
+tests/       testes automatizados
+alembic/     migrations do serving PostgreSQL
+docker/      imagens de execução
+~~~
 
-```bash
-DATA_BACKEND=postgres uvicorn src.api.main:app --reload
-```
+## Documentação
 
-O schema de serving atual acompanha o Gold realmente produzido: release por competência, indicadores por UF e indicadores por CBO. O modelo municipal só será adicionado quando o pipeline Gold municipal existir.
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [Visão técnica](docs/PROJECT_OVERVIEW.md)
+- [Contrato de dados](docs/DATA_CONTRACT.md)
+- [Metodologia](docs/METHODOLOGY.md)
+- [Recorte CBO](docs/CBO_SCOPE.md)
+- [Data lineage](docs/DATA_LINEAGE.md)
+- [Pipeline real](docs/PIPELINE_REAL.md)
+- [Deploy](docs/DEPLOY.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Changelog](CHANGELOG.md)
 
+## Limitações atuais
 
-### Reconciliação oficial
-
-A v0.9 versiona os números publicados no Sumário Executivo do MTE para julho/2026 em `config/official_reference_202607.json`.
-
-Os testes verificam automaticamente que cada UF fecha aritmeticamente, que cada região é a soma das respectivas UFs e que o Brasil fecha exatamente quando se somam as 27 UFs e os registros não identificados.
-
-A metodologia salarial também segue a regra publicada pelo MTE: em 2026, entram apenas admissões não intermitentes com salário entre R$ 486,30 e R$ 243.150,00. As métricas de tecnologia usam esse mesmo filtro, sem confundir o recorte tech com o total do mercado formal.
-
-
-### Recorte CBO v2
-
-O recorte de tecnologia foi revisado contra a CBO oficial e agora inclui:
-
-- 2122 — Engenheiros em computação;
-- 2123 — Administradores de tecnologia da informação;
-- 2124 — Analistas de tecnologia da informação;
-- 3171 — Técnicos de desenvolvimento de sistemas e aplicações;
-- 3172 — Técnicos em operação e monitoração de computadores.
-
-A v2 corrige a ausência de 2122 no recorte inicial. A mudança é versionada, justificada e coberta por teste; nenhuma família é incluída silenciosamente.
-
-Veja `docs/CBO_SCOPE.md`.
-
-
-### Dashboard visual v0.11
-
-O frontend deixa de ser apenas uma casca para os futuros indicadores tech e passa a ter valor visual mesmo antes do primeiro microdado processado.
-
-A tela mostra:
-
-- hero de produto e pipeline auditável;
-- status visual das etapas Bronze → Silver → Gold → API;
-- contexto oficial de julho/2026 para Brasil e Ceará;
-- saldo regional em gráfico;
-- link direto para a fonte oficial do MTE;
-- separação visual explícita entre **mercado formal total** e **recorte de tecnologia**;
-- cards e gráficos tech que entram automaticamente quando uma competência aprovada estiver disponível.
-
-Os números de contexto vêm do endpoint `/api/v1/metadata/official-reference/202607`; não existem métricas fictícias no frontend.
-
-
-### Deploy v0.12
-
-O projeto agora possui uma imagem de produção única: o React é compilado no primeiro estágio do Docker e o FastAPI serve tanto a API quanto os arquivos estáticos no mesmo domínio.
-
-```bash
-docker build -f docker/app/Dockerfile -t mercado-tech-brasil .
-docker run --rm -p 8000:8000 mercado-tech-brasil
-```
-
-O arquivo `render.yaml` permite criar a demonstração pública como um único Web Service Docker. Enquanto não houver Gold tech aprovado, o deploy usa `DATA_BACKEND=files`: mostra o contexto oficial do MTE e mantém os endpoints tech bloqueados, sem inventar resultados.
-
-Detalhes: `docs/DEPLOY.md`.
+- Novo CAGED mede **fluxos** de emprego formal, não estoque de trabalhadores.
+- Trabalho informal, prestação PJ e trabalho independente não são cobertos por esse indicador.
+- FOR/EXC são preservados na ingestão, mas sua semântica de ajuste ainda não é incorporada aos indicadores publicados.
+- Indicadores municipais e séries históricas entram após a validação da primeira competência real.
