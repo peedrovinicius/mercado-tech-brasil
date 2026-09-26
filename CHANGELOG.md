@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.18.0
+
+- comparação territorial da competência mais recente entre Brasil, Nordeste e Ceará;
+- participação nas admissões tech nacionais calculada diretamente dos agregados publicados;
+- participação do Ceará nas admissões tech do Nordeste;
+- novo endpoint territorial na API;
+- novo bloco visual responsivo no dashboard;
+- cobertura histórica permanece de janeiro a julho de 2026.
+
 ## 0.17.0
 
 - série histórica auditada de janeiro a julho de 2026;

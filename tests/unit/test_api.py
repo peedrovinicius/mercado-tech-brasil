@@ -47,6 +47,17 @@ def test_published_analytics_are_served():
     assert by_occupation.json()["competence"] == "202607"
     assert by_occupation.json()["items"]
 
+    comparison = client.get("/api/v1/analytics/territorial-comparison")
+    assert comparison.status_code == 200
+    payload = comparison.json()
+    assert payload["competence"] == "202607"
+    by_key = {item["key"]: item for item in payload["items"]}
+    assert by_key["BR"]["admissions"] == 19253
+    assert by_key["NE"]["admissions"] == 1951
+    assert by_key["CE"]["admissions"] == 522
+    assert by_key["NE"]["balance"] == 155
+    assert by_key["CE"]["balance"] == 107
+
 
 def test_overview_refuses_without_published_release(monkeypatch):
     monkeypatch.setattr(

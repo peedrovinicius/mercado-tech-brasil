@@ -600,3 +600,156 @@ button { cursor: pointer; }
     text-justify: inter-word;
   }
 }
+
+
+.territorial-comparison {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 5vw 52px;
+}
+
+.territorial-comparison__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 20px;
+}
+
+.territorial-comparison__heading h2 {
+  margin: 7px 0 10px;
+  font-size: clamp(28px, 3.5vw, 44px);
+  letter-spacing: -.04em;
+}
+
+.territorial-comparison__heading p:last-child {
+  max-width: 760px;
+  margin: 0;
+  color: #66666e;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+.territorial-comparison__heading > span {
+  color: #77777f;
+  font-size: 12px;
+}
+
+.territorial-comparison__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.territorial-card {
+  padding: 22px;
+  border: 1px solid #e1e1e5;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.territorial-card--ce {
+  border-color: #cfd9ff;
+  box-shadow: 0 10px 28px rgba(36, 89, 255, .07);
+}
+
+.territorial-card__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.territorial-card__top > span {
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -.02em;
+}
+
+.territorial-card__top > strong {
+  font-size: 24px;
+  letter-spacing: -.035em;
+}
+
+.territorial-card > small {
+  display: block;
+  margin-top: 5px;
+  color: #85858d;
+  font-size: 11px;
+}
+
+.territorial-card__bar {
+  height: 7px;
+  margin: 20px 0 22px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ececf0;
+}
+
+.territorial-card__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #1d1d20;
+}
+
+.territorial-card--ce .territorial-card__bar > span {
+  background: #2459ff;
+}
+
+.territorial-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.territorial-card__metrics div {
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 1px solid #ececf0;
+}
+
+.territorial-card__metrics small,
+.territorial-card__metrics strong {
+  display: block;
+}
+
+.territorial-card__metrics small {
+  color: #85858d;
+  font-size: 10px;
+}
+
+.territorial-card__metrics strong {
+  margin-top: 5px;
+  font-size: 15px;
+}
+
+.territorial-comparison__note {
+  max-width: 880px;
+  margin: 16px 0 0;
+  color: #66666e;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+@media (max-width: 840px) {
+  .territorial-comparison__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .territorial-comparison__heading {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 680px) {
+  .territorial-comparison {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

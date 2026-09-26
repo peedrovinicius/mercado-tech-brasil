@@ -148,7 +148,8 @@ O pipeline mantém:
 - referência externa para reconciliação;
 - gate de publicação vinculado ao hash do arquivo de origem;
 - carga PostgreSQL transacional e idempotente;
-- contratos de API versionados.
+- contratos de API versionados;
+- comparação Ceará, Nordeste e Brasil na competência mais recente publicada.
 
 ## Estado do produto
 
