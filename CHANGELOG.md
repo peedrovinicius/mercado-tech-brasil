@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.0
+
+- dashboard visual orientado a portfólio/recrutadores;
+- hero com pipeline auditável;
+- contexto oficial Brasil/Ceará disponível mesmo sem Gold tech;
+- gráfico regional com dados publicados pelo MTE;
+- endpoint de referência oficial para o frontend;
+- separação visual explícita entre mercado formal total e recorte tech;
+- pipeline visual com estado aguardando/publicado;
+- layout responsivo aprimorado;
+- versão de backend alinhada à versão do pacote;
+- workflow visual separado e acionado somente quando `frontend/**` muda.
+
+
 ## 0.10.0
 
 - recorte CBO de tecnologia elevado para versão 2;

@@ -59,3 +59,50 @@ export function OccupationChart({ items }: { items: OccupationItem[] }) {
   }
   return <ReactECharts option={option} style={{ height: 310 }} />
 }
+
+type RegionItem = {
+  region: string
+  admissions: number
+  dismissals: number
+  balance: number
+}
+
+export function ReferenceRegionChart({ items }: { items: RegionItem[] }) {
+  const ordered = [...items].sort((a, b) => b.balance - a.balance)
+  const option = {
+    animationDuration: 600,
+    grid: { left: 94, right: 20, top: 18, bottom: 20 },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value: number) => new Intl.NumberFormat('pt-BR').format(value),
+    },
+    xAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: '#ececf0' } },
+      axisLabel: { color: '#74747c' },
+    },
+    yAxis: {
+      type: 'category',
+      data: ordered.map((item) => item.region),
+      axisTick: { show: false },
+      axisLine: { show: false },
+      axisLabel: { color: '#4d4d54' },
+    },
+    series: [
+      {
+        name: 'Saldo',
+        type: 'bar',
+        data: ordered.map((item) => ({
+          value: item.balance,
+          itemStyle: {
+            color: item.balance >= 0 ? '#111114' : '#a7a7ad',
+            borderRadius: item.balance >= 0 ? [0, 6, 6, 0] : [6, 0, 0, 6],
+          },
+        })),
+        barMaxWidth: 22,
+      },
+    ],
+  }
+
+  return <ReactECharts option={option} style={{ height: 270 }} />
+}

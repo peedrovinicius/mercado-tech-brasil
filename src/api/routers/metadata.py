@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from src.core.settings import settings
 
@@ -12,6 +12,17 @@ router = APIRouter(prefix="/metadata", tags=["metadata"])
 @router.get("/sources")
 def sources() -> dict:
     return json.loads(settings.sources_path.read_text(encoding="utf-8"))
+
+
+@router.get("/official-reference/202607")
+def official_reference_july_2026() -> dict[str, object]:
+    path = settings.official_reference_202607_path
+    if not path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Referência oficial de julho/2026 não encontrada.",
+        )
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @router.get("/coverage")
