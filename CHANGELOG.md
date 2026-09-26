@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.1
+
+- descompressão transparente de respostas gzip da API de Localidades do IBGE;
+- sincronização de referências IBGE obrigatória na auditoria operacional;
+- teste de resposta gzip com e sem cabeçalho Content-Encoding.
+
+
 ## 0.14.0
 
 - categoria oficial Não identificado preservada como UF residual;

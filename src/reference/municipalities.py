@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 from urllib.request import Request, urlopen
@@ -24,13 +25,27 @@ def _uf_from_item(item: dict) -> str | None:
     return str(sigla) if sigla else None
 
 
+def _decode_json_body(body: bytes, *, content_encoding: str = ""):
+    encoding = content_encoding.lower().strip()
+    if encoding == "gzip" or body.startswith(b"\x1f\x8b"):
+        body = gzip.decompress(body)
+    return json.loads(body.decode("utf-8"))
+
+
 def fetch_municipalities(*, timeout: int = 60) -> dict[str, dict[str, str]]:
     request = Request(
         IBGE_MUNICIPALITIES_URL,
-        headers={"User-Agent": "mercado-tech-brasil/0.13"},
+        headers={
+            "User-Agent": "mercado-tech-brasil/0.14.1",
+            "Accept": "application/json",
+        },
     )
     with urlopen(request, timeout=timeout) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+        body = response.read()
+        payload = _decode_json_body(
+            body,
+            content_encoding=response.headers.get("Content-Encoding", ""),
+        )
 
     result: dict[str, dict[str, str]] = {}
     for item in payload:
