@@ -2,7 +2,13 @@
   "novo_caged": {
     "owner": "Ministério do Trabalho e Emprego",
     "purpose": "movimentações mensais do emprego formal",
-    "official_page": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged"
+    "official_page": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged",
+    "official_ftp": "ftp://ftp.mtps.gov.br/pdet/microdados/",
+    "https_transport": {
+      "role": "espelho de transporte, sem alterar a fonte estatística",
+      "repository": "https://huggingface.co/datasets/alexsandroprado/caged",
+      "consumer_reference": "https://cran.r-project.org/package=datacaged"
+    }
   },
   "cbo": {
     "owner": "Ministério do Trabalho e Emprego",
@@ -11,7 +17,13 @@
   },
   "ibge": {
     "owner": "Instituto Brasileiro de Geografia e Estatística",
-    "purpose": "território, população e indicadores complementares",
-    "official_page": "https://servicodados.ibge.gov.br/api/docs/"
+    "purpose": "território, população e inflação",
+    "official_page": "https://servicodados.ibge.gov.br/api/docs/",
+    "ipca": {
+      "system": "SIDRA",
+      "table": "1737",
+      "variable": "2266",
+      "api": "https://apisidra.ibge.gov.br/values"
+    }
   }
 }
