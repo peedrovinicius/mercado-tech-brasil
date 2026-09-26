@@ -46,12 +46,31 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     )
     (gold / "market-202607.parquet").write_bytes(b"parquet-placeholder")
     _write_json(
+        gold / "audit-national-mov-202607.json",
+        {
+            "competence": "202607",
+            "admissions": 2262888,
+            "dismissals": 2204320,
+            "balance": 58568,
+            "non_identified": {
+                "admissions": 803,
+                "dismissals": 566,
+                "balance": 237,
+            },
+        },
+    )
+    _write_json(
         reference,
         {
             "202607": {
                 "admissoes": 2262888,
                 "desligamentos": 2204320,
                 "saldo": 58568,
+                "nao_identificado": {
+                    "admissoes": 803,
+                    "desligamentos": 566,
+                    "saldo": 237,
+                },
             }
         },
     )
@@ -139,3 +158,25 @@ def test_gate_detects_overview_arithmetic_error(tmp_path: Path):
     )
     assert result.automatic_checks_passed is False
     assert any(check.id == "overview_arithmetic" and not check.passed for check in result.checks)
+
+
+def test_gate_blocks_when_national_reference_diverges(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    audit_path = gold / "audit-national-mov-202607.json"
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    audit["admissions"] += 1
+    _write_json(audit_path, audit)
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert any(
+        check.id == "national_reference_reconciliation" and not check.passed
+        for check in result.checks
+    )

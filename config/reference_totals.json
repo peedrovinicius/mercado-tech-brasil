@@ -7,6 +7,11 @@
     "admissoes": 2262888,
     "desligamentos": 2204320,
     "saldo": 58568,
-    "note": "Totais oficiais publicados com ajustes. A reconciliação considera MOV, FOR e EXC antes da publicação."
+    "note": "Snapshot MOV de julho/2026 reconciliado com os totais oficiais publicados pelo MTE, incluindo a categoria Não identificado.",
+    "nao_identificado": {
+      "admissoes": 803,
+      "desligamentos": 566,
+      "saldo": 237
+    }
   }
 }

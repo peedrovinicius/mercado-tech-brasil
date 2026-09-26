@@ -1,4 +1,5 @@
 from src.transform.schema import (
+    UF_CODE_TO_SIGLA,
     normalize_column_name,
     validate_core_columns,
 )
@@ -28,3 +29,7 @@ def test_layout_change_is_detected():
     missing = validate_core_columns(normalized)
     assert "cbo2002ocupacao" in missing
     assert "saldomovimentacao" in missing
+
+
+def test_non_identified_uf_is_valid_category():
+    assert UF_CODE_TO_SIGLA["99"] == "NI"

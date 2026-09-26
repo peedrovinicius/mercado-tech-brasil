@@ -1,4 +1,4 @@
-name: Ingest July 2026
+name: Ingest July 2026 v2
 
 on:
   push:
@@ -146,6 +146,7 @@ jobs:
           if-no-files-found: warn
           path: |
             data/gold/*.json
+            data/gold/audit-national-mov-202607.json
             data/gold/market-202607.parquet
             data/silver/caged_tech_202607.parquet
             data/silver/caged_tech_for_202607.parquet

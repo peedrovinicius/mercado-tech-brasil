@@ -122,9 +122,47 @@ def transform_mov_file(
     silver_path = silver_dir / f"caged_tech_{yearmonth}.parquet"
     reject_path = silver_dir / f"caged_rejected_{yearmonth}.parquet"
     quality_path = gold_dir / f"quality-{yearmonth}.json"
+    national_audit_path = gold_dir / f"audit-national-mov-{yearmonth}.json"
 
     tech.write_parquet(silver_path, compression="zstd")
     rejected.write_parquet(reject_path, compression="zstd")
+
+    national_admissions = frame.filter(pl.col("saldo_movimentacao") == 1).height
+    national_dismissals = frame.filter(pl.col("saldo_movimentacao") == -1).height
+    national_balance = int(
+        frame.select(pl.col("saldo_movimentacao").sum()).item() or 0
+    )
+    non_identified = frame.filter(pl.col("uf") == "NI")
+    national_audit_path.write_text(
+        json.dumps(
+            {
+                "source": "Novo CAGED / MTE",
+                "competence": yearmonth,
+                "scope": "MOV nacional, incluindo Não identificado",
+                "rows": frame.height,
+                "admissions": national_admissions,
+                "dismissals": national_dismissals,
+                "balance": national_balance,
+                "non_identified": {
+                    "admissions": non_identified.filter(
+                        pl.col("saldo_movimentacao") == 1
+                    ).height,
+                    "dismissals": non_identified.filter(
+                        pl.col("saldo_movimentacao") == -1
+                    ).height,
+                    "balance": int(
+                        non_identified.select(
+                            pl.col("saldo_movimentacao").sum()
+                        ).item()
+                        or 0
+                    ),
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     rows_read = frame.height
     rows_valid = valid.height
@@ -148,6 +186,7 @@ def transform_mov_file(
         "rows_tech": rows_tech,
         "valid_rate": round(rows_valid / rows_read, 8) if rows_read else 0,
         "rejection_counts": rejection_counts,
+        "non_identified_uf_rows": frame.filter(pl.col("uf") == "NI").height,
         "layout_columns": original_columns,
         "publication_ready": False,
         "publication_gate": "awaiting_first_official_run_and_methodology_review",

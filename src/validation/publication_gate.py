@@ -69,11 +69,13 @@ def evaluate_publication_gate(
     quality_path = gold_dir / f"quality-{yearmonth}.json"
     overview_path = gold_dir / f"overview-{yearmonth}.json"
     market_path = gold_dir / f"market-{yearmonth}.parquet"
+    national_audit_path = gold_dir / f"audit-national-mov-{yearmonth}.json"
 
     for check_id, path in {
         "quality_report": quality_path,
         "overview": overview_path,
         "gold_market": market_path,
+        "national_mov_audit": national_audit_path,
     }.items():
         checks.append(
             GateCheck(
@@ -194,16 +196,63 @@ def evaluate_publication_gate(
             ref_adm = int(reference["admissoes"])
             ref_des = int(reference["desligamentos"])
             ref_balance = int(reference["saldo"])
+            reference_integrity = ref_adm - ref_des == ref_balance
             checks.append(
                 GateCheck(
                     id="official_reference_integrity",
-                    passed=ref_adm - ref_des == ref_balance,
-                    message=(
-                        "Referência oficial publicada é internamente consistente. "
-                        "Ela não é comparada numericamente ao recorte tech MOV isolado."
-                    ),
+                    passed=reference_integrity,
+                    message="Referência oficial publicada é internamente consistente.",
                 )
             )
+
+            if national_audit_path.exists():
+                audit = _read_json(national_audit_path)
+                audit_adm = int(audit.get("admissions") or 0)
+                audit_des = int(audit.get("dismissals") or 0)
+                audit_balance = int(audit.get("balance") or 0)
+                reconciliation_ok = (
+                    audit_adm == ref_adm
+                    and audit_des == ref_des
+                    and audit_balance == ref_balance
+                )
+                checks.append(
+                    GateCheck(
+                        id="national_reference_reconciliation",
+                        passed=reconciliation_ok,
+                        message=(
+                            "MOV nacional reconciliado exatamente com a referência oficial."
+                            if reconciliation_ok
+                            else (
+                                "MOV nacional diverge da referência oficial: "
+                                f"MOV={audit_adm}/{audit_des}/{audit_balance}; "
+                                f"referência={ref_adm}/{ref_des}/{ref_balance}."
+                            )
+                        ),
+                    )
+                )
+
+                ref_ni = reference.get("nao_identificado")
+                if isinstance(ref_ni, dict):
+                    audit_ni = audit.get("non_identified") or {}
+                    ni_ok = (
+                        int(audit_ni.get("admissions") or 0)
+                        == int(ref_ni.get("admissoes") or 0)
+                        and int(audit_ni.get("dismissals") or 0)
+                        == int(ref_ni.get("desligamentos") or 0)
+                        and int(audit_ni.get("balance") or 0)
+                        == int(ref_ni.get("saldo") or 0)
+                    )
+                    checks.append(
+                        GateCheck(
+                            id="non_identified_reconciliation",
+                            passed=ni_ok,
+                            message=(
+                                "Categoria Não identificado reconciliada com a referência oficial."
+                                if ni_ok
+                                else "Categoria Não identificado diverge da referência oficial."
+                            ),
+                        )
+                    )
         else:
             checks.append(
                 GateCheck(
