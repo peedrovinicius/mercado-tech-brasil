@@ -1,0 +1,173 @@
+name: RAIS 2025 full audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Ano-base da RAIS"
+        required: true
+        default: "2025"
+        type: string
+
+concurrency:
+  group: rais-full-audit-${{ inputs.year }}
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+      total_bytes: ${{ steps.discover.outputs.total_bytes }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Discover official RAIS archives
+        id: discover
+        run: |
+          python scripts/rais_discover_full.py "${{ inputs.year }}"
+
+      - name: Upload discovery
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-discovery
+          retention-days: 3
+          path: rais-discovery-2025.json
+
+  process:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    env:
+      RAIS_YEAR: ${{ inputs.year }}
+      RAIS_FILENAME: ${{ matrix.filename }}
+      RAIS_KEY: ${{ matrix.key }}
+      RAIS_REMOTE_SIZE: ${{ matrix.size }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Process regional RAIS part
+        run: |
+          python scripts/rais_process_part.py "$RAIS_YEAR"             --filename "$RAIS_FILENAME"             --key "$RAIS_KEY"             --remote-size "$RAIS_REMOTE_SIZE"
+
+      - name: Remove raw regional files
+        if: always()
+        run: |
+          rm -f "work/$RAIS_KEY/archives/"*.7z || true
+          rm -f "work/$RAIS_KEY/archives/"*.part || true
+          rm -rf "work/$RAIS_KEY/extracted" || true
+
+      - name: Upload regional derivatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-part-${{ matrix.key }}
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            work/${{ matrix.key }}/download-manifest-part.json
+            work/${{ matrix.key }}/archives/*.manifest.json
+            work/${{ matrix.key }}/reports/*.json
+            work/${{ matrix.key }}/silver/*.parquet
+            work/${{ matrix.key }}/silver/*.json
+            work/${{ matrix.key }}/part-summary.json
+
+  merge:
+    if: always() && needs.discover.result == 'success'
+    needs:
+      - discover
+      - process
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      RAIS_YEAR: ${{ inputs.year }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download regional derivatives
+        uses: actions/download-artifact@v4
+        with:
+          pattern: rais-part-*
+          path: work/parts
+
+      - name: Require seven complete regional parts
+        run: |
+          count="$(find work/parts -name part-summary.json -type f | wc -l)"
+          echo "complete_parts=$count"
+          test "$count" -eq 7
+
+      - name: Merge national Silver
+        run: |
+          python -m src.cli rais-merge-parts "$RAIS_YEAR"             --parts-root work/parts
+
+      - name: Reconcile national active stock
+        id: reconcile
+        continue-on-error: true
+        run: |
+          python -m src.cli rais-reconcile "$RAIS_YEAR"
+
+      - name: Build annual Gold after exact reconciliation
+        if: steps.reconcile.outcome == 'success'
+        run: |
+          python -m src.cli rais-gold "$RAIS_YEAR"
+          python -m src.cli rais-validate-release "$RAIS_YEAR"
+
+      - name: Build full run summary
+        if: always()
+        run: |
+          python scripts/rais_full_summary.py "$RAIS_YEAR"
+
+      - name: Upload national derivatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-full-audit
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            rais-full-run-summary.json
+            data/bronze/rais/${{ inputs.year }}/archives/download-manifest.json
+            data/silver/rais_tech_${{ inputs.year }}.parquet
+            data/silver/rais_rejected_${{ inputs.year }}.parquet
+            data/silver/rais_quality_${{ inputs.year }}.json
+            data/silver/rais_reconciliation_${{ inputs.year }}.json
+            data/gold/rais-overview-${{ inputs.year }}.json
+            data/gold/rais-by-uf-${{ inputs.year }}.json
+            data/gold/rais-by-cbo-family-${{ inputs.year }}.json
+            data/gold/rais-market-${{ inputs.year }}.parquet
+            data/gold/rais-publication-gate-${{ inputs.year }}.json
+            work/parts/**/part-summary.json
+            work/parts/**/reports/*.json
