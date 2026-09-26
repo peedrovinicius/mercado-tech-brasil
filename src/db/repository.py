@@ -19,6 +19,10 @@ def get_engine(database_url: str) -> Engine:
     return create_engine(database_url, pool_pre_ping=True)
 
 
+def _float_or_none(value: Any) -> float | None:
+    return float(value) if value is not None else None
+
+
 def _latest_release(connection: Connection) -> dict[str, Any] | None:
     row = connection.execute(
         select(dataset_release)
@@ -27,6 +31,23 @@ def _latest_release(connection: Connection) -> dict[str, Any] | None:
         .limit(1)
     ).mappings().first()
     return dict(row) if row else None
+
+
+def _salary_payload(row: Any) -> dict[str, object]:
+    return {
+        "salary_mean_admissions": _float_or_none(
+            row.get("salary_mean_admissions")
+        ),
+        "salary_median_admissions": _float_or_none(
+            row.get("salary_median_admissions")
+        ),
+        "salary_mean_admissions_real": _float_or_none(
+            row.get("salary_mean_admissions_real")
+        ),
+        "salary_median_admissions_real": _float_or_none(
+            row.get("salary_median_admissions_real")
+        ),
+    }
 
 
 def fetch_overview(database_url: str) -> dict[str, object] | None:
@@ -41,15 +62,9 @@ def fetch_overview(database_url: str) -> dict[str, object] | None:
             "admissions": release["admissions"],
             "dismissals": release["dismissals"],
             "balance": release["balance"],
-            "salary_mean_admissions": (
-                float(release["salary_mean_admissions"])
-                if release["salary_mean_admissions"] is not None
-                else None
-            ),
-            "salary_median_admissions": (
-                float(release["salary_median_admissions"])
-                if release["salary_median_admissions"] is not None
-                else None
+            **_salary_payload(release),
+            "salary_real_base_competence": release.get(
+                "salary_real_base_competence"
             ),
             "records_tech": release["records_tech"],
             "source": release["source"],
@@ -79,17 +94,16 @@ def fetch_by_uf(
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
-                "salary_median_admissions": (
-                    float(row["salary_median_admissions"])
-                    if row["salary_median_admissions"] is not None
-                    else None
-                ),
+                **_salary_payload(row),
             }
             for row in rows
         ]
         return {
             "competence": release["competence"].strftime("%Y%m"),
             "source": release["source"],
+            "salary_real_base_competence": release.get(
+                "salary_real_base_competence"
+            ),
             "items": items,
         }
 
@@ -120,17 +134,16 @@ def fetch_by_occupation(
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
-                "salary_median_admissions": (
-                    float(row["salary_median_admissions"])
-                    if row["salary_median_admissions"] is not None
-                    else None
-                ),
+                **_salary_payload(row),
             }
             for row in rows
         ]
         return {
             "competence": release["competence"].strftime("%Y%m"),
             "source": release["source"],
+            "salary_real_base_competence": release.get(
+                "salary_real_base_competence"
+            ),
             "items": items,
         }
 
@@ -165,16 +178,7 @@ def fetch_by_municipality(
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
-                "salary_mean_admissions": (
-                    float(row["salary_mean_admissions"])
-                    if row["salary_mean_admissions"] is not None
-                    else None
-                ),
-                "salary_median_admissions": (
-                    float(row["salary_median_admissions"])
-                    if row["salary_median_admissions"] is not None
-                    else None
-                ),
+                **_salary_payload(row),
             }
             for row in rows
         ]
@@ -182,6 +186,9 @@ def fetch_by_municipality(
             "competence": release["competence"].strftime("%Y%m"),
             "source": release["source"],
             "code_system": "codigo_municipio_caged",
+            "salary_real_base_competence": release.get(
+                "salary_real_base_competence"
+            ),
             "items": items,
         }
 
@@ -204,15 +211,9 @@ def fetch_trend(database_url: str) -> dict[str, object] | None:
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
-                "salary_mean_admissions": (
-                    float(row["salary_mean_admissions"])
-                    if row["salary_mean_admissions"] is not None
-                    else None
-                ),
-                "salary_median_admissions": (
-                    float(row["salary_median_admissions"])
-                    if row["salary_median_admissions"] is not None
-                    else None
+                **_salary_payload(row),
+                "salary_real_base_competence": row.get(
+                    "salary_real_base_competence"
                 ),
             }
             for row in rows
