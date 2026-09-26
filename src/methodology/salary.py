@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 MINIMUM_WAGE_BY_YEAR = {
     2026: 1621.00,
 }
