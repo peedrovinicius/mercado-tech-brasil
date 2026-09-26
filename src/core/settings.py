@@ -26,6 +26,9 @@ class Settings:
     )
     publication_approvals_path: Path = ROOT / "config" / "publication_approvals.json"
     ipca_cache_path: Path = ROOT / "data" / "reference" / "ipca.json"
+    municipalities_cache_path: Path = (
+        ROOT / "data" / "reference" / "municipalities.json"
+    )
     bronze_path: Path = ROOT / "data" / "bronze"
     silver_path: Path = ROOT / "data" / "silver"
     gold_path: Path = ROOT / "data" / "gold"
