@@ -2,7 +2,7 @@
 
 ## Produção
 
-A aplicação está disponível em:
+A aplicação pública está disponível em:
 
 https://mercado-tech-brasil.onrender.com
 
@@ -13,47 +13,43 @@ Browser
    |
    v
 FastAPI
-  ├── /api/v1/*  API
-  ├── /docs      OpenAPI
-  └── /           React compilado
+  +-- /api/v1/*  API
+  +-- /docs      OpenAPI
+  +-- /           React compilado
 ~~~
 
-O serviço atual roda em Python 3.11 no Render. O build instala o backend, compila o frontend com Vite e inicia o Uvicorn.
+## Arquitetura de produção
 
-## Configuração atual
+O Render usa `render.yaml` com runtime Docker e health check em `/api/v1/system/health`.
 
-Build:
+A imagem `docker/app/Dockerfile` possui dois estágios:
 
-~~~bash
-pip install -e . && cd frontend && npm install --no-audit --no-fund && npm run build
-~~~
+1. Node 22 compila o frontend React + TypeScript com Vite;
+2. Python 3.11 instala o backend e serve API e frontend pelo Uvicorn.
 
-Start:
+O frontend de produção utiliza `/api/v1` como base da API, mantendo tudo no mesmo domínio.
 
-~~~bash
-uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
-~~~
+## Backend de dados atual
 
-Variáveis principais:
+A configuração versionada de produção usa:
 
 ~~~text
 APP_ENV=production
 DATA_BACKEND=files
-PYTHON_VERSION=3.11.11
 ~~~
 
-DATA_BACKEND=files permanece ativo até a primeira competência tech ser aprovada e carregada no PostgreSQL.
+Nesse modo, a API serve apenas competências que passaram pelo gate de publicação e possuem os artefatos Gold necessários.
 
-## Docker
+O suporte a PostgreSQL também está implementado. Para operar com serving PostgreSQL, o ambiente precisa definir `DATA_BACKEND=postgres`, disponibilizar `DATABASE_URL` e carregar previamente as competências aprovadas no banco.
 
-O repositório também mantém uma imagem multi-stage reproduzível:
+## Build local da imagem de produção
 
 ~~~bash
 docker build -f docker/app/Dockerfile -t mercado-tech-brasil .
 docker run --rm -p 8000:8000 mercado-tech-brasil
 ~~~
 
-O primeiro estágio compila o frontend. O segundo instala o backend Python e serve a aplicação inteira pelo FastAPI.
+A aplicação fica disponível em `http://localhost:8000`, com OpenAPI em `http://localhost:8000/docs`.
 
 ## Desenvolvimento local
 
@@ -71,4 +67,8 @@ npm install
 npm run dev
 ~~~
 
-Durante o desenvolvimento, o Vite encaminha /api/* para http://localhost:8000.
+Durante o desenvolvimento, o Vite encaminha `/api/*` para `http://localhost:8000`.
+
+## Verificações de publicação
+
+Antes de tratar uma competência como publicada, o projeto exige os artefatos Gold correspondentes e um gate válido. O endpoint de readiness informa o backend ativo e se há dados publicados disponíveis para serving.

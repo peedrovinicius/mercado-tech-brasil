@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.3
+
+- documentação do frontend atualizada para refletir a experiência publicada;
+- documentação de deploy alinhada ao Dockerfile e ao render.yaml atuais;
+- removida a descrição antiga que tratava o serving por arquivos como estado temporário anterior à primeira publicação;
+- teste automatizado passa a exigir alinhamento entre versões do backend, frontend e settings;
+- teste automatizado protege o escopo publicado contra reintrodução do período excluído;
+- regra contra travessões longos foi consolidada no mesmo conjunto de guardrails;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.2
 
 - gráficos com tooltips confinados à área visível para melhor uso em telas pequenas;

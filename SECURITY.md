@@ -1,8 +1,9 @@
 # Segurança
 
-Este projeto trabalha apenas com dados públicos não identificados nas análises planejadas.
+O projeto publica análises agregadas derivadas de fontes públicas e não versiona microdados brutos.
 
 Não envie:
+
 - credenciais;
 - arquivos `.env`;
 - dumps privados;

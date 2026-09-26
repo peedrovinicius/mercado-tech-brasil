@@ -1,36 +1,64 @@
 # Frontend: Mercado Tech Brasil
 
-Interface React + TypeScript para consumir exclusivamente a API do projeto.
+Interface React + TypeScript para a camada pública de análise do Mercado Tech Brasil.
+
+## Estado atual
+
+O frontend consome exclusivamente a API do projeto e apresenta a série publicada de janeiro a julho de 2026 sem manter indicadores fixos no código da interface.
+
+A experiência atual inclui:
+
+- hero com fonte, competência mais recente, cobertura e backend ativo;
+- contexto oficial do mercado formal total separado do recorte de tecnologia;
+- indicadores de admissões, desligamentos, saldo e remuneração;
+- comparação Brasil, Nordeste e Ceará;
+- gráficos por UF, município, ocupação e série histórica;
+- painel de qualidade dos dados;
+- proveniência com SHA-256;
+- metodologia acessível na própria interface;
+- estados de carregamento, ausência de dados e indisponibilidade da API;
+- responsividade para desktop, tablet e celular;
+- configuração responsiva e ARIA nos gráficos ECharts.
 
 ## Princípios
 
 - nenhum indicador tech é fixado no frontend;
-- sem microdados tech aprovados, a interface continua útil com contexto oficial separado;
-- contexto do mercado formal total nunca é apresentado como recorte de tecnologia;
-- erros de backend têm estado visual próprio;
-- metodologia e rastreabilidade ficam acessíveis na própria experiência;
-- responsividade para desktop, tablet e mobile.
+- o mercado formal total nunca é apresentado como recorte de tecnologia;
+- a competência exibida depende do que foi efetivamente publicado pela API;
+- dados ausentes usam estado explícito em vez de valores demonstrativos;
+- metodologia, qualidade e proveniência permanecem visíveis ao usuário;
+- a interface respeita foco visível e preferência por redução de movimento.
 
-## Executar
+## Desenvolvimento local
+
+Instale as dependências e inicie o Vite:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Por padrão o frontend acessa:
+Durante o desenvolvimento, o Vite encaminha chamadas de `/api/*` para:
 
 ```text
-http://localhost:8000/api/v1
+http://localhost:8000
 ```
 
-Para alterar:
+O backend pode ser iniciado na raiz do projeto com:
+
+```bash
+uvicorn src.api.main:app --reload
+```
+
+## API
+
+Em produção, frontend e API usam o mesmo domínio e o frontend utiliza `/api/v1`.
+
+Para apontar o frontend para outro backend no desenvolvimento, copie o arquivo de exemplo e defina `VITE_API_BASE_URL`:
 
 ```bash
 cp .env.example .env
 ```
-
-Defina `VITE_API_BASE_URL`.
 
 ## Build
 
@@ -38,18 +66,8 @@ Defina `VITE_API_BASE_URL`.
 npm run build
 ```
 
-## Experiência v0.11
+O build executa TypeScript e Vite. Na imagem de produção, os arquivos gerados em `frontend/dist` são servidos pelo FastAPI.
 
-- hero de produto;
-- pipeline visual;
-- contexto oficial Brasil/Ceará;
-- gráfico de saldo por região;
-- estado de espera elegante;
-- indicadores tech quando publicados;
-- admissões tech por UF;
-- saldo por CBO;
-- painel de qualidade;
-- proveniência por SHA-256;
-- modal de metodologia.
+## Fonte e escopo
 
-O contexto oficial vem da API e é claramente rotulado como **mercado formal total**, não como indicador de tecnologia.
+A fonte principal é o Novo CAGED do Ministério do Trabalho e Emprego. O contexto oficial do mercado formal total é identificado separadamente para não ser confundido com o recorte ocupacional de tecnologia.
