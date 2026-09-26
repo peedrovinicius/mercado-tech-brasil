@@ -80,6 +80,7 @@ def _effective_competence_expr(frame, kind: str, ingest_competence: str):
         .cast(pl.Utf8, strict=False)
         .str.replace_all(r"\D", "")
         .str.slice(0, 6)
+        .replace("", None)
         for name in existing
     ]
     return pl.coalesce(expressions + [pl.lit(ingest_competence)]).alias(
