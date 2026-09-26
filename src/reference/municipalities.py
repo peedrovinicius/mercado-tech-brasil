@@ -77,5 +77,5 @@ def load_municipalities(path: Path) -> dict[str, dict[str, str]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     municipalities = payload.get("municipalities")
     if not isinstance(municipalities, dict):
-        raise ValueError("Cache de municípios inválido.")
+        raise TypeError("Cache de municípios inválido.")
     return municipalities

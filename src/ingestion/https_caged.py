@@ -4,6 +4,7 @@ import json
 import time
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
+from ftplib import all_errors
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -18,6 +19,7 @@ from src.ingestion.ftp_caged import (
 
 HF_BASE = "https://huggingface.co/datasets/alexsandroprado/caged/resolve/main"
 HF_REPOSITORY = "https://huggingface.co/datasets/alexsandroprado/caged"
+FTP_DOWNLOAD_ERRORS = all_errors + (RuntimeError, ValueError)
 
 
 @dataclass(frozen=True)
@@ -168,14 +170,14 @@ def download_month_resilient(
                 )
             )
         return artifacts
-    except Exception as ftp_error:
+    except FTP_DOWNLOAD_ERRORS as ftp_error:
         try:
             return download_month_https(
                 yearmonth,
                 destination_dir,
                 file_types=requested,
             )
-        except Exception as https_error:
+        except RuntimeError as https_error:
             raise RuntimeError(
                 "Falha nos dois transportes de microdados: FTP do MTE e HTTPS alternativo."
             ) from ExceptionGroup(

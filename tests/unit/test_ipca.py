@@ -24,7 +24,7 @@ def test_correct_to_base_uses_index_ratio():
         base_index=125,
     )
 
-    assert value == Decimal("125")
+    assert value == Decimal(125)
 
 
 def test_ipca_cache_roundtrip(tmp_path: Path):
