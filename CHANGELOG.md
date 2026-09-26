@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.31.0
+
+- Gold anual RAIS implementado e separado do Gold mensal do Novo CAGED;
+- geração exige reconciliação anual com reconciled=true e gold_ready=true;
+- novo overview anual registra estoque tech, estoque nacional reconciliado e participação relativa;
+- agregado por UF registra estoque ativo e participação no estoque tech;
+- agregado por família CBO registra estoque, denominação e participação no estoque tech;
+- Parquet anual agrega UF, família CBO, CBO completa e estoque ativo;
+- município permanece fora do Gold RAIS até validação do sistema territorial observado em 2025;
+- todos os artefatos Gold RAIS permanecem com publication_ready=false;
+- CLI ganha comando rais-gold;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.30.0
 
 - referência oficial da RAIS 2025 versionada com 59.970.945 vínculos ativos;

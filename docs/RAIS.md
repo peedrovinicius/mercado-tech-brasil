@@ -269,6 +269,40 @@ O relatório é salvo em:
 data/silver/rais_reconciliation_2025.json
 ```
 
+## Gold anual
+
+Depois de uma reconciliação exata com `gold_ready=true`, os agregados anuais podem ser gerados:
+
+```bash
+python -m src.cli rais-gold 2025
+```
+
+O Gold anual é separado dos artefatos mensais do Novo CAGED e produz:
+
+```text
+data/gold/rais-overview-2025.json
+data/gold/rais-by-uf-2025.json
+data/gold/rais-by-cbo-family-2025.json
+data/gold/rais-market-2025.parquet
+```
+
+O overview registra:
+
+- estoque tech ativo em 31/12;
+- estoque nacional ativo usado na reconciliação;
+- participação do estoque tech no total nacional;
+- versão do recorte CBO;
+- quantidade de UFs;
+- status da reconciliação.
+
+O agregado por UF registra estoque ativo e participação no estoque tech. O agregado por família CBO registra estoque, denominação da família e participação no estoque tech.
+
+O Parquet Gold agrega por UF, família CBO e CBO completa.
+
+Município não entra nesta primeira camada Gold da RAIS. O sistema territorial observado nos microdados 2025 ainda precisa ser confirmado antes de qualquer enriquecimento municipal anual.
+
+Todos os artefatos são gerados com `publication_ready=false`. A existência do Gold não autoriza serving ou dashboard.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.

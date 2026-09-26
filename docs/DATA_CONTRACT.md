@@ -96,3 +96,26 @@ O relatório `rais_quality_<ano>.json` preserva contagens nacionais anteriores a
 A reconciliação usa `rows_active_source`, não `rows_tech` nem `rows_active` após validações territoriais.
 
 Para 2025, `rows_active_source` precisa ser exatamente 59.970.945 antes de o Gold anual ser liberado.
+
+
+### Gold RAIS anual
+
+Os artefatos Gold anuais possuem prefixo `rais-` e não são consumidos pelos endpoints mensais do Novo CAGED.
+
+`rais-overview-<ano>.json` contém:
+
+| Campo | Significado |
+|---|---|
+| active_stock_tech | vínculos tech ativos em 31/12 |
+| active_stock_national_reference | estoque nacional oficial reconciliado |
+| share_tech_of_national_active | participação do estoque tech no estoque nacional |
+| cbo_scope_version | versão do recorte ocupacional |
+| publication_ready | permanece falso até o gate anual |
+
+`rais-by-uf-<ano>.json` agrega estoque tech por UF.
+
+`rais-by-cbo-family-<ano>.json` agrega estoque tech por família CBO.
+
+`rais-market-<ano>.parquet` agrega ano, UF, família CBO, CBO completa e estoque ativo.
+
+A soma de `active_stock` no Parquet precisa fechar exatamente `active_stock_tech` do overview.

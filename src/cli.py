@@ -6,6 +6,7 @@ from pathlib import Path
 from src.core.settings import settings
 from src.db.loader import ReleaseNotApprovedError, load_approved_release
 from src.gold.aggregate import build_gold
+from src.gold.rais import build_rais_gold
 from src.ingestion.archive import extract_7z
 from src.ingestion.https_caged import (
     download_month_resilient,
@@ -549,6 +550,37 @@ def command_rais_reconcile(year: int) -> None:
         raise SystemExit(2)
 
 
+def command_rais_gold(year: int) -> None:
+    silver_path = settings.silver_path / f"rais_tech_{year}.parquet"
+    reconciliation_path = (
+        settings.silver_path / f"rais_reconciliation_{year}.json"
+    )
+
+    if not silver_path.exists():
+        raise SystemExit(
+            f"Silver RAIS ausente: {silver_path}. "
+            "Execute rais-transform primeiro."
+        )
+    if not reconciliation_path.exists():
+        raise SystemExit(
+            f"Reconciliação RAIS ausente: {reconciliation_path}. "
+            "Execute rais-reconcile primeiro."
+        )
+
+    paths = build_rais_gold(
+        year=year,
+        silver_path=silver_path,
+        reconciliation_path=reconciliation_path,
+        cbo_config_path=settings.cbo_config_path,
+        gold_dir=settings.gold_path,
+    )
+    print(f"rais gold overview: {paths['overview']}")
+    print(f"rais gold UF: {paths['by_uf']}")
+    print(f"rais gold CBO: {paths['by_cbo_family']}")
+    print(f"rais gold parquet: {paths['market']}")
+    print("rais publication: BLOCKED until annual publication gate")
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -752,6 +784,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rais_reconcile.add_argument("year", type=int, help="Ano-base da RAIS.")
 
+    rais_gold = sub.add_parser(
+        "rais-gold",
+        help="Gera agregados Gold anuais da RAIS após reconciliação exata.",
+    )
+    rais_gold.add_argument("year", type=int, help="Ano-base da RAIS.")
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -859,6 +897,10 @@ def main() -> None:
 
     if args.command == "rais-reconcile":
         command_rais_reconcile(args.year)
+        return
+
+    if args.command == "rais-gold":
+        command_rais_gold(args.year)
         return
 
     if args.command == "sync-municipalities":
