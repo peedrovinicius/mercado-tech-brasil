@@ -13,6 +13,7 @@ from src.ingestion.https_caged import (
 )
 from src.ingestion.local import ingest_local_file
 from src.ingestion.manifest import build_manifest, write_manifest
+from src.reference.ipca import fetch_ipca_indices, save_ipca_cache
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.validation.publication_gate import (
@@ -139,6 +140,7 @@ def _rebuild_affected_gold(adjustment_path: Path) -> None:
             base,
             yearmonth=competence,
             gold_dir=settings.gold_path,
+            ipca_cache_path=settings.ipca_cache_path,
         )
         print(f"gold reconstruído com ajustes: {competence}")
 
@@ -170,6 +172,7 @@ def command_gold(yearmonth: str) -> None:
         silver,
         yearmonth=yearmonth,
         gold_dir=settings.gold_path,
+        ipca_cache_path=settings.ipca_cache_path,
     )
     print(f"gold: {parquet}")
     print(f"overview: {overview}")
@@ -285,6 +288,26 @@ def command_approve_release(
     _run_publication_gate(yearmonth)
 
 
+def command_sync_ipca(periods: list[str], base_competence: str) -> None:
+    requested = sorted(set(periods + [base_competence]))
+    indices = fetch_ipca_indices(requested)
+    missing = [period for period in requested if period not in indices]
+    if missing:
+        raise SystemExit(
+            "SIDRA não retornou todas as competências solicitadas: "
+            + ", ".join(missing)
+        )
+    save_ipca_cache(
+        indices,
+        base_competence=base_competence,
+        destination=settings.ipca_cache_path,
+    )
+    print(
+        f"ipca: {len(indices)} competências salvas em "
+        f"{settings.ipca_cache_path} base={base_competence}"
+    )
+
+
 def command_load_postgres(yearmonth: str) -> None:
     try:
         result = load_approved_release(
@@ -301,6 +324,7 @@ def command_load_postgres(yearmonth: str) -> None:
     print(
         f"postgres: competência={result.competence} "
         f"ufs={result.uf_rows} ocupações={result.occupation_rows} "
+        f"municípios={result.municipality_rows} "
         f"sha256={result.source_sha256}"
     )
 
@@ -354,6 +378,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Confirma que layout, rejeições e metodologia foram revisados.",
     )
 
+    sync_ipca = sub.add_parser(
+        "sync-ipca",
+        help="Baixa números índice do IPCA no SIDRA para salário real.",
+    )
+    sync_ipca.add_argument(
+        "periods",
+        nargs="+",
+        help="Competências AAAAMM que devem ser armazenadas.",
+    )
+    sync_ipca.add_argument(
+        "--base",
+        required=True,
+        help="Competência base dos valores reais.",
+    )
+
     load_postgres = sub.add_parser(
         "load-postgres",
         help="Carrega no PostgreSQL apenas uma competência aprovada.",
@@ -389,6 +428,10 @@ def main() -> None:
             notes=args.notes,
             acknowledged=args.acknowledge_methodology_reviewed,
         )
+        return
+
+    if args.command == "sync-ipca":
+        command_sync_ipca(args.periods, args.base)
         return
 
     if args.command == "load-postgres":
