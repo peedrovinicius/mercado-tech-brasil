@@ -1,0 +1,17 @@
+name: Stop RAIS full audit
+
+on:
+  push:
+    paths:
+      - ".github/rais-stop.run"
+
+concurrency:
+  group: rais-full-audit-2025
+  cancel-in-progress: true
+
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - run: echo "cancel previous RAIS full audit"
