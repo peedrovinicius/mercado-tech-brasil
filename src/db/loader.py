@@ -201,6 +201,13 @@ def build_serving_payload(
                     "salary_median_admissions_real": item.get(
                         "salary_median_admissions_real"
                     ),
+                    "population_estimate": item.get("population_estimate"),
+                    "population_reference_year": item.get(
+                        "population_reference_year"
+                    ),
+                    "admissions_per_100k": item.get("admissions_per_100k"),
+                    "dismissals_per_100k": item.get("dismissals_per_100k"),
+                    "balance_per_100k": item.get("balance_per_100k"),
                 }
             )
 

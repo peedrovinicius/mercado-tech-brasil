@@ -12,7 +12,7 @@ class Settings:
     root: Path = ROOT
     environment: str = os.getenv("APP_ENV", "development")
     project_name: str = "Mercado Tech Brasil"
-    version: str = "0.21.0"
+    version: str = "0.22.0"
     data_backend: str = os.getenv("DATA_BACKEND", "files").lower()
     database_url: str = os.getenv(
         "DATABASE_URL",
@@ -29,6 +29,7 @@ class Settings:
     municipalities_cache_path: Path = (
         ROOT / "data" / "reference" / "municipalities.json"
     )
+    population_cache_path: Path = ROOT / "data" / "reference" / "population.json"
     bronze_path: Path = ROOT / "data" / "bronze"
     silver_path: Path = ROOT / "data" / "silver"
     gold_path: Path = ROOT / "data" / "gold"

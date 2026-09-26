@@ -54,6 +54,7 @@ jobs:
       - name: Sync official references
         run: |
           python -m src.cli sync-municipalities
+          python -m src.cli sync-population "${COMPETENCE:0:4}"
           python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
 
       - name: Download official competence
@@ -188,3 +189,4 @@ jobs:
             data/bronze/${{ inputs.competence }}/extracted/*.manifest.json
             data/reference/ipca.json
             data/reference/municipalities.json
+            data/reference/population.json

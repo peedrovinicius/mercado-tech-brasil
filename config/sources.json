@@ -24,6 +24,13 @@
       "table": "1737",
       "variable": "2266",
       "api": "https://apisidra.ibge.gov.br/values"
+    },
+    "population": {
+      "system": "SIDRA",
+      "table": "6579",
+      "variable": "9324",
+      "reference_date": "01-07 do ano de referência",
+      "api": "https://servicodados.ibge.gov.br/api/v3/agregados"
     }
   }
 }

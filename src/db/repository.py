@@ -181,16 +181,38 @@ def fetch_by_municipality(
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
+                "population_estimate": row["population_estimate"],
+                "population_reference_year": row["population_reference_year"],
+                "admissions_per_100k": _float_or_none(
+                    row["admissions_per_100k"]
+                ),
+                "dismissals_per_100k": _float_or_none(
+                    row["dismissals_per_100k"]
+                ),
+                "balance_per_100k": _float_or_none(
+                    row["balance_per_100k"]
+                ),
                 **_salary_payload(row),
             }
             for row in rows
         ]
+        population_years = {
+            int(item["population_reference_year"])
+            for item in items
+            if item["population_reference_year"] is not None
+        }
         return {
             "competence": release["competence"].strftime("%Y%m"),
             "source": release["source"],
             "code_system": "codigo_municipio_caged",
             "salary_real_base_competence": release.get(
                 "salary_real_base_competence"
+            ),
+            "population_source": "IBGE SIDRA" if population_years else None,
+            "population_reference_year": (
+                next(iter(population_years))
+                if len(population_years) == 1
+                else None
             ),
             "items": items,
         }

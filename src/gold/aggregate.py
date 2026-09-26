@@ -9,6 +9,7 @@ from typing import Any
 from src.methodology.salary import add_salary_eligibility, methodology_for_competence
 from src.reference.ipca import load_ipca_cache
 from src.reference.municipalities import load_municipalities
+from src.reference.population import load_population_cache
 
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
@@ -265,11 +266,30 @@ def _apply_real_salary(
 def enrich_municipality_items(
     items: list[dict[str, Any]],
     cache_path: Path | None,
+    population_cache_path: Path | None = None,
 ) -> list[dict[str, Any]]:
-    if cache_path is None or not cache_path.exists():
-        return items
+    mapping = (
+        load_municipalities(cache_path)
+        if cache_path is not None and cache_path.exists()
+        else {}
+    )
+    population_payload = (
+        load_population_cache(population_cache_path)
+        if population_cache_path is not None and population_cache_path.exists()
+        else None
+    )
+    populations = (
+        population_payload.get("municipalities", {})
+        if isinstance(population_payload, dict)
+        else {}
+    )
+    population_year = (
+        int(population_payload.get("reference_year"))
+        if isinstance(population_payload, dict)
+        and population_payload.get("reference_year") is not None
+        else None
+    )
 
-    mapping = load_municipalities(cache_path)
     for item in items:
         code = str(item.get("municipio_codigo_caged") or "")
         if code == "999999":
@@ -278,6 +298,11 @@ def enrich_municipality_items(
                     "municipio_codigo_ibge": None,
                     "municipio_nome": "Não identificado",
                     "uf": "NI",
+                    "population_estimate": None,
+                    "population_reference_year": population_year,
+                    "admissions_per_100k": None,
+                    "dismissals_per_100k": None,
+                    "balance_per_100k": None,
                 }
             )
             continue
@@ -285,6 +310,44 @@ def enrich_municipality_items(
         reference = mapping.get(code)
         if reference:
             item.update(reference)
+
+        ibge_code = str(item.get("municipio_codigo_ibge") or "")
+        raw_population = (
+            populations.get(ibge_code)
+            if isinstance(populations, dict)
+            else None
+        )
+        population = int(raw_population) if raw_population is not None else None
+        if population is None or population <= 0:
+            item.update(
+                {
+                    "population_estimate": None,
+                    "population_reference_year": population_year,
+                    "admissions_per_100k": None,
+                    "dismissals_per_100k": None,
+                    "balance_per_100k": None,
+                }
+            )
+            continue
+
+        item.update(
+            {
+                "population_estimate": population,
+                "population_reference_year": population_year,
+                "admissions_per_100k": round(
+                    int(item.get("admissions") or 0) * 100000 / population,
+                    4,
+                ),
+                "dismissals_per_100k": round(
+                    int(item.get("dismissals") or 0) * 100000 / population,
+                    4,
+                ),
+                "balance_per_100k": round(
+                    int(item.get("balance") or 0) * 100000 / population,
+                    4,
+                ),
+            }
+        )
     return items
 
 
@@ -295,6 +358,7 @@ def build_gold(
     gold_dir: Path,
     ipca_cache_path: Path | None = None,
     municipalities_cache_path: Path | None = None,
+    population_cache_path: Path | None = None,
 ) -> tuple[Path, Path]:
     try:
         import polars as pl
@@ -456,6 +520,12 @@ def build_gold(
                 real_factor,
             ),
             municipalities_cache_path,
+            population_cache_path,
+        )
+        population_payload = (
+            load_population_cache(population_cache_path)
+            if population_cache_path is not None and population_cache_path.exists()
+            else None
         )
         _write_json(
             gold_dir / f"by-municipality-{yearmonth}.json",
@@ -464,6 +534,21 @@ def build_gold(
                 "source": "Novo CAGED / MTE",
                 "code_system": "codigo_municipio_caged",
                 "salary_real_base_competence": real_base_competence,
+                "population_source": (
+                    population_payload.get("source")
+                    if isinstance(population_payload, dict)
+                    else None
+                ),
+                "population_reference_year": (
+                    population_payload.get("reference_year")
+                    if isinstance(population_payload, dict)
+                    else None
+                ),
+                "population_reference_date": (
+                    population_payload.get("reference_date")
+                    if isinstance(population_payload, dict)
+                    else None
+                ),
                 "items": municipality_items,
             },
         )

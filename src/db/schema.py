@@ -80,6 +80,11 @@ market_municipality = Table(
     Column("salary_median_admissions", Numeric(14, 2)),
     Column("salary_mean_admissions_real", Numeric(14, 2)),
     Column("salary_median_admissions_real", Numeric(14, 2)),
+    Column("population_estimate", Integer),
+    Column("population_reference_year", Integer),
+    Column("admissions_per_100k", Numeric(14, 4)),
+    Column("dismissals_per_100k", Numeric(14, 4)),
+    Column("balance_per_100k", Numeric(14, 4)),
     CheckConstraint(
         "admissions >= 0",
         name="ck_market_municipality_admissions_nonnegative",

@@ -19,6 +19,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - API FastAPI e frontend React;
 - comparação Brasil, Nordeste e Ceará;
 - consolidação trimestral com identificação de períodos parciais;
+- integração SIDRA para população municipal e cálculo por 100 mil no Gold;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -38,7 +39,7 @@ A base necessária para publicar e auditar o produto está implementada:
 
 ### Expansão analítica
 
-- incorporar população municipal para indicadores por 100 mil habitantes;
+- publicar a visualização municipal por 100 mil após o próximo ciclo Gold enriquecido;
 - adicionar RAIS para análises de estoque anual de vínculos;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.

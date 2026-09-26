@@ -18,6 +18,10 @@ from src.reference.municipalities import (
     fetch_municipalities,
     save_municipalities,
 )
+from src.reference.population import (
+    fetch_population_estimates,
+    save_population_cache,
+)
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.validation.publication_gate import (
@@ -146,6 +150,7 @@ def _rebuild_affected_gold(adjustment_path: Path) -> None:
             gold_dir=settings.gold_path,
             ipca_cache_path=settings.ipca_cache_path,
             municipalities_cache_path=settings.municipalities_cache_path,
+            population_cache_path=settings.population_cache_path,
         )
         print(f"gold reconstruído com ajustes: {competence}")
 
@@ -310,6 +315,23 @@ def command_sync_municipalities() -> None:
     )
 
 
+def command_sync_population(year: int) -> None:
+    populations = fetch_population_estimates(year)
+    if len(populations) < 5000:
+        raise SystemExit(
+            "SIDRA retornou uma quantidade inesperadamente baixa de municípios."
+        )
+    save_population_cache(
+        populations,
+        year=year,
+        destination=settings.population_cache_path,
+    )
+    print(
+        f"população: {len(populations)} municípios salvos em "
+        f"{settings.population_cache_path} referência={year}-07-01"
+    )
+
+
 def command_sync_ipca(periods: list[str], base_competence: str) -> None:
     requested = sorted(set(periods + [base_competence]))
     indices = fetch_ipca_indices(requested)
@@ -405,6 +427,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
     )
 
+    sync_population = sub.add_parser(
+        "sync-population",
+        help="Atualiza estimativas municipais de população pela tabela 6579 do SIDRA.",
+    )
+    sync_population.add_argument(
+        "year",
+        type=int,
+        help="Ano de referência populacional.",
+    )
+
     sync_ipca = sub.add_parser(
         "sync-ipca",
         help="Baixa números índice do IPCA no SIDRA para salário real.",
@@ -459,6 +491,10 @@ def main() -> None:
 
     if args.command == "sync-municipalities":
         command_sync_municipalities()
+        return
+
+    if args.command == "sync-population":
+        command_sync_population(args.year)
         return
 
     if args.command == "sync-ipca":

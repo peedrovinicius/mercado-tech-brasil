@@ -42,6 +42,11 @@ export type MunicipalityItem = SalaryFields & {
   admissions: number
   dismissals: number
   balance: number
+  population_estimate?: number | null
+  population_reference_year?: number | null
+  admissions_per_100k?: number | null
+  dismissals_per_100k?: number | null
+  balance_per_100k?: number | null
 }
 
 export type TerritorialComparisonItem = {

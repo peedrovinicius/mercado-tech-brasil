@@ -156,7 +156,7 @@ flowchart LR
 |---|---|
 | Novo CAGED, MTE | admissões, desligamentos, saldo e remuneração de admissão |
 | CBO, MTE | definição versionada das ocupações de tecnologia |
-| IBGE | municípios, território e IPCA para valores reais |
+| IBGE | municípios, estimativas populacionais, território e IPCA para valores reais |
 
 As referências nacionais de janeiro a julho de 2026 estão versionadas em **config/reference_totals.json**. A referência detalhada de julho permanece em **config/official_reference_202607.json**.
 
@@ -190,7 +190,8 @@ O pipeline mantém:
 - gate de publicação vinculado ao hash do arquivo de origem;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;
-- comparação Ceará, Nordeste e Brasil na competência mais recente publicada.
+- comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
+- pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 
 ## Estado do produto
 

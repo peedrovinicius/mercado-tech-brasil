@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.22.0
+
+- integração com Estimativas da População do IBGE pela tabela SIDRA 6579, variável 9324;
+- nova sincronização populacional por ano com cache auditável e data de referência;
+- Gold municipal passa a derivar admissões, desligamentos e saldo por 100 mil habitantes quando há denominador válido;
+- categoria municipal residual permanece sem taxa populacional, sem imputação artificial;
+- auditoria mensal sincroniza população do mesmo ano da competência antes da geração Gold;
+- serving PostgreSQL recebe população, ano de referência e taxas por 100 mil;
+- migration adiciona os novos campos à tabela municipal;
+- contrato TypeScript já aceita os novos indicadores para a próxima etapa visual;
+- testes cobrem parsing SIDRA, cache populacional e cálculo das taxas;
+- cobertura publicada de emprego permanece de janeiro a julho de 2026.
+
 ## 0.21.0
 
 - novo endpoint de consolidação temporal derivado exclusivamente da série publicada;

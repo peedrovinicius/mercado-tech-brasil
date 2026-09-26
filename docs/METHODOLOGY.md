@@ -97,6 +97,22 @@ O mapeamento usa os seis primeiros dígitos do código IBGE como chave de corres
 
 Quando o CAGED informa o código residual `999999`, o produto registra o município como **Não identificado**, com UF `NI` e sem fabricar um código IBGE. O gate de publicação valida essa exceção explicitamente e exige identificação completa para os demais municípios.
 
+### População municipal e taxas por 100 mil habitantes
+
+A referência populacional usa a pesquisa Estimativas da População do IBGE, tabela 6579 do SIDRA, variável 9324. Para a série de 2026, a data de referência é 1º de julho de 2026.
+
+A população é associada pelo código IBGE de sete dígitos já incorporado à dimensão municipal. Quando a referência está disponível, o Gold municipal deriva:
+
+`admissoes_por_100_mil = admissoes / populacao_estimada x 100000`
+
+`desligamentos_por_100_mil = desligamentos / populacao_estimada x 100000`
+
+`saldo_por_100_mil = saldo / populacao_estimada x 100000`
+
+Municípios sem código IBGE válido, população ausente ou categoria residual permanecem com essas taxas nulas. O pipeline não substitui denominadores ausentes por estimativas próprias.
+
+A referência populacional é sincronizada antes da geração Gold e registra fonte, tabela, variável, ano e data de referência no cache de processamento.
+
 ## Série histórica
 
 Cada overview Gold é incorporado em `trend.json`. No backend PostgreSQL, a série é construída diretamente a partir das competências publicadas em `dataset_release`.
