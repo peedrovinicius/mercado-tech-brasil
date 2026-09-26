@@ -175,6 +175,9 @@ def fetch_by_municipality(
         items = [
             {
                 "municipio_codigo_caged": row["municipality_code"],
+                "municipio_codigo_ibge": row["municipality_ibge_code"],
+                "municipio_nome": row["municipality_name"],
+                "uf": row["uf"],
                 "admissions": row["admissions"],
                 "dismissals": row["dismissals"],
                 "balance": row["balance"],
