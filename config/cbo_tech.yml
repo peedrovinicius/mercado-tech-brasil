@@ -1,10 +1,23 @@
-version: 1
-name: recorte_tech_inicial
+version: 2
+name: recorte_tech_cbo_v2
 families:
+  "2122": "Engenheiros em computação"
   "2123": "Administradores de tecnologia da informação"
   "2124": "Analistas de tecnologia da informação"
   "3171": "Técnicos de desenvolvimento de sistemas e aplicações"
   "3172": "Técnicos em operação e monitoração de computadores"
+sources:
+  cbo_group_212: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/cbo2002_liv3.pdf"
+  cbo_family_2122: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/livro-1-portal-cbo.pdf"
+  cbo_family_2123: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/livro-1-portal-cbo.pdf"
+  cbo_family_2124: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/livro-1-portal-cbo.pdf"
+  cbo_group_317: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads/cbo2002_liv3.pdf"
+rationale:
+  - "2122 entra na v2 porque o MTE a classifica como Engenheiros em computação dentro do grupo 212 Profissionais da Informática."
+  - "2123 e 2124 permanecem como famílias profissionais diretamente ligadas à informática."
+  - "3171 e 3172 permanecem como famílias técnicas do grupo 317 Técnicos em Informática."
+  - "O recorte é ocupacional, não setorial: profissionais podem trabalhar em qualquer atividade econômica."
 notes:
   - "O recorte é explícito e versionado."
-  - "Ampliações devem ser justificadas e testadas."
+  - "Nenhuma família entra ou sai silenciosamente."
+  - "Mudanças exigem fonte oficial, justificativa e teste."

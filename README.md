@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.9 — reconciliação oficial e metodologia salarial**
+**v0.10 — recorte CBO oficial v2**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -180,6 +180,7 @@ mercado-tech-brasil/
 - [x] testes automatizados;
 - [x] referência oficial de julho/2026 por Brasil, região e UF;
 - [x] metodologia salarial do MTE reproduzida e testada;
+- [x] recorte CBO v2 revisado contra a classificação oficial do MTE;
 - [ ] processar a primeira competência oficial real;
 - [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
 - [x] carga transacional e idempotente Gold → PostgreSQL implementada;
@@ -352,3 +353,18 @@ A v0.9 versiona os números publicados no Sumário Executivo do MTE para julho/2
 Os testes verificam automaticamente que cada UF fecha aritmeticamente, que cada região é a soma das respectivas UFs e que o Brasil fecha exatamente quando se somam as 27 UFs e os registros não identificados.
 
 A metodologia salarial também segue a regra publicada pelo MTE: em 2026, entram apenas admissões não intermitentes com salário entre R$ 486,30 e R$ 243.150,00. As métricas de tecnologia usam esse mesmo filtro, sem confundir o recorte tech com o total do mercado formal.
+
+
+### Recorte CBO v2
+
+O recorte de tecnologia foi revisado contra a CBO oficial e agora inclui:
+
+- 2122 — Engenheiros em computação;
+- 2123 — Administradores de tecnologia da informação;
+- 2124 — Analistas de tecnologia da informação;
+- 3171 — Técnicos de desenvolvimento de sistemas e aplicações;
+- 3172 — Técnicos em operação e monitoração de computadores.
+
+A v2 corrige a ausência de 2122 no recorte inicial. A mudança é versionada, justificada e coberta por teste; nenhuma família é incluída silenciosamente.
+
+Veja `docs/CBO_SCOPE.md`.
