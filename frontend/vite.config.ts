@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   build: {
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -12,20 +13,12 @@ export default defineConfig({
           if (!has('node_modules')) {
             return undefined
           }
-          if (has('/zrender/')) {
-            return 'zrender'
-          }
-          if (has('/echarts-for-react/')) {
-            return 'echarts-react'
-          }
-          if (has('/echarts/lib/chart/')) {
-            return 'echarts-charts'
-          }
-          if (has('/echarts/lib/component/')) {
-            return 'echarts-components'
-          }
-          if (has('/echarts/')) {
-            return 'echarts-core'
+          if (
+            has('/echarts/') ||
+            has('/zrender/') ||
+            has('/echarts-for-react/')
+          ) {
+            return 'charts'
           }
           if (
             has('/react/') ||
