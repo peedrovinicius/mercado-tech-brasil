@@ -8,7 +8,13 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from src.ingestion.ftp_caged import VALID_FILE_TYPES, validate_yearmonth
+from src.ingestion.ftp_caged import (
+    BASE_DIR,
+    FTP_HOST,
+    VALID_FILE_TYPES,
+    download_month,
+    validate_yearmonth,
+)
 
 HF_BASE = "https://huggingface.co/datasets/alexsandroprado/caged/resolve/main"
 HF_REPOSITORY = "https://huggingface.co/datasets/alexsandroprado/caged"
@@ -128,3 +134,51 @@ def write_download_manifest(
         json.dumps(payload, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
+
+
+def download_month_resilient(
+    yearmonth: str,
+    destination_dir: Path,
+    file_types: Iterable[str] = ("MOV", "FOR", "EXC"),
+) -> list[DownloadArtifact]:
+    requested = tuple(kind.upper().strip() for kind in file_types)
+
+    try:
+        paths = download_month(
+            yearmonth,
+            destination_dir,
+            file_types=requested,
+        )
+        artifacts = []
+        for path in paths:
+            upper = path.name.upper()
+            kind = next(
+                candidate
+                for candidate in requested
+                if f"CAGED{candidate}" in upper
+            )
+            remote_dir = f"{BASE_DIR}/{yearmonth[:4]}/{yearmonth}"
+            artifacts.append(
+                DownloadArtifact(
+                    path=path,
+                    kind=kind,
+                    transport="ftp_mte",
+                    url=f"ftp://{FTP_HOST}/{remote_dir}/{path.name}",
+                )
+            )
+        return artifacts
+    except Exception as ftp_error:
+        try:
+            return download_month_https(
+                yearmonth,
+                destination_dir,
+                file_types=requested,
+            )
+        except Exception as https_error:
+            raise RuntimeError(
+                "Falha nos dois transportes de microdados: FTP do MTE e HTTPS alternativo."
+            ) from ExceptionGroup(
+                "Erros de transporte",
+                [ftp_error, https_error],
+            )
