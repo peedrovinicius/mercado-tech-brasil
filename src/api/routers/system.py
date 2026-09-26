@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 from sqlalchemy.exc import SQLAlchemyError
 
+from src.api.publication import latest_published_competence
 from src.core.settings import settings
 from src.db.repository import fetch_overview
 
@@ -44,18 +45,34 @@ def readiness() -> dict[str, object]:
             ),
         }
 
-    overview_files = sorted(settings.gold_path.glob("overview-*.json"))
-    market_files = sorted(settings.gold_path.glob("market-*.parquet"))
-    data_loaded = bool(overview_files and market_files)
+    competence = latest_published_competence(settings.gold_path)
+    overview_path = (
+        settings.gold_path / f"overview-{competence}.json"
+        if competence
+        else None
+    )
+    market_path = (
+        settings.gold_path / f"market-{competence}.parquet"
+        if competence
+        else None
+    )
+    data_loaded = bool(
+        competence
+        and overview_path
+        and overview_path.exists()
+        and market_path
+        and market_path.exists()
+    )
 
     return {
         "api": "ready",
         "data_loaded": data_loaded,
         "backend": "files",
-        "latest_overview": overview_files[-1].name if overview_files else None,
-        "latest_market": market_files[-1].name if market_files else None,
+        "published_competence": competence if data_loaded else None,
+        "latest_overview": overview_path.name if data_loaded else None,
+        "latest_market": market_path.name if data_loaded else None,
         "note": (
-            "A API está operacional. data_loaded=true somente quando a camada Gold "
-            "possui overview e tabela analítica correspondentes."
+            "A API está operacional. data_loaded=true somente quando a competência "
+            "possui gate de publicação aprovado e os artefatos Gold correspondentes."
         ),
     }

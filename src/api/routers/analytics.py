@@ -6,6 +6,10 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import SQLAlchemyError
 
+from src.api.publication import (
+    latest_published_competence,
+    published_competencies,
+)
 from src.core.settings import settings
 from src.db.repository import (
     fetch_by_municipality,
@@ -17,17 +21,24 @@ from src.db.repository import (
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
-def _latest_json(prefix: str) -> Path:
-    files = sorted(settings.gold_path.glob(f"{prefix}-*.json"))
-    if not files:
+def _published_json(prefix: str) -> Path:
+    competence = latest_published_competence(settings.gold_path)
+    if competence is None:
         raise HTTPException(
             status_code=503,
             detail=(
                 "Indicador ainda não disponível. O pipeline oficial precisa ser "
-                "processado e validado antes da publicação."
+                "processado, validado e aprovado antes da publicação."
             ),
         )
-    return files[-1]
+
+    path = settings.gold_path / f"{prefix}-{competence}.json"
+    if not path.exists():
+        raise HTTPException(
+            status_code=503,
+            detail=f"Artefato publicado ausente para {prefix} em {competence}.",
+        )
+    return path
 
 
 @router.get("/by-uf")
@@ -47,7 +58,7 @@ def by_uf(limit: int = Query(default=27, ge=1, le=27)) -> dict[str, object]:
             )
         return payload
 
-    payload = json.loads(_latest_json("by-uf").read_text(encoding="utf-8"))
+    payload = json.loads(_published_json("by-uf").read_text(encoding="utf-8"))
     return {
         **payload,
         "items": payload.get("items", [])[:limit],
@@ -71,7 +82,9 @@ def by_occupation(limit: int = Query(default=10, ge=1, le=50)) -> dict[str, obje
             )
         return payload
 
-    payload = json.loads(_latest_json("by-occupation").read_text(encoding="utf-8"))
+    payload = json.loads(
+        _published_json("by-occupation").read_text(encoding="utf-8")
+    )
     return {
         **payload,
         "items": payload.get("items", [])[:limit],
@@ -98,7 +111,7 @@ def by_municipality(
         return payload
 
     payload = json.loads(
-        _latest_json("by-municipality").read_text(encoding="utf-8")
+        _published_json("by-municipality").read_text(encoding="utf-8")
     )
     return {
         **payload,
@@ -123,10 +136,23 @@ def trend() -> dict[str, object]:
             )
         return payload
 
+    approved = set(published_competencies(settings.gold_path))
     path = settings.gold_path / "trend.json"
-    if not path.exists():
+    if not approved or not path.exists():
         raise HTTPException(
             status_code=503,
-            detail="Série histórica ainda não disponível.",
+            detail="Série histórica publicada ainda não disponível.",
         )
-    return json.loads(path.read_text(encoding="utf-8"))
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    items = [
+        item
+        for item in payload.get("items", [])
+        if str(item.get("competence") or "") in approved
+    ]
+    if not items:
+        raise HTTPException(
+            status_code=503,
+            detail="Série histórica não possui competências aprovadas.",
+        )
+    return {**payload, "items": items}
