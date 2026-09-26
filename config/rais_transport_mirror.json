@@ -4,7 +4,7 @@
   "official_ftp_base": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/",
   "mirror_provider": "Hugging Face",
   "mirror_dataset": "selenelindsay/rais-caged-bronze",
-  "mirror_commit": "298640dfa9ff8f6ebc0ba4c931df67f11571d11e",
+  "mirror_commit": "ad02ee3f6aa2263dd539c7b552785c362b222130",
   "mirror_path_prefix": "RAIS/2025",
   "official_discovery": {
     "year": 2025,

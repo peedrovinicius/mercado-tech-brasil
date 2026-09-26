@@ -37,7 +37,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: rais-2025-parts-mirror-retry
-          path: work/parts
+          path: work
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: peedrovinicius/mercado-tech-brasil
           run-id: 36275196275

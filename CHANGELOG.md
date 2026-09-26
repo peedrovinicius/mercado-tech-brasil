@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.34.3
+
+- espelho RAIS 2025 passa a usar como pin a revisão que já contém os sete arquivos regionais de vínculos;
+- artefato do retry anterior é restaurado no nível correto para reaproveitar Centro-Oeste, NI e Norte;
+- processador seletivo detecta automaticamente essas três partes e continua somente com as quatro regiões faltantes;
+- fallback para main permanece disponível se o snapshot pinado não fornecer um arquivo esperado;
+- tamanho oficial do FTP continua sendo validado para cada download pelo espelho;
+- reconciliação nacional permanece obrigatória antes de Gold e publicação;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.34.2
 
 - retry HTTPS da RAIS passa a tentar primeiro a revisão pinada e depois a referência main quando o arquivo não existe no snapshot;
