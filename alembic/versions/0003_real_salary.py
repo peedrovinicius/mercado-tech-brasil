@@ -28,6 +28,15 @@ def upgrade() -> None:
     for table in (
         "fact_market_uf",
         "fact_market_occupation",
+    ):
+        op.add_column(
+            table,
+            sa.Column("salary_mean_admissions", sa.Numeric(14, 2)),
+        )
+
+    for table in (
+        "fact_market_uf",
+        "fact_market_occupation",
         "fact_market_municipality",
     ):
         op.add_column(
@@ -48,6 +57,12 @@ def downgrade() -> None:
     ):
         op.drop_column(table, "salary_median_admissions_real")
         op.drop_column(table, "salary_mean_admissions_real")
+
+    for table in (
+        "fact_market_occupation",
+        "fact_market_uf",
+    ):
+        op.drop_column(table, "salary_mean_admissions")
 
     op.drop_column("dataset_release", "salary_real_base_competence")
     op.drop_column("dataset_release", "salary_median_admissions_real")
