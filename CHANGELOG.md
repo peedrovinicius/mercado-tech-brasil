@@ -121,5 +121,4 @@
 - testes de API e qualidade;
 - CI leve para lint e testes;
 - scripts locais;
-- guia rápido para avaliação técnica;
 - ADR documentando a escolha de DuckDB/Polars.
