@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Bronze, Silver, reconciliação e gerador Gold implementados; serving ainda bloqueado |
+| RAIS anual | Pipeline até gate anual implementado; serving exige publishable=true |
 
 ## Série publicada
 
@@ -190,7 +190,8 @@ O pipeline mantém:
 - salário real com número índice do IPCA pelo SIDRA/IBGE;
 - ajustes FOR e EXC incorporados como deltas auditáveis;
 - referência externa para reconciliação;
-- gate de publicação vinculado ao hash do arquivo de origem;
+- gate mensal vinculado ao hash do arquivo de origem;
+- gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
@@ -277,6 +278,7 @@ python -m src.cli rais-validate-values 2025
 python -m src.cli rais-transform 2025
 python -m src.cli rais-reconcile 2025
 python -m src.cli rais-gold 2025
+python -m src.cli rais-validate-release 2025
 ~~~
 
 Processamento por competência:
@@ -299,6 +301,11 @@ python -m src.cli validate-release 202607
 python -m src.cli approve-release 202607 \
   --reviewer "responsavel" \
   --notes "Layout, rejeições e metodologia revisados." \
+  --acknowledge-methodology-reviewed
+
+python -m src.cli rais-approve-release 2025 \
+  --reviewer "responsavel" \
+  --notes "Origem, rejeições, reconciliação e Gold revisados." \
   --acknowledge-methodology-reviewed
 ~~~
 

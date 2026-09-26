@@ -303,21 +303,60 @@ Município não entra nesta primeira camada Gold da RAIS. O sistema territorial 
 
 Todos os artefatos são gerados com `publication_ready=false`. A existência do Gold não autoriza serving ou dashboard.
 
+## Gate anual de publicação
+
+Depois do Gold, a release anual ainda permanece fora do serving até passar pelo gate específico da RAIS.
+
+Executar os checks:
+
+```bash
+python -m src.cli rais-validate-release 2025
+```
+
+Para exigir código de saída 2 enquanto a release não estiver publicável:
+
+```bash
+python -m src.cli rais-validate-release 2025 --strict
+```
+
+O gate verifica:
+
+- proveniência dos arquivos anuais de origem com SHA-256;
+- presença da reconciliação e dos quatro artefatos Gold;
+- reconciliação nacional exata;
+- integridade dos totais do overview;
+- fechamento do agregado por UF;
+- fechamento do agregado por família CBO;
+- fechamento do Parquet Gold;
+- manutenção de `publication_ready=false` antes da aprovação;
+- fingerprint completo da release.
+
+O fingerprint combina os SHA-256 dos arquivos de origem com hashes da reconciliação e dos quatro artefatos Gold. Qualquer alteração em entrada ou saída muda o fingerprint e invalida automaticamente uma aprovação anterior.
+
+A aprovação metodológica é separada da aprovação mensal do Novo CAGED:
+
+```bash
+python -m src.cli rais-approve-release 2025 \
+  --reviewer "responsavel" \
+  --notes "Origem, rejeições, reconciliação e Gold revisados." \
+  --acknowledge-methodology-reviewed
+```
+
+A aprovação manual só pode ser registrada depois que todos os checks automáticos passam.
+
+O gate final é salvo em:
+
+```text
+data/gold/rais-publication-gate-2025.json
+```
+
+Somente `publishable=true` autoriza uma camada futura de API a expor os agregados anuais. Os helpers de publicação ignoram anos sem gate aprovado, mesmo quando os arquivos Gold existem.
+
 ## Regra de publicação
 
-A existência do Bronze RAIS não autoriza a publicação de métricas.
+A existência de Bronze, Silver ou Gold RAIS não autoriza a publicação de métricas. O serving deve considerar apenas anos com `rais-publication-gate-<ano>.json` e `publishable=true`.
 
-Antes de entrar no serving, a camada anual ainda precisa de:
-
-1. contrato de layout validado;
-2. transformação Silver;
-3. recorte CBO v2 aplicado de forma documentada;
-4. reconciliação com referência anual oficial;
-5. Gold de estoque anual;
-6. testes;
-7. gate de publicação específico para RAIS.
-
-Até esse ciclo ser concluído, o dashboard público continua exibindo somente indicadores derivados das competências do Novo CAGED já aprovadas.
+Até uma release anual atingir esse estado, o dashboard público continua exibindo somente indicadores derivados das competências do Novo CAGED já aprovadas.
 
 ## Separação conceitual
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.32.0
+
+- gate anual de publicação RAIS implementado e separado do gate mensal do Novo CAGED;
+- checks automáticos validam proveniência, reconciliação e fechamento dos agregados Gold;
+- fingerprint da release combina hashes dos arquivos de origem, reconciliação e quatro artefatos Gold;
+- qualquer alteração em entrada ou saída invalida a aprovação metodológica anterior;
+- aprovação manual só pode ser registrada quando todos os checks automáticos passam;
+- arquivo de aprovações RAIS é separado das aprovações mensais do CAGED;
+- CLI ganha rais-validate-release e rais-approve-release;
+- helpers de publicação retornam apenas anos RAIS com publishable=true;
+- Gold anual não aprovado continua invisível para uma futura camada de serving;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.31.0
 
 - Gold anual RAIS implementado e separado do Gold mensal do Novo CAGED;

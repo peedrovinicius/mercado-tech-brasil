@@ -30,6 +30,8 @@ A base necessária para publicar e auditar o produto está implementada:
 - transformação Silver RAIS em streaming com rejeições auditáveis;
 - reconciliação nacional RAIS contra referência oficial do MTE;
 - Gold anual RAIS por overview, UF e família CBO;
+- gate anual RAIS com fingerprint integral e aprovação metodológica;
+- helpers de serving que ignoram anos sem publicação aprovada;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -57,7 +59,8 @@ A base necessária para publicar e auditar o produto está implementada:
 - executar o Silver sobre os microdados reais de 2025 após as validações;
 - executar a reconciliação exata com 59.970.945 vínculos ativos;
 - executar rais-gold 2025 somente depois de gold_ready=true;
-- implementar gate anual de publicação RAIS antes de expor os agregados na API;
+- executar o gate anual sobre os artefatos reais da RAIS 2025;
+- expor endpoints RAIS somente depois de uma release real atingir publishable=true;
 - validar sistema de códigos municipais da RAIS 2025 antes de agregação municipal;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.

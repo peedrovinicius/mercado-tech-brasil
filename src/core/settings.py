@@ -12,7 +12,7 @@ class Settings:
     root: Path = ROOT
     environment: str = os.getenv("APP_ENV", "development")
     project_name: str = "Mercado Tech Brasil"
-    version: str = "0.31.0"
+    version: str = "0.32.0"
     data_backend: str = os.getenv("DATA_BACKEND", "files").lower()
     database_url: str = os.getenv(
         "DATABASE_URL",
@@ -26,6 +26,9 @@ class Settings:
         ROOT / "config" / "official_reference_202607.json"
     )
     publication_approvals_path: Path = ROOT / "config" / "publication_approvals.json"
+    rais_publication_approvals_path: Path = (
+        ROOT / "config" / "rais_publication_approvals.json"
+    )
     ipca_cache_path: Path = ROOT / "data" / "reference" / "ipca.json"
     municipalities_cache_path: Path = (
         ROOT / "data" / "reference" / "municipalities.json"

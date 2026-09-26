@@ -41,6 +41,11 @@ from src.validation.publication_gate import (
     evaluate_publication_gate,
     write_publication_gate,
 )
+from src.validation.rais_publication_gate import (
+    approve_rais_release,
+    evaluate_rais_publication_gate,
+    write_rais_publication_gate,
+)
 from src.validation.rais_reconciliation import (
     evaluate_rais_reconciliation,
     write_rais_reconciliation,
@@ -581,6 +586,82 @@ def command_rais_gold(year: int) -> None:
     print("rais publication: BLOCKED until annual publication gate")
 
 
+def _run_rais_publication_gate(
+    year: int,
+    *,
+    strict: bool = False,
+):
+    result = evaluate_rais_publication_gate(
+        year=year,
+        bronze_dir=settings.bronze_path,
+        silver_dir=settings.silver_path,
+        gold_dir=settings.gold_path,
+        approvals_path=settings.rais_publication_approvals_path,
+    )
+    destination = settings.gold_path / f"rais-publication-gate-{year}.json"
+    write_rais_publication_gate(result, destination)
+
+    print(f"rais gate: {destination}")
+    for check in result.checks:
+        status = "PASS" if check.passed else ("WARN" if not check.blocking else "FAIL")
+        print(f"[{status}] {check.id}: {check.message}")
+
+    print(
+        "rais publication: "
+        + ("APPROVED" if result.publishable else "BLOCKED")
+        + f" | automatic={result.automatic_checks_passed}"
+        + f" | manual={result.manual_approval_valid}"
+    )
+
+    if strict and not result.publishable:
+        raise SystemExit(2)
+
+    return result
+
+
+def command_rais_validate_release(
+    year: int,
+    *,
+    strict: bool,
+) -> None:
+    _run_rais_publication_gate(year, strict=strict)
+
+
+def command_rais_approve_release(
+    year: int,
+    *,
+    reviewer: str,
+    notes: str,
+    acknowledged: bool,
+) -> None:
+    if not acknowledged:
+        raise SystemExit(
+            "A aprovação RAIS exige --acknowledge-methodology-reviewed "
+            "após revisar origem, rejeições, reconciliação e Gold."
+        )
+
+    precheck = _run_rais_publication_gate(year)
+    if not precheck.automatic_checks_passed:
+        raise SystemExit(
+            "Aprovação RAIS bloqueada porque existem checks automáticos pendentes."
+        )
+
+    approval = approve_rais_release(
+        year=year,
+        reviewer=reviewer,
+        notes=notes,
+        bronze_dir=settings.bronze_path,
+        silver_dir=settings.silver_path,
+        gold_dir=settings.gold_path,
+        approvals_path=settings.rais_publication_approvals_path,
+    )
+    print(
+        f"aprovação RAIS registrada: reviewer={approval['reviewer']} "
+        f"release_sha256={approval['release_sha256']}"
+    )
+    _run_rais_publication_gate(year)
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -790,6 +871,38 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rais_gold.add_argument("year", type=int, help="Ano-base da RAIS.")
 
+    rais_validate_release = sub.add_parser(
+        "rais-validate-release",
+        help="Executa o gate anual de publicação da RAIS.",
+    )
+    rais_validate_release.add_argument(
+        "year",
+        type=int,
+        help="Ano-base da RAIS.",
+    )
+    rais_validate_release.add_argument(
+        "--strict",
+        action="store_true",
+        help="Retorna código 2 enquanto a release RAIS não estiver publicável.",
+    )
+
+    rais_approve_release = sub.add_parser(
+        "rais-approve-release",
+        help="Registra revisão metodológica da release RAIS atual.",
+    )
+    rais_approve_release.add_argument(
+        "year",
+        type=int,
+        help="Ano-base da RAIS.",
+    )
+    rais_approve_release.add_argument("--reviewer", required=True)
+    rais_approve_release.add_argument("--notes", required=True)
+    rais_approve_release.add_argument(
+        "--acknowledge-methodology-reviewed",
+        action="store_true",
+        help="Confirma revisão de origem, qualidade, reconciliação e Gold.",
+    )
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -901,6 +1014,22 @@ def main() -> None:
 
     if args.command == "rais-gold":
         command_rais_gold(args.year)
+        return
+
+    if args.command == "rais-validate-release":
+        command_rais_validate_release(
+            args.year,
+            strict=args.strict,
+        )
+        return
+
+    if args.command == "rais-approve-release":
+        command_rais_approve_release(
+            args.year,
+            reviewer=args.reviewer,
+            notes=args.notes,
+            acknowledged=args.acknowledge_methodology_reviewed,
+        )
         return
 
     if args.command == "sync-municipalities":
