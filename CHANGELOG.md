@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.12.0
+
+- imagem de produção unificada para FastAPI + React;
+- FastAPI serve o frontend compilado quando `frontend/dist` está presente;
+- frontend usa `/api/v1` por padrão;
+- proxy Vite mantém desenvolvimento local sem CORS;
+- Docker multi-stage reduz a topologia pública a um único serviço;
+- `render.yaml` com plano free e health check;
+- documentação de deploy;
+- testes garantindo root/API docs no modo de desenvolvimento.
+
+
 ## 0.11.0
 
 - dashboard visual orientado a portfólio/recrutadores;

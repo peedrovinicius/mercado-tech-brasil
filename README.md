@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.11 — dashboard visual de portfólio**
+**v0.12 — deploy público preparado**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -183,14 +183,16 @@ mercado-tech-brasil/
 - [x] recorte CBO v2 revisado contra a classificação oficial do MTE;
 - [x] contexto visual oficial Brasil/Ceará e gráfico regional;
 - [x] pipeline visual e estado de espera sem dados fictícios;
+- [x] container único FastAPI + React para produção;
+- [x] blueprint Render com health check;
 - [ ] processar a primeira competência oficial real;
 - [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
 - [x] carga transacional e idempotente Gold → PostgreSQL implementada;
 - [x] API pode servir indicadores diretamente do PostgreSQL;
 - [x] migrations Alembic para a camada de serving;
 - [ ] carregar a primeira competência oficial aprovada no PostgreSQL;
-- [ ] validar build completo do frontend no CI visual;
-- [ ] publicar a aplicação em ambiente acessível.
+- [x] build completo do frontend validado no CI visual;
+- [ ] criar o serviço público a partir do blueprint `render.yaml`;
 
 ## Princípios
 
@@ -387,3 +389,17 @@ A tela mostra:
 - cards e gráficos tech que entram automaticamente quando uma competência aprovada estiver disponível.
 
 Os números de contexto vêm do endpoint `/api/v1/metadata/official-reference/202607`; não existem métricas fictícias no frontend.
+
+
+### Deploy v0.12
+
+O projeto agora possui uma imagem de produção única: o React é compilado no primeiro estágio do Docker e o FastAPI serve tanto a API quanto os arquivos estáticos no mesmo domínio.
+
+```bash
+docker build -f docker/app/Dockerfile -t mercado-tech-brasil .
+docker run --rm -p 8000:8000 mercado-tech-brasil
+```
+
+O arquivo `render.yaml` permite criar a demonstração pública como um único Web Service Docker. Enquanto não houver Gold tech aprovado, o deploy usa `DATA_BACKEND=files`: mostra o contexto oficial do MTE e mantém os endpoints tech bloqueados, sem inventar resultados.
+
+Detalhes: `docs/DEPLOY.md`.

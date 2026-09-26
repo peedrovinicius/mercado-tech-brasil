@@ -3,6 +3,9 @@
 ## Concluído
 
 - frontend React/TypeScript integrado à API;
+- build Vite/TypeScript validado no CI;
+- imagem de produção unificada FastAPI + React;
+- blueprint de deploy público Render;
 - dashboard sem dados fictícios;
 - analytics Gold por UF e ocupação;
 
@@ -35,7 +38,6 @@
 4. validar códigos municipais;
 5. implementar semântica testada de FOR/EXC;
 6. reconciliar totais nacionais ajustados;
-7. validar o build completo do frontend com as dependências instaladas;
+7. criar a demonstração pública a partir do blueprint de deploy;
 8. carregar a primeira competência oficial aprovada no PostgreSQL;
-9. conectar o dashboard aos primeiros dados oficiais validados;
-10. preparar deploy público após a reconciliação metodológica.
+9. conectar o dashboard aos primeiros dados oficiais tech validados.
