@@ -13,7 +13,6 @@ from src.db.loader import (
 from src.db.repository import fetch_by_occupation, fetch_by_uf, fetch_overview
 from src.db.schema import dataset_release, market_occupation, market_uf
 
-
 YEAR_MONTH = "202607"
 SOURCE_SHA = "a" * 64
 
