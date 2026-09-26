@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.0
+
+- categoria oficial Não identificado preservada como UF residual;
+- auditoria nacional MOV gerada antes do recorte tech;
+- reconciliação nacional exata com a referência oficial no gate;
+- reconciliação específica de Não identificado;
+- correção da classificação de 1.369 registros reais de julho/2026.
+
+
 ## 0.13.0
 
 - transporte resiliente com FTP do MTE e fallback HTTPS;
