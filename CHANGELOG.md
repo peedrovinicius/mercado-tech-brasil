@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.25.0
+
+- RAIS anual ganha etapa explícita de extração separada do download;
+- arquivos extraídos recebem manifests com SHA-256 e metadados de origem;
+- nova inspeção de layout aceita .comt, .txt e .csv;
+- codificação e delimitador são detectados antes da leitura do cabeçalho;
+- nomes de colunas são normalizados apenas para comparação de schema;
+- cada layout observado recebe assinatura SHA-256 do cabeçalho normalizado;
+- layout-report.json registra os layouts encontrados sem liberar transformação ou publicação;
+- CLI ganha comandos rais-extract e rais-inspect;
+- documentação passa a considerar formalmente a mudança de estrutura dos microdados RAIS recentes;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.24.0
 
 - camada anual RAIS iniciada de forma separada do fluxo mensal do Novo CAGED;

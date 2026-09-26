@@ -269,6 +269,8 @@ python -m src.cli sync-ipca 202607 --base 202607
 # Camada anual RAIS, separada do Novo CAGED
 python -m src.cli rais-discover 2025
 python -m src.cli rais-download 2025
+python -m src.cli rais-extract 2025
+python -m src.cli rais-inspect 2025
 ~~~
 
 Processamento por competência:

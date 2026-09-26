@@ -2,9 +2,11 @@ from pathlib import Path
 
 import pytest
 
+import src.ingestion.rais as rais_module
 from src.ingestion.rais import (
     RaisRemoteFile,
     classify_filename,
+    extract_year,
     select_remote_files,
     validate_year,
 )
@@ -70,3 +72,51 @@ def test_invalid_year_and_dataset_are_rejected():
 
 def test_manifest_source_path_is_not_required_for_selection(tmp_path: Path):
     assert tmp_path.exists()
+
+
+
+def test_extract_year_preserves_source_metadata(
+    monkeypatch,
+    tmp_path: Path,
+):
+    archive_dir = tmp_path / "archives"
+    extracted_dir = tmp_path / "extracted"
+    archive_dir.mkdir()
+    extracted_dir.mkdir()
+
+    archive = archive_dir / "RAIS_VINC_PUB_TESTE.7z"
+    archive.write_bytes(b"archive")
+    (archive_dir / "download-manifest.json").write_text(
+        """{
+  "files": [
+    {
+      "path": "RAIS_VINC_PUB_TESTE.7z",
+      "transport": "ftp_mte",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_TESTE.7z"
+    }
+  ]
+}""",
+        encoding="utf-8",
+    )
+
+    extracted = extracted_dir / "RAIS_VINC_PUB_TESTE.comt"
+    extracted.write_text(
+        "Ano;CBO;Municipio;UF;Ativo\n2025;212405;2304400;CE;1\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        rais_module,
+        "extract_7z",
+        lambda _archive, _destination: [extracted],
+    )
+
+    result = extract_year(2025, archive_dir, extracted_dir)
+
+    assert result == [extracted]
+    manifest = extracted.with_suffix(".comt.manifest.json")
+    assert manifest.exists()
+    payload = __import__("json").loads(manifest.read_text(encoding="utf-8"))
+    assert payload["source"] == "rais_mte"
+    assert payload["competence"] == "2025"
+    assert payload["transport"] == "ftp_mte"
+    assert payload["source_url"].endswith("RAIS_VINC_PUB_TESTE.7z")

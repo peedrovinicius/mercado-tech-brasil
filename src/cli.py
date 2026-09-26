@@ -16,6 +16,7 @@ from src.ingestion.manifest import build_manifest, write_manifest
 from src.ingestion.rais import (
     discover_files as discover_rais_files,
     download_year as download_rais_year,
+    extract_year as extract_rais_year,
     write_download_manifest as write_rais_download_manifest,
 )
 from src.reference.ipca import fetch_ipca_indices, save_ipca_cache
@@ -29,6 +30,7 @@ from src.reference.population import (
 )
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
+from src.transform.rais_schema import inspect_rais_directory
 from src.validation.publication_gate import (
     approve_competence,
     evaluate_publication_gate,
@@ -345,6 +347,39 @@ def command_rais_download(year: int, dataset: str) -> None:
     print(f"rais manifest: {manifest}")
 
 
+def command_rais_extract(year: int) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    archive_dir = base_dir / "archives"
+    extracted_dir = base_dir / "extracted"
+
+    files = extract_rais_year(
+        year,
+        archive_dir,
+        extracted_dir,
+    )
+    print(
+        f"rais: {len(files)} arquivos extraídos para {extracted_dir}"
+    )
+
+
+def command_rais_inspect(year: int) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    extracted_dir = base_dir / "extracted"
+    report_path = base_dir / "layout-report.json"
+
+    payload = inspect_rais_directory(
+        extracted_dir,
+        year=year,
+        destination=report_path,
+    )
+    print(
+        f"rais layout: arquivos={payload['files_inspected']} "
+        f"layouts={payload['unique_layouts']} "
+        f"relatório={report_path}"
+    )
+    print("rais publication: BLOCKED until semantic layout validation")
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -490,6 +525,18 @@ def build_parser() -> argparse.ArgumentParser:
         default="vinculos",
     )
 
+    rais_extract = sub.add_parser(
+        "rais-extract",
+        help="Extrai os arquivos anuais RAIS e cria manifests dos arquivos resultantes.",
+    )
+    rais_extract.add_argument("year", type=int, help="Ano-base da RAIS.")
+
+    rais_inspect = sub.add_parser(
+        "rais-inspect",
+        help="Inspeciona o layout real dos arquivos RAIS extraídos.",
+    )
+    rais_inspect.add_argument("year", type=int, help="Ano-base da RAIS.")
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -563,6 +610,14 @@ def main() -> None:
 
     if args.command == "rais-download":
         command_rais_download(args.year, args.dataset)
+        return
+
+    if args.command == "rais-extract":
+        command_rais_extract(args.year)
+        return
+
+    if args.command == "rais-inspect":
+        command_rais_inspect(args.year)
         return
 
     if args.command == "sync-municipalities":

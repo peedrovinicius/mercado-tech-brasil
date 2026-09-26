@@ -63,6 +63,44 @@ Arquivos de estabelecimentos não entram no download padrão:
 python -m src.cli rais-download 2025 --dataset estabelecimentos
 ```
 
+## Extração e inspeção de layout
+
+A partir da RAIS 2024, o MTE informou mudança estrutural nos microdados públicos. Os arquivos compactados continuam em `.7z`, mas os arquivos de dados podem usar a extensão `.comt`, formato textual estruturado equivalente a CSV. O MTE também informou mudanças na nomenclatura e formatação de variáveis.
+
+Por isso, o pipeline não assume que o layout histórico continua válido.
+
+Extrair o Bronze anual:
+
+```bash
+python -m src.cli rais-extract 2025
+```
+
+Inspecionar os cabeçalhos realmente extraídos:
+
+```bash
+python -m src.cli rais-inspect 2025
+```
+
+A inspeção aceita `.comt`, `.txt` e `.csv`, detecta a codificação, identifica o delimitador, normaliza apenas os nomes para comparação e calcula uma assinatura SHA-256 do cabeçalho.
+
+O resultado é salvo em:
+
+```text
+data/bronze/rais/2025/layout-report.json
+```
+
+O relatório registra, por arquivo:
+
+- extensão;
+- codificação detectada;
+- delimitador;
+- colunas originais;
+- colunas normalizadas;
+- quantidade de colunas;
+- assinatura SHA-256 do layout.
+
+`silver_ready` e `publication_ready` permanecem falsos. A inspeção estrutural não substitui a validação semântica com o dicionário oficial do ano.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.

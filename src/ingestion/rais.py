@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 from ftplib import FTP
 from pathlib import Path
 
+from src.ingestion.archive import extract_7z
 from src.ingestion.manifest import build_manifest, write_manifest
 
 FTP_HOST = "ftp.mtps.gov.br"
@@ -172,3 +173,52 @@ def write_download_manifest(
         ),
         encoding="utf-8",
     )
+
+
+
+def extract_year(
+    year: int,
+    archive_dir: Path,
+    extracted_dir: Path,
+) -> list[Path]:
+    validate_year(year)
+    archives = sorted(archive_dir.glob("*.7z"))
+    if not archives:
+        raise FileNotFoundError(
+            f"Nenhum arquivo RAIS .7z encontrado em {archive_dir}"
+        )
+
+    metadata_by_archive: dict[str, dict[str, object]] = {}
+    manifest_path = archive_dir / "download-manifest.json"
+    if manifest_path.exists():
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        metadata_by_archive = {
+            str(item.get("path") or ""): item
+            for item in payload.get("files", [])
+            if isinstance(item, dict)
+        }
+
+    extracted_files: list[Path] = []
+    for archive in archives:
+        metadata = metadata_by_archive.get(archive.name, {})
+        source_url = metadata.get("source_url")
+        transport = metadata.get("transport")
+
+        for path in extract_7z(archive, extracted_dir):
+            if not path.is_file():
+                continue
+
+            file_manifest = build_manifest(
+                path,
+                "rais_mte",
+                str(year),
+                transport=str(transport) if transport else None,
+                source_url=str(source_url) if source_url else None,
+            )
+            write_manifest(
+                file_manifest,
+                path.with_suffix(path.suffix + ".manifest.json"),
+            )
+            extracted_files.append(path)
+
+    return sorted(extracted_files)
