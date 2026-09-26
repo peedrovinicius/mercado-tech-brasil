@@ -1,5 +1,11 @@
 import ReactECharts from 'echarts-for-react'
-import type { OccupationItem, UfItem } from '../lib/api'
+import type {
+  MunicipalityItem,
+  OccupationItem,
+  TrendItem,
+  UfItem,
+} from '../lib/api'
+import { formatCompetence, formatNumber } from '../lib/format'
 
 export function UfChart({ items }: { items: UfItem[] }) {
   const top = items.slice(0, 10)
@@ -58,6 +64,104 @@ export function OccupationChart({ items }: { items: OccupationItem[] }) {
     ],
   }
   return <ReactECharts option={option} style={{ height: 310 }} />
+}
+
+export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
+  const top = items.slice(0, 12).reverse()
+  const labels = top.map((item) => {
+    const name = item.municipio_nome ?? item.municipio_codigo_caged
+    return item.uf ? `${name} / ${item.uf}` : name
+  })
+  const option = {
+    animationDuration: 500,
+    grid: { left: 142, right: 20, top: 12, bottom: 24 },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value: number) => formatNumber(value),
+    },
+    xAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: '#ececf0' } },
+      axisLabel: { color: '#74747c' },
+    },
+    yAxis: {
+      type: 'category',
+      data: labels,
+      axisTick: { show: false },
+      axisLine: { show: false },
+      axisLabel: {
+        color: '#4d4d54',
+        width: 128,
+        overflow: 'truncate',
+      },
+    },
+    series: [
+      {
+        name: 'Admissões',
+        type: 'bar',
+        data: top.map((item) => item.admissions),
+        itemStyle: { color: '#242428', borderRadius: [0, 5, 5, 0] },
+        barMaxWidth: 18,
+      },
+    ],
+  }
+  return <ReactECharts option={option} style={{ height: 340 }} />
+}
+
+export function TrendChart({ items }: { items: TrendItem[] }) {
+  const ordered = [...items].sort((a, b) =>
+    a.competence.localeCompare(b.competence),
+  )
+  const option = {
+    animationDuration: 600,
+    grid: { left: 50, right: 22, top: 28, bottom: 42 },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value: number) => formatNumber(value),
+    },
+    legend: {
+      top: 0,
+      data: ['Admissões', 'Desligamentos', 'Saldo'],
+      textStyle: { color: '#67676f' },
+    },
+    xAxis: {
+      type: 'category',
+      data: ordered.map((item) => formatCompetence(item.competence)),
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: '#d9d9de' } },
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { color: '#74747c' },
+      splitLine: { lineStyle: { color: '#ececf0' } },
+    },
+    series: [
+      {
+        name: 'Admissões',
+        type: 'line',
+        smooth: true,
+        showSymbol: ordered.length < 18,
+        data: ordered.map((item) => item.admissions),
+        lineStyle: { width: 2 },
+      },
+      {
+        name: 'Desligamentos',
+        type: 'line',
+        smooth: true,
+        showSymbol: ordered.length < 18,
+        data: ordered.map((item) => item.dismissals),
+        lineStyle: { width: 2 },
+      },
+      {
+        name: 'Saldo',
+        type: 'bar',
+        data: ordered.map((item) => item.balance),
+        barMaxWidth: 18,
+      },
+    ],
+  }
+
+  return <ReactECharts option={option} style={{ height: 340 }} />
 }
 
 type RegionItem = {

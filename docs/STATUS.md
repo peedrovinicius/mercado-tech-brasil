@@ -6,46 +6,52 @@
 - API: https://mercado-tech-brasil.onrender.com/api/v1
 - OpenAPI: https://mercado-tech-brasil.onrender.com/docs
 - runtime: Python 3.11
-- backend atual: arquivos versionados e referência oficial agregada
+- PostgreSQL gerenciado: provisionado no Render
 
-## Implementado
+## Dados
 
-### Dados
-- arquitetura Bronze / Silver / Gold;
-- ingestão FTP e ingestão local;
+- Bronze, Silver e Gold;
+- ingestão FTP;
+- fallback HTTPS;
 - extração de arquivos .7z;
 - manifesto SHA-256;
+- proveniência de transporte;
 - detecção de mudança de layout;
-- normalização de cabeçalhos e tipos;
+- normalização e tipagem;
 - rejeições auditáveis;
-- Silver em Parquet;
-- Gold por UF e ocupação;
+- MOV, FOR e EXC;
+- Gold por UF;
+- Gold por ocupação;
+- Gold por município;
+- série histórica;
 - referência oficial de julho/2026;
-- metodologia salarial alinhada ao MTE;
-- recorte CBO v2.
+- recorte CBO v2;
+- metodologia salarial MTE;
+- salário real por IPCA;
+- referência municipal IBGE.
 
-### Qualidade e publicação
-- checks automáticos de qualidade;
+## Qualidade e publicação
+
+- checks automáticos;
 - gate de publicação por competência;
 - aprovação metodológica vinculada ao SHA-256;
 - invalidação da aprovação quando a origem muda;
-- testes de reconciliação da referência oficial.
+- testes de reconciliação;
+- teste de regra editorial para travessões.
 
-### Serving e aplicação
-- PostgreSQL com migrations Alembic;
-- carga Gold → PostgreSQL transacional e idempotente;
-- backend selecionável entre arquivos e PostgreSQL;
-- FastAPI / OpenAPI;
-- frontend React / TypeScript;
-- build Vite validado em CI;
+## Serving e aplicação
+
+- PostgreSQL;
+- SQLAlchemy;
+- Alembic;
+- carga transacional e idempotente;
+- API FastAPI;
+- OpenAPI;
+- React e TypeScript;
+- gráficos ECharts;
+- frontend responsivo;
 - deploy público no Render.
 
-## Em andamento
+## Próxima carga de dados
 
-1. processar a primeira competência oficial de microdados;
-2. revisar rejeições e layout reais;
-3. validar a semântica de FOR/EXC;
-4. reconciliar agregados do microdado com as referências publicadas;
-5. liberar a primeira competência tech pelo gate;
-6. carregar o Gold aprovado no PostgreSQL;
-7. ativar os indicadores tech no dashboard público.
+O pipeline está preparado para baixar, transformar, reconciliar e publicar a primeira competência tech real. A publicação permanece condicionada ao gate metodológico e ao SHA-256 da origem.

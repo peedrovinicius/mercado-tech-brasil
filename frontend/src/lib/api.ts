@@ -1,33 +1,55 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
-export type Overview = {
+export type SalaryFields = {
+  salary_mean_admissions: number | null
+  salary_median_admissions: number | null
+  salary_mean_admissions_real?: number | null
+  salary_median_admissions_real?: number | null
+}
+
+export type Overview = SalaryFields & {
   competence: string
   scope: string
   admissions: number
   dismissals: number
   balance: number
-  salary_mean_admissions: number | null
-  salary_median_admissions: number | null
+  salary_real_base_competence?: string | null
   records_tech: number
   source: string
   status: string
 }
 
-export type UfItem = {
+export type UfItem = SalaryFields & {
   uf: string
   admissions: number
   dismissals: number
   balance: number
-  salary_median_admissions: number | null
 }
 
-export type OccupationItem = {
+export type OccupationItem = SalaryFields & {
   cbo_familia: string
   cbo_codigo: string
   admissions: number
   dismissals: number
   balance: number
-  salary_median_admissions: number | null
+}
+
+export type MunicipalityItem = SalaryFields & {
+  municipio_codigo_caged: string
+  municipio_codigo_ibge?: string | null
+  municipio_nome?: string | null
+  uf?: string | null
+  admissions: number
+  dismissals: number
+  balance: number
+}
+
+export type TrendItem = SalaryFields & {
+  competence: string
+  admissions: number
+  dismissals: number
+  balance: number
+  salary_real_base_competence?: string | null
 }
 
 export type Readiness = {
@@ -51,6 +73,8 @@ export type Provenance = {
   sha256: string
   ingested_at_utc: string
   manifest_path: string
+  transport?: string
+  source_url?: string
 }
 
 export type QualityReport = {
@@ -123,11 +147,25 @@ async function get<T>(path: string): Promise<T> {
 
 export const api = {
   overview: () => get<Overview>('/indicators/overview'),
-  byUf: () => get<{ competence: string; source: string; items: UfItem[] }>('/analytics/by-uf'),
-  byOccupation: () => get<{ competence: string; source: string; items: OccupationItem[] }>('/analytics/by-occupation?limit=10'),
+  byUf: () => get<{ competence: string; source: string; items: UfItem[] }>(
+    '/analytics/by-uf',
+  ),
+  byOccupation: () =>
+    get<{ competence: string; source: string; items: OccupationItem[] }>(
+      '/analytics/by-occupation?limit=10',
+    ),
+  byMunicipality: () =>
+    get<{ competence: string; source: string; items: MunicipalityItem[] }>(
+      '/analytics/by-municipality?limit=15',
+    ),
+  trend: () =>
+    get<{ source: string; scope: string; items: TrendItem[] }>(
+      '/analytics/trend',
+    ),
   readiness: () => get<Readiness>('/system/readiness'),
   coverage: () => get<Coverage>('/metadata/coverage'),
-  officialReferenceJuly2026: () => get<OfficialReference>('/metadata/official-reference/202607'),
+  officialReferenceJuly2026: () =>
+    get<OfficialReference>('/metadata/official-reference/202607'),
   quality: () => get<QualityReport>('/quality/latest'),
   provenance: () => get<Provenance>('/provenance/latest'),
 }

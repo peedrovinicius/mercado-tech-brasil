@@ -30,6 +30,8 @@ def latest_provenance() -> dict[str, object]:
         "size_bytes": payload.get("size_bytes"),
         "sha256": payload.get("sha256"),
         "ingested_at_utc": payload.get("ingested_at_utc"),
+        "transport": payload.get("transport"),
+        "source_url": payload.get("source_url"),
         "manifest_path": str(latest.relative_to(settings.root))
         if hasattr(settings, "root")
         else str(latest),

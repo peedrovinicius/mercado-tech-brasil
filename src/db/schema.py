@@ -29,6 +29,9 @@ dataset_release = Table(
     Column("records_tech", Integer, nullable=False),
     Column("salary_mean_admissions", Numeric(14, 2)),
     Column("salary_median_admissions", Numeric(14, 2)),
+    Column("salary_mean_admissions_real", Numeric(14, 2)),
+    Column("salary_median_admissions_real", Numeric(14, 2)),
+    Column("salary_real_base_competence", String(6)),
     Column("valid_rate", Numeric(8, 6), nullable=False),
     Column("loaded_at_utc", DateTime(timezone=True), nullable=False),
     CheckConstraint("admissions >= 0", name="ck_release_admissions_nonnegative"),
@@ -49,9 +52,42 @@ market_uf = Table(
     Column("admissions", Integer, nullable=False),
     Column("dismissals", Integer, nullable=False),
     Column("balance", Integer, nullable=False),
+    Column("salary_mean_admissions", Numeric(14, 2)),
     Column("salary_median_admissions", Numeric(14, 2)),
+    Column("salary_mean_admissions_real", Numeric(14, 2)),
+    Column("salary_median_admissions_real", Numeric(14, 2)),
     CheckConstraint("admissions >= 0", name="ck_market_uf_admissions_nonnegative"),
     CheckConstraint("dismissals >= 0", name="ck_market_uf_dismissals_nonnegative"),
+)
+
+market_municipality = Table(
+    "fact_market_municipality",
+    metadata,
+    Column(
+        "competence",
+        Date,
+        ForeignKey("dataset_release.competence", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column("municipality_code", String(8), primary_key=True),
+    Column("municipality_ibge_code", String(7)),
+    Column("municipality_name", String(160)),
+    Column("uf", String(2)),
+    Column("admissions", Integer, nullable=False),
+    Column("dismissals", Integer, nullable=False),
+    Column("balance", Integer, nullable=False),
+    Column("salary_mean_admissions", Numeric(14, 2)),
+    Column("salary_median_admissions", Numeric(14, 2)),
+    Column("salary_mean_admissions_real", Numeric(14, 2)),
+    Column("salary_median_admissions_real", Numeric(14, 2)),
+    CheckConstraint(
+        "admissions >= 0",
+        name="ck_market_municipality_admissions_nonnegative",
+    ),
+    CheckConstraint(
+        "dismissals >= 0",
+        name="ck_market_municipality_dismissals_nonnegative",
+    ),
 )
 
 market_occupation = Table(
@@ -68,7 +104,10 @@ market_occupation = Table(
     Column("admissions", Integer, nullable=False),
     Column("dismissals", Integer, nullable=False),
     Column("balance", Integer, nullable=False),
+    Column("salary_mean_admissions", Numeric(14, 2)),
     Column("salary_median_admissions", Numeric(14, 2)),
+    Column("salary_mean_admissions_real", Numeric(14, 2)),
+    Column("salary_median_admissions_real", Numeric(14, 2)),
     CheckConstraint(
         "admissions >= 0",
         name="ck_market_occupation_admissions_nonnegative",
