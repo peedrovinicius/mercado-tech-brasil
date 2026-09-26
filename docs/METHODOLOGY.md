@@ -65,7 +65,7 @@ Para comparar municípios de tamanhos muito diferentes, a aplicação deverá in
 
 O recorte CBO é versionado em `config/cbo_tech.yml`.
 
-A versão 2 inclui as famílias 2122, 2123, 2124, 3171 e 3172. A inclusão de 2122 corrige uma omissão da versão inicial: o MTE classifica 2122 — Engenheiros em computação junto a 2123 e 2124 no grupo 212 — Profissionais da Informática. As famílias 3171 e 3172 pertencem ao grupo 317 — Técnicos em Informática.
+A versão 2 inclui as famílias 2122, 2123, 2124, 3171 e 3172. A inclusão de 2122 corrige uma omissão da versão inicial: o MTE classifica 2122: Engenheiros em computação junto a 2123 e 2124 no grupo 212: Profissionais da Informática. As famílias 3171 e 3172 pertencem ao grupo 317: Técnicos em Informática.
 
 O recorte é ocupacional, não setorial. A atividade econômica do empregador não determina, por si só, se o vínculo entra no indicador.
 
@@ -79,6 +79,6 @@ Nenhuma ocupação entra ou sai silenciosamente. Toda mudança exige:
 
 Detalhes: `docs/CBO_SCOPE.md`.
 
-## Limitações
+## Escopo
 
-O projeto analisa emprego formal captado pelas fontes utilizadas. Não deve ser apresentado como representação completa de todo o trabalho em tecnologia, especialmente trabalho informal, prestação PJ, trabalho independente e outras relações não observadas pelo indicador.
+O projeto analisa movimentações do emprego formal captadas pelas fontes utilizadas. As métricas publicadas preservam esse recorte em seus metadados e na interface.

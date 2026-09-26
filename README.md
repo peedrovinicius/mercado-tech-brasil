@@ -1,27 +1,29 @@
+<div align="center">
+
 # Mercado Tech Brasil
+
+Plataforma de dados para análise do mercado formal de trabalho em tecnologia no Brasil com fontes públicas oficiais, rastreabilidade e metodologia versionada.
 
 [![CI](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml)
 [![Frontend](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Production](https://img.shields.io/badge/production-live-2ea44f)](https://mercado-tech-brasil.onrender.com)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
-Plataforma open source para análise do mercado formal de trabalho em tecnologia no Brasil a partir de fontes públicas oficiais.
+[Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Health](https://mercado-tech-brasil.onrender.com/api/v1/system/health)
 
-**Produção:** https://mercado-tech-brasil.onrender.com  
-**API:** https://mercado-tech-brasil.onrender.com/docs  
-**Health:** https://mercado-tech-brasil.onrender.com/api/v1/system/health
+</div>
 
-## Visão geral
+## Produto
 
-O projeto transforma dados públicos do trabalho formal em uma cadeia auditável de ingestão, validação, transformação, serving e visualização.
+O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadeia auditável de ingestão, validação, transformação, serving e visualização.
 
-O desenho prioriza três propriedades:
-
-- **rastreabilidade** — cada arquivo ingerido recebe manifesto e SHA-256;
-- **reprodutibilidade** — regras de transformação, recorte CBO e metodologia são versionadas;
-- **publicação controlada** — uma competência só pode alimentar o serving após passar pelos checks automáticos e pelo gate metodológico.
-
-A aplicação pública já apresenta o contexto oficial de julho de 2026 publicado pelo MTE. Os indicadores específicos de tecnologia permanecem bloqueados até a primeira competência de microdados passar integralmente pelo pipeline e pelo gate de publicação.
+<table>
+<tr>
+<td><strong>Rastreabilidade</strong><br/>Manifesto, competência, origem e SHA-256 por arquivo.</td>
+<td><strong>Reprodutibilidade</strong><br/>Recorte CBO, metodologia e regras versionadas.</td>
+<td><strong>Publicação controlada</strong><br/>Dados chegam ao serving somente após validação.</td>
+</tr>
+</table>
 
 ## Arquitetura
 
@@ -32,8 +34,15 @@ flowchart LR
     C --> D["Gold<br/>agregados reproduzíveis"]
     D --> E["PostgreSQL<br/>serving"]
     D --> F["DuckDB<br/>validação local"]
-    E --> G["FastAPI<br/>/api/v1 + OpenAPI"]
+    E --> G["FastAPI<br/>API + OpenAPI"]
     G --> H["React + TypeScript<br/>dashboard"]
+
+    classDef source fill:#f2f5ff,stroke:#8ea6ff,color:#15245c
+    classDef data fill:#f7f7f8,stroke:#bfc1c8,color:#25262b
+    classDef serving fill:#eef9f2,stroke:#75b98b,color:#184d2c
+    class A source
+    class B,C,D,F data
+    class E,G,H serving
 ~~~
 
 ### Fluxo de publicação
@@ -45,35 +54,24 @@ flowchart LR
     C --> D["Rejeições auditáveis"]
     D --> E["Agregações Gold"]
     E --> F["Gate automático"]
-    F --> G["Revisão metodológica<br/>vinculada ao SHA-256"]
-    G --> H["PostgreSQL / API"]
+    F --> G["Revisão metodológica"]
+    G --> H["PostgreSQL + API"]
 ~~~
 
-## Fontes
-
-| Fonte | Uso |
-|---|---|
-| Novo CAGED — MTE | admissões, desligamentos, saldo e remuneração de admissão |
-| CBO — MTE | definição versionada das ocupações de tecnologia |
-| IBGE | base territorial e indicadores normalizados planejados |
-
-A referência oficial de julho de 2026 está versionada em **config/official_reference_202607.json**.
-
-## Recorte de tecnologia
-
-O recorte atual é ocupacional e está versionado em **config/cbo_tech.yml**.
-
-| Família CBO | Denominação |
-|---|---|
-| 2122 | Engenheiros em computação |
-| 2123 | Administradores de tecnologia da informação |
-| 2124 | Analistas de tecnologia da informação |
-| 3171 | Técnicos de desenvolvimento de sistemas e aplicações |
-| 3172 | Técnicos em operação e monitoração de computadores |
-
-A justificativa e as regras de governança do recorte estão em [docs/CBO_SCOPE.md](docs/CBO_SCOPE.md).
-
 ## Stack
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Polars](https://img.shields.io/badge/Polars-data-6B5BFF)
+![DuckDB](https://img.shields.io/badge/DuckDB-analytics-FFF000?logo=duckdb&logoColor=000)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-serving-4169E1?logo=postgresql&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-frontend-61DAFB?logo=react&logoColor=000)
+![TypeScript](https://img.shields.io/badge/TypeScript-frontend-3178C6?logo=typescript&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-runtime-2496ED?logo=docker&logoColor=white)
+
+</div>
 
 | Camada | Tecnologias |
 |---|---|
@@ -84,9 +82,33 @@ A justificativa e as regras de governança do recorte estão em [docs/CBO_SCOPE.
 | Qualidade | Pytest, Ruff |
 | Infraestrutura | Docker, GitHub Actions, Render |
 
+## Fontes
+
+| Fonte | Uso |
+|---|---|
+| Novo CAGED, MTE | admissões, desligamentos, saldo e remuneração de admissão |
+| CBO, MTE | definição versionada das ocupações de tecnologia |
+| IBGE | base territorial e indicadores normalizados planejados |
+
+A referência oficial de julho de 2026 está versionada em **config/official_reference_202607.json**.
+
+## Recorte de tecnologia
+
+O recorte é ocupacional e está versionado em **config/cbo_tech.yml**.
+
+| Família CBO | Denominação |
+|---|---|
+| 2122 | Engenheiros em computação |
+| 2123 | Administradores de tecnologia da informação |
+| 2124 | Analistas de tecnologia da informação |
+| 3171 | Técnicos de desenvolvimento de sistemas e aplicações |
+| 3172 | Técnicos em operação e monitoração de computadores |
+
+A justificativa e as regras de governança estão em [docs/CBO_SCOPE.md](docs/CBO_SCOPE.md).
+
 ## Qualidade e governança
 
-O pipeline implementa:
+O pipeline mantém:
 
 - Bronze imutável com manifesto e SHA-256;
 - detecção de mudança de layout;
@@ -97,11 +119,17 @@ O pipeline implementa:
 - referência externa para reconciliação;
 - gate de publicação vinculado ao hash do arquivo de origem;
 - carga PostgreSQL transacional e idempotente;
-- API que não serve uma competência não aprovada.
+- contratos de API versionados.
 
-Detalhes em [Metodologia](docs/METHODOLOGY.md), [Data lineage](docs/DATA_LINEAGE.md) e [Pipeline](docs/PIPELINE_REAL.md).
+## Estado do produto
 
-## Estado atual
+~~~mermaid
+flowchart LR
+    A["Aplicação pública<br/>operacional"] --> B["API + OpenAPI<br/>operacional"]
+    B --> C["Pipeline de dados<br/>implementado"]
+    C --> D["Gate de publicação<br/>implementado"]
+    D --> E["PostgreSQL serving<br/>implementado"]
+~~~
 
 | Componente | Estado |
 |---|---|
@@ -112,10 +140,7 @@ Detalhes em [Metodologia](docs/METHODOLOGY.md), [Data lineage](docs/DATA_LINEAGE
 | Gate de publicação | Implementado |
 | PostgreSQL serving | Implementado |
 | Reconciliação oficial de julho/2026 | Implementada |
-| Primeira competência tech real publicada | Em andamento |
-| Histórico multi-mês | Planejado após a primeira competência validada |
-
-A aplicação pública usa, neste momento, a referência oficial agregada do MTE para demonstrar o produto sem substituir os microdados ainda não processados.
+| Primeira competência tech real | Em processamento metodológico |
 
 ## Execução local
 
@@ -142,8 +167,6 @@ npm install
 npm run dev
 ~~~
 
-O Vite encaminha /api/* para o backend local em localhost:8000.
-
 ### Testes
 
 ~~~bash
@@ -154,19 +177,19 @@ cd frontend && npm run build
 
 ## Pipeline
 
-Execução automática a partir da estrutura oficial:
+Processamento por competência:
 
 ~~~bash
 python -m src.cli pipeline 202607
 ~~~
 
-Para um arquivo oficial já disponível localmente:
+Processamento de arquivo oficial local:
 
 ~~~bash
 python -m src.cli local-pipeline 202607 "/caminho/CAGEDMOV202607.7z" --kind MOV
 ~~~
 
-Validação e aprovação de uma competência:
+Validação e aprovação:
 
 ~~~bash
 python -m src.cli validate-release 202607
@@ -177,7 +200,7 @@ python -m src.cli approve-release 202607 \
   --acknowledge-methodology-reviewed
 ~~~
 
-Carga da competência aprovada no serving:
+Carga no serving:
 
 ~~~bash
 alembic upgrade head
@@ -190,29 +213,23 @@ python -m src.cli load-postgres 202607
 config/      regras, fontes e referências versionadas
 data/        camadas Bronze, Silver e Gold
 docs/        arquitetura, metodologia, lineage e operação
-frontend/    aplicação React/TypeScript
+frontend/    aplicação React e TypeScript
 src/         ingestão, transformação, qualidade, banco e API
 tests/       testes automatizados
-alembic/     migrations do serving PostgreSQL
+alembic/     migrations do PostgreSQL
 docker/      imagens de execução
 ~~~
 
 ## Documentação
 
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [Visão técnica](docs/PROJECT_OVERVIEW.md)
-- [Contrato de dados](docs/DATA_CONTRACT.md)
-- [Metodologia](docs/METHODOLOGY.md)
-- [Recorte CBO](docs/CBO_SCOPE.md)
-- [Data lineage](docs/DATA_LINEAGE.md)
-- [Pipeline real](docs/PIPELINE_REAL.md)
-- [Deploy](docs/DEPLOY.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Changelog](CHANGELOG.md)
-
-## Limitações atuais
-
-- Novo CAGED mede **fluxos** de emprego formal, não estoque de trabalhadores.
-- Trabalho informal, prestação PJ e trabalho independente não são cobertos por esse indicador.
-- FOR/EXC são preservados na ingestão, mas sua semântica de ajuste ainda não é incorporada aos indicadores publicados.
-- Indicadores municipais e séries históricas entram após a validação da primeira competência real.
+| Documento | Conteúdo |
+|---|---|
+| [Arquitetura](docs/ARCHITECTURE.md) | componentes e responsabilidades |
+| [Visão técnica](docs/PROJECT_OVERVIEW.md) | desenho geral do produto |
+| [Contrato de dados](docs/DATA_CONTRACT.md) | campos e expectativas de schema |
+| [Metodologia](docs/METHODOLOGY.md) | regras de cálculo e reconciliação |
+| [Recorte CBO](docs/CBO_SCOPE.md) | definição ocupacional de tecnologia |
+| [Data lineage](docs/DATA_LINEAGE.md) | origem e transformação dos dados |
+| [Pipeline](docs/PIPELINE_REAL.md) | execução do processamento |
+| [Deploy](docs/DEPLOY.md) | produção e execução |
+| [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |

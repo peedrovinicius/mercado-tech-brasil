@@ -85,7 +85,7 @@ def build_gold(
             "minimum_salary_brl": salary_methodology.minimum_salary_brl,
             "maximum_salary_brl": salary_methodology.maximum_salary_brl,
             "exclude_intermittent": True,
-            "source": "MTE — Sumário Executivo Novo Caged",
+            "source": "MTE: Sumário Executivo Novo Caged",
         },
         "records_tech": data.height,
         "source": "Novo CAGED / MTE",

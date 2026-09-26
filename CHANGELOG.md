@@ -27,7 +27,7 @@
 ## 0.10.0
 
 - recorte CBO de tecnologia elevado para versão 2;
-- inclusão de 2122 — Engenheiros em computação;
+- inclusão de 2122: Engenheiros em computação;
 - manutenção de 2123, 2124, 3171 e 3172;
 - fontes oficiais da CBO registradas no arquivo de configuração;
 - justificativa metodológica do recorte ocupacional;

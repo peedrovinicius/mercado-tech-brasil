@@ -153,7 +153,7 @@ export function Dashboard() {
             <MetricCard
               label="Saldo"
               value={`${overview.data.balance >= 0 ? '+' : ''}${formatNumber(overview.data.balance)}`}
-              detail="admissões − desligamentos"
+              detail="admissões menos desligamentos"
               tone={overview.data.balance >= 0 ? 'positive' : 'negative'}
             />
             <MetricCard
@@ -191,11 +191,11 @@ export function Dashboard() {
             </div>
             <article className="quality-card">
               <span>Taxa de registros válidos</span>
-              <strong>{quality.data ? formatPercent(quality.data.valid_rate) : '—'}</strong>
+              <strong>{quality.data ? formatPercent(quality.data.valid_rate) : ':'}</strong>
               <div className="quality-card__rows">
-                <span>Linhas lidas</span><b>{quality.data ? formatNumber(quality.data.rows_read) : '—'}</b>
-                <span>Rejeitadas</span><b>{quality.data ? formatNumber(quality.data.rows_rejected) : '—'}</b>
-                <span>Recorte tech</span><b>{quality.data ? formatNumber(quality.data.rows_tech) : '—'}</b>
+                <span>Linhas lidas</span><b>{quality.data ? formatNumber(quality.data.rows_read) : ':'}</b>
+                <span>Rejeitadas</span><b>{quality.data ? formatNumber(quality.data.rows_rejected) : ':'}</b>
+                <span>Recorte tech</span><b>{quality.data ? formatNumber(quality.data.rows_tech) : ':'}</b>
               </div>
             </article>
           </section>

@@ -3,7 +3,7 @@ export function formatNumber(value: number): string {
 }
 
 export function formatCurrency(value: number | null): string {
-  if (value === null) return '—'
+  if (value === null) return ':'
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -12,7 +12,7 @@ export function formatCurrency(value: number | null): string {
 }
 
 export function formatCurrencyPrecise(value: number | null): string {
-  if (value === null) return '—'
+  if (value === null) return ':'
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',

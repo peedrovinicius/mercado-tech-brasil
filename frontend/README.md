@@ -1,4 +1,4 @@
-# Frontend — Mercado Tech Brasil
+# Frontend: Mercado Tech Brasil
 
 Interface React + TypeScript para consumir exclusivamente a API do projeto.
 

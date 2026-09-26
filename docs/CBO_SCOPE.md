@@ -22,9 +22,9 @@ Famílias incluídas:
 
 A versão 1 continha 2123, 2124, 3171 e 3172. A revisão da documentação oficial da CBO mostrou que o MTE organiza o subgrupo 212 como **Profissionais da Informática**, incluindo:
 
-- 2122 — Engenheiros em computação;
-- 2123 — Administradores de tecnologia da informação;
-- 2124 — Analistas de tecnologia da informação.
+- 2122: Engenheiros em computação;
+- 2123: Administradores de tecnologia da informação;
+- 2124: Analistas de tecnologia da informação.
 
 A família 2122 inclui ocupações como engenheiro de aplicativos em computação, engenheiro de equipamentos em computação e engenheiro de sistemas operacionais em computação. Por isso, sua exclusão reduziria artificialmente o universo ocupacional de tecnologia.
 
@@ -32,7 +32,7 @@ O grupo 317, por sua vez, é definido como **Técnicos em Informática** e cont�
 
 ## O que não entra automaticamente
 
-O projeto não inclui famílias apenas porque podem usar tecnologia no trabalho. Ocupações adjacentes — por exemplo telecomunicações, eletrônica, estatística, design ou gestão — exigem justificativa própria antes de entrar.
+O projeto não inclui famílias apenas porque podem usar tecnologia no trabalho. Ocupações adjacentes: por exemplo telecomunicações, eletrônica, estatística, design ou gestão: exigem justificativa própria antes de entrar.
 
 ## Governança
 

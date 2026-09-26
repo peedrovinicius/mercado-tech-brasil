@@ -17,7 +17,7 @@ export function ReferenceContext({ data }: { data: OfficialReference }) {
           <h2>Antes do recorte tech, o retrato do mercado formal brasileiro.</h2>
           <p>
             Estes números são a referência publicada pelo MTE para todo o mercado formal.
-            Eles servem como contexto e reconciliação — não são apresentados como indicadores de tecnologia.
+            Eles servem como contexto e reconciliação: não são apresentados como indicadores de tecnologia.
           </p>
         </div>
         <a
@@ -56,7 +56,7 @@ export function ReferenceContext({ data }: { data: OfficialReference }) {
           <strong>{formatCurrencyPrecise(ceara.salary_mean_admission_brl)}</strong>
           <span>média nominal oficial</span>
           <div className="reference-card__rule">
-            Regra MTE: 0,3–150 salários mínimos, sem intermitentes
+            Regra MTE: 0,3 a 150 salários mínimos, sem intermitentes
           </div>
         </article>
 
