@@ -1,0 +1,66 @@
+version: 1
+dataset: rais_vinculos
+year_reference: 2025
+sources:
+  rais_2025: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025"
+  rais_2024_change_notice: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/comunicados/comunicado-microdados-rais-2024"
+  cbo: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/informacoes-gerais"
+
+required:
+  year:
+    description: "Ano-base da RAIS"
+    aliases:
+      - ano
+      - ano_base
+      - ano_rais
+
+  cbo_occupation:
+    description: "Código de ocupação CBO 2002"
+    aliases:
+      - cbo_ocupacao_2002
+      - cbo_2002_ocupacao
+      - cbo_ocupacao
+      - cbo
+
+  municipality:
+    description: "Município do vínculo ou do trabalho"
+    aliases:
+      - municipio
+      - municipio_trabalho
+      - mun_trab
+      - municipio_estabelecimento
+
+  uf:
+    description: "Unidade da Federação do vínculo ou do trabalho"
+    aliases:
+      - uf
+      - uf_trabalho
+      - uf_estabelecimento
+
+  active_3112:
+    description: "Indicador de vínculo ativo em 31/12"
+    aliases:
+      - vinculo_ativo_31_12
+      - vinculo_ativo_3112
+      - emp_em_31_12
+      - emprego_em_31_12
+
+optional:
+  december_remuneration_nominal:
+    description: "Remuneração nominal de dezembro"
+    aliases:
+      - vl_remun_dezembro_nom
+      - remuneracao_dezembro_nominal
+      - remuneracao_dezembro
+
+  mean_remuneration_nominal:
+    description: "Remuneração média nominal"
+    aliases:
+      - vl_remun_media_nom
+      - remuneracao_media_nominal
+      - remuneracao_media
+
+rules:
+  require_all_required_concepts_in_every_layout: true
+  reject_ambiguous_matches: true
+  publication_ready_after_semantic_validation: false

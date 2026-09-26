@@ -31,6 +31,7 @@ from src.reference.population import (
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.transform.rais_schema import inspect_rais_directory
+from src.transform.rais_semantics import validate_layout_semantics
 from src.validation.publication_gate import (
     approve_competence,
     evaluate_publication_gate,
@@ -380,6 +381,31 @@ def command_rais_inspect(year: int) -> None:
     print("rais publication: BLOCKED until semantic layout validation")
 
 
+def command_rais_validate_layout(year: int) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    layout_report = base_dir / "layout-report.json"
+    destination = base_dir / "semantic-layout-report.json"
+
+    if not layout_report.exists():
+        raise SystemExit(
+            f"Relatório de layout ausente: {layout_report}. "
+            "Execute rais-inspect primeiro."
+        )
+
+    payload = validate_layout_semantics(
+        layout_report,
+        settings.root / "config" / "rais_semantic_contract.yml",
+        destination,
+    )
+    status = "READY" if payload["silver_ready"] else "BLOCKED"
+    print(
+        f"rais semantic: status={status} "
+        f"arquivos={payload['files_validated']} relatório={destination}"
+    )
+    if not payload["silver_ready"]:
+        raise SystemExit(2)
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -537,6 +563,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rais_inspect.add_argument("year", type=int, help="Ano-base da RAIS.")
 
+    rais_validate_layout = sub.add_parser(
+        "rais-validate-layout",
+        help="Valida semanticamente o layout RAIS contra o contrato versionado.",
+    )
+    rais_validate_layout.add_argument("year", type=int, help="Ano-base da RAIS.")
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -618,6 +650,10 @@ def main() -> None:
 
     if args.command == "rais-inspect":
         command_rais_inspect(args.year)
+        return
+
+    if args.command == "rais-validate-layout":
+        command_rais_validate_layout(args.year)
         return
 
     if args.command == "sync-municipalities":

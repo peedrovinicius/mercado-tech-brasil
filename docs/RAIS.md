@@ -101,6 +101,40 @@ O relatório registra, por arquivo:
 
 `silver_ready` e `publication_ready` permanecem falsos. A inspeção estrutural não substitui a validação semântica com o dicionário oficial do ano.
 
+## Contrato semântico
+
+O contrato versionado fica em:
+
+```text
+config/rais_semantic_contract.yml
+```
+
+Ele define conceitos de negócio em vez de depender de um único nome literal de coluna. São obrigatórios:
+
+- ano-base;
+- ocupação CBO 2002;
+- município;
+- UF;
+- indicador de vínculo ativo em 31/12.
+
+Remuneração de dezembro e remuneração média são opcionais nesta etapa.
+
+Executar a validação:
+
+```bash
+python -m src.cli rais-validate-layout 2025
+```
+
+A validação lê `layout-report.json` e gera:
+
+```text
+data/bronze/rais/2025/semantic-layout-report.json
+```
+
+Cada conceito obrigatório precisa produzir exatamente uma correspondência em cada layout. Ausência ou múltiplos aliases encontrados bloqueiam o Silver.
+
+`silver_ready=true` significa apenas que o layout possui os conceitos mínimos sem ambiguidade. `publication_ready` continua falso até transformação, qualidade, reconciliação anual e gate específico.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.

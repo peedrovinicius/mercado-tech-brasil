@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.26.0
+
+- contrato semântico RAIS versionado separadamente do layout físico;
+- conceitos obrigatórios passam a incluir ano-base, CBO 2002, município, UF e vínculo ativo em 31/12;
+- remuneração permanece opcional até a etapa salarial anual;
+- aliases permitem absorver mudanças de nomenclatura sem esconder mudança de schema;
+- ausência de conceito obrigatório bloqueia o Silver;
+- mais de um alias do mesmo conceito no mesmo layout é tratado como ambiguidade e também bloqueia;
+- semantic-layout-report.json registra correspondências, ausências e ambiguidades por arquivo;
+- CLI ganha comando rais-validate-layout;
+- silver_ready pode ser liberado pela validação semântica, mas publication_ready permanece falso;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.25.0
 
 - RAIS anual ganha etapa explícita de extração separada do download;
