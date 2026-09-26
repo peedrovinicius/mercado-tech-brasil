@@ -1,43 +1,51 @@
 # Status de implementação
 
-## Concluído
+## Produção
 
-- frontend React/TypeScript integrado à API;
-- build Vite/TypeScript validado no CI;
-- imagem de produção unificada FastAPI + React;
-- blueprint de deploy público Render;
-- dashboard sem dados fictícios;
-- analytics Gold por UF e ocupação;
+- aplicação: https://mercado-tech-brasil.onrender.com
+- API: https://mercado-tech-brasil.onrender.com/api/v1
+- OpenAPI: https://mercado-tech-brasil.onrender.com/docs
+- runtime: Python 3.11
+- backend atual: arquivos versionados e referência oficial agregada
 
-- arquitetura Bronze/Silver/Gold;
-- descoberta automática de arquivos no FTP oficial;
-- download de MOV/FOR/EXC;
-- extração de `.7z`;
+## Implementado
+
+### Dados
+- arquitetura Bronze / Silver / Gold;
+- ingestão FTP e ingestão local;
+- extração de arquivos .7z;
 - manifesto SHA-256;
 - detecção de mudança de layout;
-- normalização de cabeçalhos com acentos;
-- regras iniciais de qualidade;
-- separação de registros rejeitados;
-- recorte CBO versionado;
-- Silver Parquet;
-- Gold agregado;
-- overview JSON consumível pela API;
+- normalização de cabeçalhos e tipos;
+- rejeições auditáveis;
+- Silver em Parquet;
+- Gold por UF e ocupação;
 - referência oficial de julho/2026;
-- testes de schema e integridade da referência;
-- gate de publicação vinculado ao SHA-256;
-- camada PostgreSQL de serving;
+- metodologia salarial alinhada ao MTE;
+- recorte CBO v2.
+
+### Qualidade e publicação
+- checks automáticos de qualidade;
+- gate de publicação por competência;
+- aprovação metodológica vinculada ao SHA-256;
+- invalidação da aprovação quando a origem muda;
+- testes de reconciliação da referência oficial.
+
+### Serving e aplicação
+- PostgreSQL com migrations Alembic;
 - carga Gold → PostgreSQL transacional e idempotente;
-- Alembic configurado;
-- API com backend selecionável entre arquivos e PostgreSQL.
+- backend selecionável entre arquivos e PostgreSQL;
+- FastAPI / OpenAPI;
+- frontend React / TypeScript;
+- build Vite validado em CI;
+- deploy público no Render.
 
-## Próximos gates
+## Em andamento
 
-1. executar contra o arquivo oficial de julho/2026;
-2. revisar rejeições reais;
-3. confirmar parse de salário no layout atual;
-4. validar códigos municipais;
-5. implementar semântica testada de FOR/EXC;
-6. reconciliar totais nacionais ajustados;
-7. criar a demonstração pública a partir do blueprint de deploy;
-8. carregar a primeira competência oficial aprovada no PostgreSQL;
-9. conectar o dashboard aos primeiros dados oficiais tech validados.
+1. processar a primeira competência oficial de microdados;
+2. revisar rejeições e layout reais;
+3. validar a semântica de FOR/EXC;
+4. reconciliar agregados do microdado com as referências publicadas;
+5. liberar a primeira competência tech pelo gate;
+6. carregar o Gold aprovado no PostgreSQL;
+7. ativar os indicadores tech no dashboard público.
