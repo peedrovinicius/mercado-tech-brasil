@@ -4,7 +4,6 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-
 UF_BY_REGION = {
     "Norte": ("RO", "AC", "AM", "RR", "PA", "AP", "TO"),
     "Nordeste": ("MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA"),
