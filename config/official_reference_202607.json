@@ -1,0 +1,220 @@
+{
+  "competence": "202607",
+  "source": {
+    "owner": "Ministério do Trabalho e Emprego",
+    "document": "Sumário Executivo — Novo Caged — Referência: Julho de 2026",
+    "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/julho/sumario-executivo_julho-de-2026.pdf/@@download/file",
+    "published_at": "2026-08-28"
+  },
+  "salary_methodology": {
+    "minimum_wage_brl": 1621,
+    "minimum_multiple": 0.3,
+    "maximum_multiple": 150,
+    "minimum_salary_brl": 486.3,
+    "maximum_salary_brl": 243150,
+    "exclude_intermittent": true,
+    "metric": "salário médio nominal de admissão"
+  },
+  "national": {
+    "admissions": 2262888,
+    "dismissals": 2204320,
+    "balance": 58568,
+    "salary_mean_admission_brl": 2419.23
+  },
+  "non_identified": {
+    "admissions": 803,
+    "dismissals": 566,
+    "balance": 237
+  },
+  "regions": {
+    "Norte": {
+      "admissions": 116434,
+      "dismissals": 108059,
+      "balance": 8375
+    },
+    "Nordeste": {
+      "admissions": 327186,
+      "dismissals": 308213,
+      "balance": 18973
+    },
+    "Sudeste": {
+      "admissions": 1156205,
+      "dismissals": 1134537,
+      "balance": 21668
+    },
+    "Sul": {
+      "admissions": 440695,
+      "dismissals": 441323,
+      "balance": -628
+    },
+    "Centro-Oeste": {
+      "admissions": 221565,
+      "dismissals": 211622,
+      "balance": 9943
+    }
+  },
+  "ufs": {
+    "RO": {
+      "admissions": 14824,
+      "dismissals": 14625,
+      "balance": 199,
+      "salary_mean_admission_brl": 2016.27
+    },
+    "AC": {
+      "admissions": 5394,
+      "dismissals": 5114,
+      "balance": 280,
+      "salary_mean_admission_brl": 1989.17
+    },
+    "AM": {
+      "admissions": 29496,
+      "dismissals": 25846,
+      "balance": 3650,
+      "salary_mean_admission_brl": 2115.87
+    },
+    "RR": {
+      "admissions": 4877,
+      "dismissals": 4491,
+      "balance": 386,
+      "salary_mean_admission_brl": 2019.27
+    },
+    "PA": {
+      "admissions": 44964,
+      "dismissals": 41148,
+      "balance": 3816,
+      "salary_mean_admission_brl": 2186.66
+    },
+    "AP": {
+      "admissions": 5248,
+      "dismissals": 4838,
+      "balance": 410,
+      "salary_mean_admission_brl": 1978.92
+    },
+    "TO": {
+      "admissions": 11631,
+      "dismissals": 11997,
+      "balance": -366,
+      "salary_mean_admission_brl": 2091.2
+    },
+    "MA": {
+      "admissions": 23791,
+      "dismissals": 23137,
+      "balance": 654,
+      "salary_mean_admission_brl": 2094.59
+    },
+    "PI": {
+      "admissions": 15295,
+      "dismissals": 13308,
+      "balance": 1987,
+      "salary_mean_admission_brl": 2048.81
+    },
+    "CE": {
+      "admissions": 61739,
+      "dismissals": 57558,
+      "balance": 4181,
+      "salary_mean_admission_brl": 2173.94
+    },
+    "RN": {
+      "admissions": 21759,
+      "dismissals": 20760,
+      "balance": 999,
+      "salary_mean_admission_brl": 1903.41
+    },
+    "PB": {
+      "admissions": 24972,
+      "dismissals": 22665,
+      "balance": 2307,
+      "salary_mean_admission_brl": 2692.49
+    },
+    "PE": {
+      "admissions": 59715,
+      "dismissals": 57832,
+      "balance": 1883,
+      "salary_mean_admission_brl": 2076.62
+    },
+    "AL": {
+      "admissions": 16466,
+      "dismissals": 15263,
+      "balance": 1203,
+      "salary_mean_admission_brl": 1941.37
+    },
+    "SE": {
+      "admissions": 13362,
+      "dismissals": 12267,
+      "balance": 1095,
+      "salary_mean_admission_brl": 1994.37
+    },
+    "BA": {
+      "admissions": 90087,
+      "dismissals": 85423,
+      "balance": 4664,
+      "salary_mean_admission_brl": 2143.43
+    },
+    "MG": {
+      "admissions": 249731,
+      "dismissals": 244532,
+      "balance": 5199,
+      "salary_mean_admission_brl": 2301.88
+    },
+    "ES": {
+      "admissions": 50526,
+      "dismissals": 53131,
+      "balance": -2605,
+      "salary_mean_admission_brl": 2331.45
+    },
+    "RJ": {
+      "admissions": 147492,
+      "dismissals": 146232,
+      "balance": 1260,
+      "salary_mean_admission_brl": 2441.19
+    },
+    "SP": {
+      "admissions": 708456,
+      "dismissals": 690642,
+      "balance": 17814,
+      "salary_mean_admission_brl": 2706.37
+    },
+    "PR": {
+      "admissions": 170748,
+      "dismissals": 170225,
+      "balance": 523,
+      "salary_mean_admission_brl": 2392.04
+    },
+    "SC": {
+      "admissions": 141225,
+      "dismissals": 141473,
+      "balance": -248,
+      "salary_mean_admission_brl": 2456.66
+    },
+    "RS": {
+      "admissions": 128722,
+      "dismissals": 129625,
+      "balance": -903,
+      "salary_mean_admission_brl": 2297.61
+    },
+    "MS": {
+      "admissions": 34983,
+      "dismissals": 34253,
+      "balance": 730,
+      "salary_mean_admission_brl": 2310.65
+    },
+    "MT": {
+      "admissions": 61174,
+      "dismissals": 55408,
+      "balance": 5766,
+      "salary_mean_admission_brl": 2401.81
+    },
+    "GO": {
+      "admissions": 84757,
+      "dismissals": 81176,
+      "balance": 3581,
+      "salary_mean_admission_brl": 2154.77
+    },
+    "DF": {
+      "admissions": 40651,
+      "dismissals": 40785,
+      "balance": -134,
+      "salary_mean_admission_brl": 2367.82
+    }
+  }
+}
