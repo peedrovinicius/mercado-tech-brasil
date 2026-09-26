@@ -2,9 +2,6 @@ name: RAIS 2025 NI refresh
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/rais-ni-refresh.run"
 
 permissions:
   contents: read
