@@ -9,7 +9,13 @@ from typing import Any
 
 from sqlalchemy import Engine, create_engine, delete, func, insert, select
 
-from src.db.schema import dataset_release, market_occupation, market_uf, metadata
+from src.db.schema import (
+    dataset_release,
+    market_municipality,
+    market_occupation,
+    market_uf,
+    metadata,
+)
 from src.validation.publication_gate import evaluate_publication_gate
 
 
@@ -23,6 +29,7 @@ class ServingPayload:
     release: dict[str, Any]
     uf_items: tuple[dict[str, Any], ...]
     occupation_items: tuple[dict[str, Any], ...]
+    municipality_items: tuple[dict[str, Any], ...]
 
 
 @dataclass(frozen=True)
@@ -30,12 +37,19 @@ class LoadResult:
     competence: str
     uf_rows: int
     occupation_rows: int
+    municipality_rows: int
     source_sha256: str
 
 
 def _read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(path)
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _read_json_optional(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -83,15 +97,24 @@ def build_serving_payload(
     quality = _read_json(gold_dir / f"quality-{yearmonth}.json")
     by_uf = _read_json(gold_dir / f"by-uf-{yearmonth}.json")
     by_occupation = _read_json(gold_dir / f"by-occupation-{yearmonth}.json")
+    by_municipality = _read_json_optional(
+        gold_dir / f"by-municipality-{yearmonth}.json"
+    )
 
-    for name, payload in {
+    required_payloads = {
         "overview": overview,
         "quality": quality,
         "by_uf": by_uf,
         "by_occupation": by_occupation,
-    }.items():
+    }
+    for name, payload in required_payloads.items():
         if str(payload.get("competence")) != yearmonth:
             raise ValueError(f"{name}: competência divergente.")
+
+    if by_municipality is not None and str(
+        by_municipality.get("competence")
+    ) != yearmonth:
+        raise ValueError("by_municipality: competência divergente.")
 
     release_admissions = int(overview["admissions"])
     release_dismissals = int(overview["dismissals"])
@@ -137,6 +160,27 @@ def build_serving_payload(
             }
         )
 
+    municipality_items: list[dict[str, Any]] = []
+    if by_municipality is not None:
+        for raw in by_municipality.get("items", []):
+            code = str(raw.get("municipio_codigo_caged") or "")
+            item = _validate_metric_item(raw, label=f"Município {code}")
+            if not code.isdigit():
+                raise ValueError(f"Código municipal inválido: {code!r}")
+            municipality_items.append(
+                {
+                    "competence": competence,
+                    "municipality_code": code,
+                    "admissions": item["admissions"],
+                    "dismissals": item["dismissals"],
+                    "balance": item["balance"],
+                    "salary_mean_admissions": item.get("salary_mean_admissions"),
+                    "salary_median_admissions": item.get(
+                        "salary_median_admissions"
+                    ),
+                }
+            )
+
     release = {
         "competence": competence,
         "source": str(overview.get("source") or "Novo CAGED / MTE"),
@@ -157,6 +201,7 @@ def build_serving_payload(
         release=release,
         uf_items=tuple(uf_items),
         occupation_items=tuple(occupation_items),
+        municipality_items=tuple(municipality_items),
     )
 
 
@@ -164,6 +209,11 @@ def load_serving_payload(engine: Engine, payload: ServingPayload) -> LoadResult:
     metadata.create_all(engine)
 
     with engine.begin() as connection:
+        connection.execute(
+            delete(market_municipality).where(
+                market_municipality.c.competence == payload.competence
+            )
+        )
         connection.execute(
             delete(market_occupation).where(
                 market_occupation.c.competence == payload.competence
@@ -183,26 +233,42 @@ def load_serving_payload(engine: Engine, payload: ServingPayload) -> LoadResult:
             connection.execute(insert(market_uf), list(payload.uf_items))
         if payload.occupation_items:
             connection.execute(insert(market_occupation), list(payload.occupation_items))
+        if payload.municipality_items:
+            connection.execute(
+                insert(market_municipality),
+                list(payload.municipality_items),
+            )
 
-        uf_count = connection.scalar(
-            select(func.count())
-            .select_from(market_uf)
-            .where(market_uf.c.competence == payload.competence)
-        )
-        occupation_count = connection.scalar(
-            select(func.count())
-            .select_from(market_occupation)
-            .where(market_occupation.c.competence == payload.competence)
-        )
-        if uf_count != len(payload.uf_items):
-            raise RuntimeError("Contagem pós-carga de UF divergiu do payload.")
-        if occupation_count != len(payload.occupation_items):
-            raise RuntimeError("Contagem pós-carga de CBO divergiu do payload.")
+        checks = {
+            "UF": (
+                market_uf,
+                len(payload.uf_items),
+            ),
+            "CBO": (
+                market_occupation,
+                len(payload.occupation_items),
+            ),
+            "município": (
+                market_municipality,
+                len(payload.municipality_items),
+            ),
+        }
+        for label, (table, expected) in checks.items():
+            count = connection.scalar(
+                select(func.count())
+                .select_from(table)
+                .where(table.c.competence == payload.competence)
+            )
+            if count != expected:
+                raise RuntimeError(
+                    f"Contagem pós-carga de {label} divergiu do payload."
+                )
 
     return LoadResult(
         competence=payload.competence.strftime("%Y%m"),
         uf_rows=len(payload.uf_items),
         occupation_rows=len(payload.occupation_items),
+        municipality_rows=len(payload.municipality_items),
         source_sha256=str(payload.release["source_sha256"]),
     )
 
