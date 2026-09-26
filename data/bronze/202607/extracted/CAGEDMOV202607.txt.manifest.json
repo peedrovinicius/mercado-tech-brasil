@@ -4,7 +4,7 @@
   "original_name": "CAGEDMOV202607.txt",
   "size_bytes": 465982385,
   "sha256": "07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f",
-  "ingested_at_utc": "2026-09-26T08:23:24.254656+00:00",
+  "ingested_at_utc": "2026-09-26T08:59:32.578904+00:00",
   "transport": "ftp_mte",
   "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202607/CAGEDMOV202607.7z"
 }

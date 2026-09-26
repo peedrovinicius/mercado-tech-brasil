@@ -1,0 +1,47 @@
+{
+  "competence": "202605",
+  "scope": "recorte CBO de tecnologia versionado",
+  "admissions": 18153,
+  "dismissals": 17706,
+  "balance": 447,
+  "salary_mean_admissions": 6112.461583434829,
+  "salary_median_admissions": 4000.0,
+  "salary_mean_admissions_real": 6126.526369418976,
+  "salary_median_admissions_real": 4009.2040077747165,
+  "salary_real_base_competence": "202607",
+  "salary_eligible_admissions": 18062,
+  "salary_excluded_admissions": 91,
+  "salary_methodology": {
+    "minimum_wage_brl": 1621.0,
+    "minimum_salary_brl": 486.3,
+    "maximum_salary_brl": 243150.0,
+    "exclude_intermittent": true,
+    "source": "MTE: Sumário Executivo Novo Caged"
+  },
+  "records_tech": 35885,
+  "adjustments": [
+    {
+      "adjustment_kind": "EXC",
+      "rows": 13,
+      "admissions_delta": -7,
+      "dismissals_delta": -6,
+      "balance_delta": -1
+    },
+    {
+      "adjustment_kind": "FOR",
+      "rows": 215,
+      "admissions_delta": 119,
+      "dismissals_delta": 96,
+      "balance_delta": 23
+    },
+    {
+      "adjustment_kind": "MOV",
+      "rows": 35657,
+      "admissions_delta": 18041,
+      "dismissals_delta": 17616,
+      "balance_delta": 425
+    }
+  ],
+  "source": "Novo CAGED / MTE",
+  "status": "generated_from_official_microdata"
+}

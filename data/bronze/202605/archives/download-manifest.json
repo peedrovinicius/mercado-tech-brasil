@@ -1,0 +1,24 @@
+{
+  "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
+  "transport_repository": "https://huggingface.co/datasets/alexsandroprado/caged",
+  "files": [
+    {
+      "path": "CAGEDMOV202605.7z",
+      "kind": "MOV",
+      "transport": "ftp_mte",
+      "url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202605/CAGEDMOV202605.7z"
+    },
+    {
+      "path": "CAGEDFOR202605.7z",
+      "kind": "FOR",
+      "transport": "ftp_mte",
+      "url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202605/CAGEDFOR202605.7z"
+    },
+    {
+      "path": "CAGEDEXC202605.7z",
+      "kind": "EXC",
+      "transport": "ftp_mte",
+      "url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202605/CAGEDEXC202605.7z"
+    }
+  ]
+}

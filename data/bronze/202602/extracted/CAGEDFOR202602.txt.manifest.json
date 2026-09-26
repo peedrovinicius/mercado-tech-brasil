@@ -1,0 +1,10 @@
+{
+  "source": "novo_caged_mte",
+  "competence": "202602",
+  "original_name": "CAGEDFOR202602.txt",
+  "size_bytes": 8214045,
+  "sha256": "1a7d6c87a6bf605a33ece5190ff21312fd216116a671dcaf4a1b95240ac7eb3e",
+  "ingested_at_utc": "2026-09-26T08:50:38.439849+00:00",
+  "transport": "ftp_mte",
+  "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202602/CAGEDFOR202602.7z"
+}

@@ -4,7 +4,7 @@
   "original_name": "CAGEDFOR202607.txt",
   "size_bytes": 8147432,
   "sha256": "db2d5756dfed37e615a30220ccd1d47dc3f382dc6addf5d13e46093e83da8975",
-  "ingested_at_utc": "2026-09-26T08:23:20.476140+00:00",
+  "ingested_at_utc": "2026-09-26T08:59:28.877278+00:00",
   "transport": "ftp_mte",
   "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202607/CAGEDFOR202607.7z"
 }

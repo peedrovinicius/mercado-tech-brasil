@@ -8,10 +8,10 @@
       "admissions": 8436,
       "dismissals": 8228,
       "balance": 208,
-      "salary_mean_admissions": 7545.883436830832,
+      "salary_mean_admissions": 7545.883436830844,
       "salary_median_admissions": 5301.975,
       "salary_eligible_admissions": 8406,
-      "salary_mean_admissions_real": 7545.883436830832,
+      "salary_mean_admissions_real": 7545.883436830844,
       "salary_median_admissions_real": 5301.975
     },
     {
@@ -30,10 +30,10 @@
       "admissions": 1228,
       "dismissals": 1301,
       "balance": -73,
-      "salary_mean_admissions": 4697.717872340431,
+      "salary_mean_admissions": 4697.717872340425,
       "salary_median_admissions": 3345.36,
       "salary_eligible_admissions": 1222,
-      "salary_mean_admissions_real": 4697.717872340431,
+      "salary_mean_admissions_real": 4697.717872340425,
       "salary_median_admissions_real": 3345.36
     },
     {
@@ -41,10 +41,10 @@
       "admissions": 1221,
       "dismissals": 1204,
       "balance": 17,
-      "salary_mean_admissions": 5085.107448389763,
+      "salary_mean_admissions": 5085.107448389759,
       "salary_median_admissions": 3620.54,
       "salary_eligible_admissions": 1211,
-      "salary_mean_admissions_real": 5085.107448389763,
+      "salary_mean_admissions_real": 5085.107448389759,
       "salary_median_admissions_real": 3620.54
     },
     {
@@ -63,10 +63,10 @@
       "admissions": 1142,
       "dismissals": 1045,
       "balance": 97,
-      "salary_mean_admissions": 5703.20754170325,
+      "salary_mean_admissions": 5703.207541703253,
       "salary_median_admissions": 4186.0,
       "salary_eligible_admissions": 1139,
-      "salary_mean_admissions_real": 5703.20754170325,
+      "salary_mean_admissions_real": 5703.207541703253,
       "salary_median_admissions_real": 4186.0
     },
     {
@@ -74,10 +74,10 @@
       "admissions": 864,
       "dismissals": 650,
       "balance": 214,
-      "salary_mean_admissions": 6068.924359281437,
+      "salary_mean_admissions": 6068.924359281434,
       "salary_median_admissions": 5000.0,
       "salary_eligible_admissions": 835,
-      "salary_mean_admissions_real": 6068.924359281437,
+      "salary_mean_admissions_real": 6068.924359281434,
       "salary_median_admissions_real": 5000.0
     },
     {
@@ -85,10 +85,10 @@
       "admissions": 522,
       "dismissals": 415,
       "balance": 107,
-      "salary_mean_admissions": 3906.583474088292,
+      "salary_mean_admissions": 3906.5834740882906,
       "salary_median_admissions": 2493.75,
       "salary_eligible_admissions": 521,
-      "salary_mean_admissions_real": 3906.583474088292,
+      "salary_mean_admissions_real": 3906.5834740882906,
       "salary_median_admissions_real": 2493.75
     },
     {
@@ -118,10 +118,10 @@
       "admissions": 369,
       "dismissals": 302,
       "balance": 67,
-      "salary_mean_admissions": 4479.853269754767,
+      "salary_mean_admissions": 4479.85326975477,
       "salary_median_admissions": 2700.0,
       "salary_eligible_admissions": 367,
-      "salary_mean_admissions_real": 4479.853269754767,
+      "salary_mean_admissions_real": 4479.85326975477,
       "salary_median_admissions_real": 2700.0
     },
     {
@@ -129,10 +129,10 @@
       "admissions": 282,
       "dismissals": 321,
       "balance": -39,
-      "salary_mean_admissions": 3495.534716312057,
+      "salary_mean_admissions": 3495.5347163120573,
       "salary_median_admissions": 2500.0,
       "salary_eligible_admissions": 282,
-      "salary_mean_admissions_real": 3495.534716312057,
+      "salary_mean_admissions_real": 3495.5347163120573,
       "salary_median_admissions_real": 2500.0
     },
     {
@@ -140,10 +140,10 @@
       "admissions": 281,
       "dismissals": 196,
       "balance": 85,
-      "salary_mean_admissions": 6086.318398576512,
+      "salary_mean_admissions": 6086.318398576514,
       "salary_median_admissions": 4000.0,
       "salary_eligible_admissions": 281,
-      "salary_mean_admissions_real": 6086.318398576512,
+      "salary_mean_admissions_real": 6086.318398576514,
       "salary_median_admissions_real": 4000.0
     },
     {
@@ -151,10 +151,10 @@
       "admissions": 179,
       "dismissals": 150,
       "balance": 29,
-      "salary_mean_admissions": 4832.123687150839,
+      "salary_mean_admissions": 4832.123687150836,
       "salary_median_admissions": 4000.0,
       "salary_eligible_admissions": 179,
-      "salary_mean_admissions_real": 4832.123687150839,
+      "salary_mean_admissions_real": 4832.123687150836,
       "salary_median_admissions_real": 4000.0
     },
     {
@@ -162,10 +162,10 @@
       "admissions": 151,
       "dismissals": 127,
       "balance": 24,
-      "salary_mean_admissions": 3072.657027027028,
+      "salary_mean_admissions": 3072.657027027027,
       "salary_median_admissions": 2275.0,
       "salary_eligible_admissions": 148,
-      "salary_mean_admissions_real": 3072.657027027028,
+      "salary_mean_admissions_real": 3072.657027027027,
       "salary_median_admissions_real": 2275.0
     },
     {
@@ -173,10 +173,10 @@
       "admissions": 112,
       "dismissals": 120,
       "balance": -8,
-      "salary_mean_admissions": 2870.7284821428575,
+      "salary_mean_admissions": 2870.728482142857,
       "salary_median_admissions": 2402.0,
       "salary_eligible_admissions": 112,
-      "salary_mean_admissions_real": 2870.7284821428575,
+      "salary_mean_admissions_real": 2870.728482142857,
       "salary_median_admissions_real": 2402.0
     },
     {
@@ -195,10 +195,10 @@
       "admissions": 82,
       "dismissals": 76,
       "balance": 6,
-      "salary_mean_admissions": 2043.2169620253167,
+      "salary_mean_admissions": 2043.2169620253162,
       "salary_median_admissions": 1806.75,
       "salary_eligible_admissions": 79,
-      "salary_mean_admissions_real": 2043.2169620253167,
+      "salary_mean_admissions_real": 2043.2169620253162,
       "salary_median_admissions_real": 1806.75
     },
     {
@@ -206,43 +206,43 @@
       "admissions": 76,
       "dismissals": 55,
       "balance": 21,
-      "salary_mean_admissions": 3421.2639473684208,
+      "salary_mean_admissions": 3421.263947368421,
       "salary_median_admissions": 2467.19,
       "salary_eligible_admissions": 76,
-      "salary_mean_admissions_real": 3421.2639473684208,
+      "salary_mean_admissions_real": 3421.263947368421,
       "salary_median_admissions_real": 2467.19
-    },
-    {
-      "uf": "SE",
-      "admissions": 75,
-      "dismissals": 138,
-      "balance": -63,
-      "salary_mean_admissions": 2724.4784000000004,
-      "salary_median_admissions": 2269.4,
-      "salary_eligible_admissions": 75,
-      "salary_mean_admissions_real": 2724.4784000000004,
-      "salary_median_admissions_real": 2269.4
     },
     {
       "uf": "MA",
       "admissions": 75,
       "dismissals": 91,
       "balance": -16,
-      "salary_mean_admissions": 2501.7072972972974,
+      "salary_mean_admissions": 2501.707297297298,
       "salary_median_admissions": 1800.0,
       "salary_eligible_admissions": 74,
-      "salary_mean_admissions_real": 2501.7072972972974,
+      "salary_mean_admissions_real": 2501.707297297298,
       "salary_median_admissions_real": 1800.0
+    },
+    {
+      "uf": "SE",
+      "admissions": 75,
+      "dismissals": 138,
+      "balance": -63,
+      "salary_mean_admissions": 2724.4784,
+      "salary_median_admissions": 2269.4,
+      "salary_eligible_admissions": 75,
+      "salary_mean_admissions_real": 2724.4784,
+      "salary_median_admissions_real": 2269.4
     },
     {
       "uf": "PI",
       "admissions": 65,
       "dismissals": 82,
       "balance": -17,
-      "salary_mean_admissions": 2601.9252459016393,
+      "salary_mean_admissions": 2601.9252459016398,
       "salary_median_admissions": 2157.27,
       "salary_eligible_admissions": 61,
-      "salary_mean_admissions_real": 2601.9252459016393,
+      "salary_mean_admissions_real": 2601.9252459016398,
       "salary_median_admissions_real": 2157.27
     },
     {
@@ -250,10 +250,10 @@
       "admissions": 60,
       "dismissals": 54,
       "balance": 6,
-      "salary_mean_admissions": 2253.904333333333,
+      "salary_mean_admissions": 2253.9043333333334,
       "salary_median_admissions": 2000.0,
       "salary_eligible_admissions": 60,
-      "salary_mean_admissions_real": 2253.904333333333,
+      "salary_mean_admissions_real": 2253.9043333333334,
       "salary_median_admissions_real": 2000.0
     },
     {

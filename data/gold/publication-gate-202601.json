@@ -1,0 +1,100 @@
+{
+  "competence": "202601",
+  "automatic_checks_passed": true,
+  "manual_approval_valid": true,
+  "publishable": true,
+  "source_sha256": "577814d43f2ff2acf26d34a79fb3a758267ae89fffcec2e24c37cc164dfcc3dc",
+  "generated_at_utc": "2026-09-26T09:11:22.613058+00:00",
+  "checks": [
+    {
+      "id": "quality_report",
+      "passed": true,
+      "message": "Artefato encontrado: quality-202601.json",
+      "blocking": true
+    },
+    {
+      "id": "overview",
+      "passed": true,
+      "message": "Artefato encontrado: overview-202601.json",
+      "blocking": true
+    },
+    {
+      "id": "gold_market",
+      "passed": true,
+      "message": "Artefato encontrado: market-202601.parquet",
+      "blocking": true
+    },
+    {
+      "id": "national_mov_audit",
+      "passed": true,
+      "message": "Artefato encontrado: audit-national-mov-202601.json",
+      "blocking": true
+    },
+    {
+      "id": "municipality_gold",
+      "passed": true,
+      "message": "Artefato encontrado: by-municipality-202601.json",
+      "blocking": true
+    },
+    {
+      "id": "mov_provenance",
+      "passed": true,
+      "message": "Proveniência MOV registrada com SHA-256 577814d43f2ff2acf26d34a79fb3a758267ae89fffcec2e24c37cc164dfcc3dc.",
+      "blocking": true
+    },
+    {
+      "id": "quality_competence",
+      "passed": true,
+      "message": "Competência do relatório de qualidade confere.",
+      "blocking": true
+    },
+    {
+      "id": "quality_counts",
+      "passed": true,
+      "message": "Contagens coerentes: lidas=4303726, válidas=4303726, rejeitadas=0.",
+      "blocking": true
+    },
+    {
+      "id": "valid_rate",
+      "passed": true,
+      "message": "Taxa válida=100.0000%; mínimo=99.00%.",
+      "blocking": true
+    },
+    {
+      "id": "overview_competence",
+      "passed": true,
+      "message": "Competência do overview confere.",
+      "blocking": true
+    },
+    {
+      "id": "overview_arithmetic",
+      "passed": true,
+      "message": "Saldo confere: 19633 - 18041 = 1592.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_dimension_quality",
+      "passed": true,
+      "message": "Dimensão municipal identificada e residual controlado: 1286 itens, 0 residual.",
+      "blocking": true
+    },
+    {
+      "id": "official_reference_integrity",
+      "passed": true,
+      "message": "Referência oficial publicada é internamente consistente.",
+      "blocking": true
+    },
+    {
+      "id": "national_reference_reconciliation",
+      "passed": true,
+      "message": "MOV nacional reconciliado exatamente com a referência oficial.",
+      "blocking": true
+    },
+    {
+      "id": "manual_methodology_approval",
+      "passed": true,
+      "message": "Revisão metodológica aprovada e vinculada ao SHA-256 atual.",
+      "blocking": true
+    }
+  ]
+}

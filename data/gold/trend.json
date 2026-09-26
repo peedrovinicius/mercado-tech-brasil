@@ -3,13 +3,79 @@
   "scope": "recorte CBO de tecnologia versionado",
   "items": [
     {
+      "competence": "202601",
+      "admissions": 19633,
+      "dismissals": 18041,
+      "balance": 1592,
+      "salary_mean_admissions": 5957.204309151513,
+      "salary_median_admissions": 3724.0,
+      "salary_mean_admissions_real": 6141.677682292657,
+      "salary_median_admissions_real": 3839.3189996391893,
+      "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202602",
+      "admissions": 18131,
+      "dismissals": 17679,
+      "balance": 452,
+      "salary_mean_admissions": 5404.168531962208,
+      "salary_median_admissions": 3408.25,
+      "salary_mean_admissions_real": 5532.789839748193,
+      "salary_median_admissions_real": 3489.3676723429116,
+      "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202603",
+      "admissions": 20415,
+      "dismissals": 19517,
+      "balance": 898,
+      "salary_mean_admissions": 5776.848127623838,
+      "salary_median_admissions": 3570.48,
+      "salary_mean_admissions_real": 5862.74830427404,
+      "salary_median_admissions_real": 3623.572076500922,
+      "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202604",
+      "admissions": 19603,
+      "dismissals": 19089,
+      "balance": 514,
+      "salary_mean_admissions": 6187.109689421897,
+      "salary_median_admissions": 4000.0,
+      "salary_mean_admissions_real": 6237.316235323271,
+      "salary_median_admissions_real": 4032.4588044638754,
+      "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202605",
+      "admissions": 18153,
+      "dismissals": 17706,
+      "balance": 447,
+      "salary_mean_admissions": 6112.461583434829,
+      "salary_median_admissions": 4000.0,
+      "salary_mean_admissions_real": 6126.526369418976,
+      "salary_median_admissions_real": 4009.2040077747165,
+      "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202606",
+      "admissions": 19021,
+      "dismissals": 17486,
+      "balance": 1535,
+      "salary_mean_admissions": 6020.451947818735,
+      "salary_median_admissions": 3900.0,
+      "salary_mean_admissions_real": 6024.668892692063,
+      "salary_median_admissions_real": 3902.7317027273903,
+      "salary_real_base_competence": "202607"
+    },
+    {
       "competence": "202607",
       "admissions": 19253,
       "dismissals": 18347,
       "balance": 906,
-      "salary_mean_admissions": 6155.046008565752,
+      "salary_mean_admissions": 6155.046008565744,
       "salary_median_admissions": 3990.0550000000003,
-      "salary_mean_admissions_real": 6155.046008565752,
+      "salary_mean_admissions_real": 6155.046008565744,
       "salary_median_admissions_real": 3990.0550000000003,
       "salary_real_base_competence": "202607"
     }
