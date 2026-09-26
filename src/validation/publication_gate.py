@@ -70,12 +70,14 @@ def evaluate_publication_gate(
     overview_path = gold_dir / f"overview-{yearmonth}.json"
     market_path = gold_dir / f"market-{yearmonth}.parquet"
     national_audit_path = gold_dir / f"audit-national-mov-{yearmonth}.json"
+    municipality_path = gold_dir / f"by-municipality-{yearmonth}.json"
 
     for check_id, path in {
         "quality_report": quality_path,
         "overview": overview_path,
         "gold_market": market_path,
         "national_mov_audit": national_audit_path,
+        "municipality_gold": municipality_path,
     }.items():
         checks.append(
             GateCheck(
@@ -186,6 +188,51 @@ def evaluate_publication_gate(
                     f"Saldo confere: {admissions} - {dismissals} = {balance}."
                     if arithmetic_ok
                     else "Saldo do overview não é igual a admissões menos desligamentos."
+                ),
+            )
+        )
+
+
+    if municipality_path.exists():
+        municipality = _read_json(municipality_path)
+        municipality_items = municipality.get("items")
+        dimension_ok = isinstance(municipality_items, list) and bool(
+            municipality_items
+        )
+        residual_count = 0
+        if dimension_ok:
+            for item in municipality_items:
+                code = str(item.get("municipio_codigo_caged") or "")
+                name = str(item.get("municipio_nome") or "")
+                uf = str(item.get("uf") or "")
+                ibge_code = item.get("municipio_codigo_ibge")
+
+                if code == "999999":
+                    residual_count += 1
+                    if name != "Não identificado" or uf != "NI":
+                        dimension_ok = False
+                        break
+                    continue
+
+                if (
+                    not code
+                    or not name
+                    or len(uf) != 2
+                    or len(str(ibge_code or "")) != 7
+                ):
+                    dimension_ok = False
+                    break
+
+        checks.append(
+            GateCheck(
+                id="municipality_dimension_quality",
+                passed=dimension_ok,
+                message=(
+                    "Dimensão municipal identificada e residual controlado: "
+                    f"{len(municipality_items)} itens, "
+                    f"{residual_count} residual."
+                    if dimension_ok
+                    else "Dimensão municipal possui item sem identificação válida."
                 ),
             )
         )
