@@ -10,11 +10,11 @@ from src.reference.ipca import (
 
 
 def test_sidra_url_uses_ipca_number_index_series():
-    url = build_sidra_url(["202607", "202608"])
+    url = build_sidra_url(["202606", "202607"])
 
     assert "/t/1737/" in url
     assert "/v/2266/" in url
-    assert "202607,202608" in url
+    assert "202606,202607" in url
 
 
 def test_correct_to_base_uses_index_ratio():
@@ -32,12 +32,12 @@ def test_ipca_cache_roundtrip(tmp_path: Path):
     save_ipca_cache(
         {
             "202607": Decimal("7300.1"),
-            "202608": Decimal("7310.2"),
+            "202606": Decimal("7290.2"),
         },
-        base_competence="202608",
+        base_competence="202607",
         destination=destination,
     )
 
     payload = load_ipca_cache(destination)
-    assert payload["base_competence"] == "202608"
+    assert payload["base_competence"] == "202607"
     assert payload["indices"]["202607"] == "7300.1"
