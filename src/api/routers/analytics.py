@@ -178,10 +178,18 @@ def by_occupation(limit: int = Query(default=10, ge=1, le=50)) -> dict[str, obje
 @router.get("/by-municipality")
 def by_municipality(
     limit: int = Query(default=20, ge=1, le=200),
+    metric: str = Query(
+        default="admissions",
+        pattern="^(admissions|admissions_per_100k)$",
+    ),
 ) -> dict[str, object]:
     if settings.data_backend == "postgres":
         try:
-            payload = fetch_by_municipality(settings.database_url, limit=limit)
+            payload = fetch_by_municipality(
+                settings.database_url,
+                limit=limit,
+                metric=metric,
+            )
         except SQLAlchemyError as exc:
             raise HTTPException(
                 status_code=503,
@@ -197,9 +205,38 @@ def by_municipality(
     payload = json.loads(
         _published_json("by-municipality").read_text(encoding="utf-8")
     )
+    raw_items = [
+        item
+        for item in payload.get("items", [])
+        if isinstance(item, dict)
+    ]
+    normalization_available = any(
+        item.get("admissions_per_100k") is not None
+        for item in raw_items
+    )
+
+    if metric == "admissions_per_100k":
+        ranked = sorted(
+            (
+                item
+                for item in raw_items
+                if item.get("admissions_per_100k") is not None
+            ),
+            key=lambda item: float(item["admissions_per_100k"]),
+            reverse=True,
+        )
+    else:
+        ranked = sorted(
+            raw_items,
+            key=lambda item: int(item.get("admissions") or 0),
+            reverse=True,
+        )
+
     return {
         **payload,
-        "items": payload.get("items", [])[:limit],
+        "ranking_metric": metric,
+        "normalization_available": normalization_available,
+        "items": ranked[:limit],
     }
 
 

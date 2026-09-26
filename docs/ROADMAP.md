@@ -20,6 +20,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - comparação Brasil, Nordeste e Ceará;
 - consolidação trimestral com identificação de períodos parciais;
 - integração SIDRA para população municipal e cálculo por 100 mil no Gold;
+- ranking municipal normalizado no frontend, ativado somente quando há denominador publicado;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -39,7 +40,7 @@ A base necessária para publicar e auditar o produto está implementada:
 
 ### Expansão analítica
 
-- publicar a visualização municipal por 100 mil após o próximo ciclo Gold enriquecido;
+- acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
 - adicionar RAIS para análises de estoque anual de vínculos;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.

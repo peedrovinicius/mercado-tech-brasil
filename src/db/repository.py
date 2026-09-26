@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-from sqlalchemy import Engine, create_engine, select
+from sqlalchemy import Engine, create_engine, func, select
 from sqlalchemy.engine import Connection
 
 from src.db.schema import (
@@ -152,6 +152,7 @@ def fetch_by_municipality(
     database_url: str,
     *,
     limit: int,
+    metric: str = "admissions",
 ) -> dict[str, object] | None:
     engine = get_engine(database_url)
     with engine.connect() as connection:
@@ -159,17 +160,37 @@ def fetch_by_municipality(
         if release is None:
             return None
 
+        if metric not in {"admissions", "admissions_per_100k"}:
+            raise ValueError(f"Métrica municipal inválida: {metric}")
+
+        ranking_column = (
+            market_municipality.c.admissions_per_100k
+            if metric == "admissions_per_100k"
+            else market_municipality.c.admissions
+        )
+        statement = select(market_municipality).where(
+            market_municipality.c.competence == release["competence"]
+        )
+        if metric == "admissions_per_100k":
+            statement = statement.where(ranking_column.is_not(None))
         rows = connection.execute(
-            select(market_municipality)
-            .where(market_municipality.c.competence == release["competence"])
-            .order_by(
-                market_municipality.c.admissions.desc(),
+            statement.order_by(
+                ranking_column.desc(),
                 market_municipality.c.municipality_code.asc(),
-            )
-            .limit(limit)
+            ).limit(limit)
         ).mappings().all()
 
-        if not rows:
+        normalization_count = connection.scalar(
+            select(func.count())
+            .select_from(market_municipality)
+            .where(
+                market_municipality.c.competence == release["competence"],
+                market_municipality.c.admissions_per_100k.is_not(None),
+            )
+        )
+        normalization_available = bool(normalization_count)
+
+        if not rows and metric == "admissions":
             return None
 
         items = [
@@ -214,6 +235,13 @@ def fetch_by_municipality(
                 if len(population_years) == 1
                 else None
             ),
+            "population_reference_date": (
+                f"{next(iter(population_years))}-07-01"
+                if len(population_years) == 1
+                else None
+            ),
+            "ranking_metric": metric,
+            "normalization_available": normalization_available,
             "items": items,
         }
 

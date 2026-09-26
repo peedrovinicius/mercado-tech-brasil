@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.23.0
+
+- endpoint municipal passa a aceitar ranking por admissões absolutas ou admissões por 100 mil habitantes;
+- rankings absoluto e normalizado são calculados separadamente para preservar comparabilidade;
+- municípios sem denominador populacional são excluídos apenas do ranking normalizado;
+- resposta municipal informa disponibilidade da normalização e referência populacional;
+- PostgreSQL e arquivos Gold mantêm o mesmo contrato de ranking;
+- frontend ganha seletor Volume e Por 100 mil, exibido somente quando a normalização está disponível;
+- gráfico municipal adapta eixo, tooltip e cor ao modo normalizado;
+- testes cobrem ranking normalizado, ausência de denominador e rejeição de métricas inválidas;
+- cobertura publicada de emprego permanece de janeiro a julho de 2026.
+
 ## 0.22.0
 
 - integração com Estimativas da População do IBGE pela tabela SIDRA 6579, variável 9324;

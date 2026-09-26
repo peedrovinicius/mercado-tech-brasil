@@ -34,3 +34,11 @@ export function formatPercent(value: number): string {
     maximumFractionDigits: 2,
   }).format(value)
 }
+
+
+export function formatRate(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value)
+}

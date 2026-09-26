@@ -62,6 +62,7 @@ python scripts/generate_readme_dashboard.py
 | Serving de produção | Arquivos Gold publicados |
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
+| Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
 
 ## Série publicada
 
@@ -260,6 +261,7 @@ Sincronização das referências oficiais:
 
 ~~~bash
 python -m src.cli sync-municipalities
+python -m src.cli sync-population 2026
 python -m src.cli sync-ipca 202607 --base 202607
 ~~~
 

@@ -49,6 +49,19 @@ export type MunicipalityItem = SalaryFields & {
   balance_per_100k?: number | null
 }
 
+export type MunicipalityResponse = {
+  competence: string
+  source: string
+  code_system?: string
+  salary_real_base_competence?: string | null
+  population_source?: string | null
+  population_reference_year?: number | null
+  population_reference_date?: string | null
+  ranking_metric: 'admissions' | 'admissions_per_100k'
+  normalization_available: boolean
+  items: MunicipalityItem[]
+}
+
 export type TerritorialComparisonItem = {
   key: 'BR' | 'NE' | 'CE'
   label: string
@@ -224,8 +237,10 @@ export const api = {
       '/analytics/by-occupation?limit=10',
     ),
   byMunicipality: () =>
-    get<{ competence: string; source: string; items: MunicipalityItem[] }>(
-      '/analytics/by-municipality?limit=15',
+    get<MunicipalityResponse>('/analytics/by-municipality?limit=15'),
+  byMunicipalityNormalized: () =>
+    get<MunicipalityResponse>(
+      '/analytics/by-municipality?limit=15&metric=admissions_per_100k',
     ),
   territorialComparison: () =>
     get<TerritorialComparison>('/analytics/territorial-comparison'),

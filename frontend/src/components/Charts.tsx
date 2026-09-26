@@ -25,7 +25,7 @@ import type {
   TrendItem,
   UfItem,
 } from '../lib/api'
-import { formatCompetence, formatNumber } from '../lib/format'
+import { formatCompetence, formatNumber, formatRate } from '../lib/format'
 
 const axisLabelColor = '#686870'
 const categoryLabelColor = '#44444b'
@@ -146,21 +146,42 @@ export function OccupationChart({ items }: { items: OccupationItem[] }) {
   )
 }
 
-export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
+export function MunicipalityChart({
+  items,
+  metric = 'admissions',
+}: {
+  items: MunicipalityItem[]
+  metric?: 'admissions' | 'admissions_per_100k'
+}) {
+  const normalized = metric === 'admissions_per_100k'
   const top = items.slice(0, 12).reverse()
   const labels = top.map((item) => {
     const name = item.municipio_nome ?? item.municipio_codigo_caged
     return item.uf ? `${name} / ${item.uf}` : name
   })
+  const values = top.map((item) =>
+    normalized ? (item.admissions_per_100k ?? 0) : item.admissions,
+  )
+  const formatter = (value: number) =>
+    normalized ? formatRate(value) : formatNumber(value)
+
   const option = {
     animationDuration: 450,
     aria: { show: true },
     grid: { left: 150, right: 16, top: 12, bottom: 24, containLabel: true },
     tooltip: {
-      ...numberTooltip,
+      trigger: 'axis',
+      confine: true,
+      valueFormatter: formatter,
       axisPointer: { type: 'shadow' },
     },
-    xAxis: valueAxis,
+    xAxis: {
+      ...valueAxis,
+      axisLabel: {
+        color: axisLabelColor,
+        formatter,
+      },
+    },
     yAxis: {
       type: 'category',
       data: labels,
@@ -174,10 +195,13 @@ export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
     },
     series: [
       {
-        name: 'Admissões',
+        name: normalized ? 'Admissões por 100 mil' : 'Admissões',
         type: 'bar',
-        data: top.map((item) => item.admissions),
-        itemStyle: { color: '#242428', borderRadius: [0, 5, 5, 0] },
+        data: values,
+        itemStyle: {
+          color: normalized ? '#2459ff' : '#242428',
+          borderRadius: [0, 5, 5, 0],
+        },
         barMaxWidth: 18,
       },
     ],
@@ -186,7 +210,7 @@ export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
         query: { maxWidth: 520 },
         option: {
           grid: { left: 6, right: 8, top: 12, bottom: 20, containLabel: true },
-          xAxis: { axisLabel: { fontSize: 10 } },
+          xAxis: { axisLabel: { fontSize: 10, formatter } },
           yAxis: {
             axisLabel: {
               width: 92,

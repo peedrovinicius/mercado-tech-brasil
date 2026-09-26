@@ -6,7 +6,6 @@ import { MetricCard } from '../components/MetricCard'
 import { EmptyState } from '../components/EmptyState'
 import { MethodologyPanel } from '../components/MethodologyPanel'
 import {
-  MunicipalityChart,
   OccupationChart,
   TrendChart,
   UfChart,
@@ -16,6 +15,7 @@ import { ReferenceContext } from '../components/ReferenceContext'
 import { PipelineVisual } from '../components/PipelineVisual'
 import { TerritorialComparison } from '../components/TerritorialComparison'
 import { TemporalSummary } from '../components/TemporalSummary'
+import { MunicipalityAnalysis } from '../components/MunicipalityAnalysis'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
@@ -58,6 +58,12 @@ export function Dashboard() {
   const byMunicipality = useQuery({
     queryKey: ['by-municipality'],
     queryFn: api.byMunicipality,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const byMunicipalityNormalized = useQuery({
+    queryKey: ['by-municipality-normalized'],
+    queryFn: api.byMunicipalityNormalized,
     retry: false,
     enabled: overview.isSuccess,
   })
@@ -268,16 +274,10 @@ export function Dashboard() {
           {(byMunicipality.data || (trend.data?.items.length ?? 0) > 1) ? (
             <section className="analysis-grid">
               {byMunicipality.data ? (
-                <article className="panel panel--wide">
-                  <div className="panel__heading">
-                    <div>
-                      <p className="eyebrow">Municípios</p>
-                      <h2>Admissões tech por município</h2>
-                    </div>
-                    <span>Top 12</span>
-                  </div>
-                  <MunicipalityChart items={byMunicipality.data.items} />
-                </article>
+                <MunicipalityAnalysis
+                  volume={byMunicipality.data}
+                  normalized={byMunicipalityNormalized.data}
+                />
               ) : null}
 
               {(trend.data?.items.length ?? 0) > 1 ? (

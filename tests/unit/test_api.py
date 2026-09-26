@@ -47,6 +47,19 @@ def test_published_analytics_are_served():
     assert by_occupation.json()["competence"] == "202607"
     assert by_occupation.json()["items"]
 
+    by_municipality = client.get("/api/v1/analytics/by-municipality?limit=15")
+    assert by_municipality.status_code == 200
+    assert by_municipality.json()["ranking_metric"] == "admissions"
+
+    normalized = client.get(
+        "/api/v1/analytics/by-municipality"
+        "?limit=15&metric=admissions_per_100k"
+    )
+    assert normalized.status_code == 200
+    assert normalized.json()["ranking_metric"] == "admissions_per_100k"
+    assert normalized.json()["normalization_available"] is False
+    assert normalized.json()["items"] == []
+
     comparison = client.get("/api/v1/analytics/territorial-comparison")
     assert comparison.status_code == 200
     payload = comparison.json()
@@ -106,3 +119,10 @@ def test_analytics_refuse_without_published_release(monkeypatch):
     by_occupation = client.get("/api/v1/analytics/by-occupation")
     assert by_occupation.status_code == 503
     assert "processado, validado e aprovado" in by_occupation.json()["detail"]
+
+
+def test_municipality_rejects_unknown_ranking_metric():
+    response = client.get(
+        "/api/v1/analytics/by-municipality?metric=salary_mean_admissions"
+    )
+    assert response.status_code == 422
