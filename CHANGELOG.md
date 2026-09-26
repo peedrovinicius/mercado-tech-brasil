@@ -11,10 +11,9 @@
 - documentação de deploy;
 - testes garantindo root/API docs no modo de desenvolvimento.
 
-
 ## 0.11.0
 
-- dashboard visual orientado a portfólio/recrutadores;
+- dashboard visual responsivo para análise pública;
 - hero com pipeline auditável;
 - contexto oficial Brasil/Ceará disponível mesmo sem Gold tech;
 - gráfico regional com dados publicados pelo MTE;
@@ -25,7 +24,6 @@
 - versão de backend alinhada à versão do pacote;
 - workflow visual separado e acionado somente quando `frontend/**` muda.
 
-
 ## 0.10.0
 
 - recorte CBO de tecnologia elevado para versão 2;
@@ -35,7 +33,6 @@
 - justificativa metodológica do recorte ocupacional;
 - teste de regressão garantindo o conjunto exato de famílias;
 - documentação dedicada em `docs/CBO_SCOPE.md`.
-
 
 ## 0.9.0
 
