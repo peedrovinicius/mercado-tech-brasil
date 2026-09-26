@@ -52,6 +52,17 @@
 - frontend responsivo;
 - deploy público no Render.
 
-## Próxima carga de dados
+## Competência publicada
 
-O pipeline está preparado para baixar, transformar, reconciliar e publicar a primeira competência tech real. A publicação permanece condicionada ao gate metodológico e ao SHA-256 da origem.
+Julho de 2026 é a primeira competência tech real validada pelo pipeline.
+
+- MOV: 4.467.208 registros, 100% válidos;
+- FOR: 78.129 registros, 100% válidos;
+- EXC: 9.733 registros, 100% válidos;
+- recorte tech: 19.253 admissões, 18.347 desligamentos e saldo +906;
+- salário mediano de admissão: R$ 3.990,06;
+- municípios no recorte: 1.274;
+- reconciliação nacional com a referência oficial: aprovada;
+- proveniência MOV vinculada ao SHA-256 07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f.
+
+Os arquivos brutos permanecem fora do Git. O repositório versiona somente artefatos derivados e manifests necessários para rastreabilidade.

@@ -1,1 +1,9 @@
-{}
+{
+  "202607": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "Layout oficial revisado. MOV, FOR e EXC com taxa válida de 100%. MOV nacional reconciliado exatamente com a referência oficial, incluindo Não identificado. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Metodologia salarial e proveniência revisadas antes da publicação.",
+    "source_sha256": "07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f",
+    "approved_at_utc": "2026-09-26T08:25:00Z"
+  }
+}

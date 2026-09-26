@@ -25,6 +25,23 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
 </tr>
 </table>
 
+## Snapshot publicado
+
+**Competência: julho de 2026**
+
+<table>
+<tr>
+<td><strong>19.253</strong><br/>admissões tech</td>
+<td><strong>18.347</strong><br/>desligamentos tech</td>
+<td><strong>+906</strong><br/>saldo</td>
+<td><strong>R$ 3.990,06</strong><br/>salário mediano de admissão</td>
+</tr>
+</table>
+
+A primeira competência real foi processada a partir dos microdados oficiais do Novo CAGED. O MOV de julho contém 4.467.208 registros e reconciliou exatamente com os totais nacionais publicados pelo MTE. O recorte tech contém 37.600 movimentações e 1.274 municípios identificados pela referência do IBGE.
+
+**SHA-256 do MOV:** `07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f`
+
 ## Arquitetura
 
 ~~~mermaid
@@ -148,7 +165,7 @@ flowchart LR
 | Série histórica incremental | Implementada |
 | Salário real por IPCA | Implementado |
 | PostgreSQL gerenciado | Provisionado |
-| Primeira competência tech real | Pipeline preparado para ingestão |
+| Primeira competência tech real | Julho/2026 validada e publicada |
 
 ## Execução local
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.15.0
+
+- primeira competência tech real validada para julho/2026;
+- 4.467.208 registros MOV reconciliados exatamente com a referência oficial;
+- categoria Não identificado reconciliada separadamente;
+- zero rejeições em MOV, FOR e EXC após tratamento do código residual oficial;
+- 19.253 admissões tech, 18.347 desligamentos e saldo +906;
+- salário mediano de admissão de R$ 3.990,06;
+- 1.274 municípios enriquecidos com nome, UF e código IBGE;
+- publicação vinculada ao SHA-256 do arquivo MOV;
+- snapshot Gold e manifests de proveniência versionados sem microdados brutos.
+
+
 ## 0.14.1
 
 - descompressão transparente de respostas gzip da API de Localidades do IBGE;
