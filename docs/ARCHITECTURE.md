@@ -1,57 +1,111 @@
 # Arquitetura
 
-## Decisão principal
+## Visão geral
 
-O projeto adota uma arquitetura de dados em três camadas.
+~~~mermaid
+flowchart LR
+    A["Fontes oficiais"] --> B["Bronze"]
+    B --> C["Silver"]
+    C --> D["Gold"]
+    D --> E["PostgreSQL"]
+    D --> F["DuckDB"]
+    E --> G["FastAPI"]
+    G --> H["React"]
+~~~
 
-### Bronze
+## Bronze
 
-Armazena o arquivo original exatamente como obtido da fonte pública.
+Preserva o arquivo recebido da fonte oficial.
 
-Cada arquivo deve ter um manifesto contendo:
+Cada ingestão registra:
 
 - origem;
 - competência;
-- URL de referência;
-- timestamp de ingestão;
+- nome original;
+- timestamp;
 - tamanho;
-- SHA-256;
-- nome original.
+- SHA-256.
 
-A Bronze é imutável.
+A camada Bronze não é usada diretamente pela interface.
 
-### Silver
+## Silver
 
-Converte o dado para formato colunar Parquet e aplica:
+Normaliza o microdado para processamento analítico:
 
-- padronização de nomes;
-- tipagem;
-- normalização de CBO;
-- normalização territorial;
-- tratamento de ausências;
-- validação das categorias;
-- flags de qualidade.
+- nomes de colunas;
+- tipos;
+- CBO;
+- território;
+- salário;
+- flags de qualidade;
+- registros rejeitados.
 
-### Gold
+O formato principal é Parquet.
 
-Agregados prontos para consumo:
+## Gold
 
-- indicadores nacionais;
+Contém somente agregados derivados da Silver e prontos para serving.
+
+O escopo atual implementado inclui:
+
+- overview da competência;
 - indicadores por UF;
-- indicadores por município;
-- indicadores por ocupação;
-- séries temporais;
-- remuneração;
-- métricas normalizadas por população.
+- indicadores por família/ocupação CBO;
+- métricas de remuneração de admissão.
 
-## Por que Parquet + DuckDB
+Indicadores municipais e séries temporais entram quando as respectivas etapas de dados estiverem validadas.
 
-Os microdados são grandes. Parquet reduz armazenamento e leitura desnecessária; DuckDB permite consultar arquivos colunares localmente sem exigir que todos os registros sejam carregados no PostgreSQL.
+## PostgreSQL
 
-O PostgreSQL funciona como serving database para as tabelas Gold consumidas pela API.
+O PostgreSQL recebe somente competências aprovadas.
 
-## Não usar Spark inicialmente
+A carga é:
 
-Spark acrescentaria complexidade operacional sem necessidade comprovada. O projeto só deverá migrar para processamento distribuído se benchmarks demonstrarem que Polars/DuckDB deixaram de atender.
+- transacional;
+- idempotente por competência;
+- protegida pelo gate de publicação;
+- vinculada ao SHA-256 da origem.
 
-Essa decisão é intencional e deve ser apresentada como trade-off técnico.
+## DuckDB e Polars
+
+Polars executa as transformações colunares e DuckDB apoia consultas e validações locais.
+
+Spark não faz parte da arquitetura atual porque a complexidade distribuída não é necessária para o volume e o modo de execução previstos. A adoção de processamento distribuído depende de benchmark.
+
+## API
+
+FastAPI expõe:
+
+- health e readiness;
+- metadados e fontes;
+- qualidade;
+- proveniência;
+- indicadores;
+- analytics por UF e ocupação.
+
+A API pública é versionada em /api/v1.
+
+## Frontend
+
+React + TypeScript consome exclusivamente os contratos da API.
+
+A interface distingue:
+
+- contexto oficial agregado do mercado formal;
+- indicadores do recorte tech;
+- estado de dados não publicados;
+- qualidade e proveniência.
+
+## Produção
+
+A aplicação pública usa um único serviço:
+
+~~~text
+Render
+└── FastAPI
+    ├── /api/v1
+    ├── /docs
+    └── / -> frontend/dist
+~~~
+
+A imagem Docker multi-stage permanece disponível como alternativa de execução reproduzível.
