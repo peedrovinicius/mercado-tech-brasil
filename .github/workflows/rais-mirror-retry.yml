@@ -2,9 +2,6 @@ name: RAIS 2025 mirror retry
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/rais-mirror-retry.run"
 
 permissions:
   contents: read
