@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from src.core.settings import settings
+from src.db.loader import ReleaseNotApprovedError, load_approved_release
 from src.gold.aggregate import build_gold
 from src.ingestion.archive import extract_7z
 from src.ingestion.ftp_caged import download_month
@@ -195,6 +196,26 @@ def command_approve_release(
     _run_publication_gate(yearmonth)
 
 
+def command_load_postgres(yearmonth: str) -> None:
+    try:
+        result = load_approved_release(
+            database_url=settings.database_url,
+            yearmonth=yearmonth,
+            bronze_dir=settings.bronze_path,
+            gold_dir=settings.gold_path,
+            reference_path=settings.reference_totals_path,
+            approvals_path=settings.publication_approvals_path,
+        )
+    except ReleaseNotApprovedError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    print(
+        f"postgres: competência={result.competence} "
+        f"ufs={result.uf_rows} ocupações={result.occupation_rows} "
+        f"sha256={result.source_sha256}"
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mercado-tech-brasil")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -244,6 +265,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Confirma que layout, rejeições e metodologia foram revisados.",
     )
 
+    load_postgres = sub.add_parser(
+        "load-postgres",
+        help="Carrega no PostgreSQL apenas uma competência aprovada.",
+    )
+    load_postgres.add_argument("yearmonth", help="Competência AAAAMM")
+
     return parser
 
 
@@ -273,6 +300,10 @@ def main() -> None:
             notes=args.notes,
             acknowledged=args.acknowledge_methodology_reviewed,
         )
+        return
+
+    if args.command == "load-postgres":
+        command_load_postgres(args.yearmonth)
         return
 
     commands = {

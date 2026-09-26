@@ -1,0 +1,130 @@
+from __future__ import annotations
+
+from functools import lru_cache
+from typing import Any
+
+from sqlalchemy import Engine, create_engine, select
+from sqlalchemy.engine import Connection
+
+from src.db.schema import dataset_release, market_occupation, market_uf
+
+
+@lru_cache(maxsize=4)
+def get_engine(database_url: str) -> Engine:
+    return create_engine(database_url, pool_pre_ping=True)
+
+
+def _latest_release(connection: Connection) -> dict[str, Any] | None:
+    row = connection.execute(
+        select(dataset_release)
+        .where(dataset_release.c.publishable.is_(True))
+        .order_by(dataset_release.c.competence.desc())
+        .limit(1)
+    ).mappings().first()
+    return dict(row) if row else None
+
+
+def fetch_overview(database_url: str) -> dict[str, object] | None:
+    engine = get_engine(database_url)
+    with engine.connect() as connection:
+        release = _latest_release(connection)
+        if release is None:
+            return None
+        return {
+            "competence": release["competence"].strftime("%Y%m"),
+            "scope": "recorte CBO de tecnologia versionado",
+            "admissions": release["admissions"],
+            "dismissals": release["dismissals"],
+            "balance": release["balance"],
+            "salary_mean_admissions": (
+                float(release["salary_mean_admissions"])
+                if release["salary_mean_admissions"] is not None
+                else None
+            ),
+            "salary_median_admissions": (
+                float(release["salary_median_admissions"])
+                if release["salary_median_admissions"] is not None
+                else None
+            ),
+            "records_tech": release["records_tech"],
+            "source": release["source"],
+            "status": "served_from_postgresql",
+        }
+
+
+def fetch_by_uf(
+    database_url: str,
+    *,
+    limit: int,
+) -> dict[str, object] | None:
+    engine = get_engine(database_url)
+    with engine.connect() as connection:
+        release = _latest_release(connection)
+        if release is None:
+            return None
+        rows = connection.execute(
+            select(market_uf)
+            .where(market_uf.c.competence == release["competence"])
+            .order_by(market_uf.c.admissions.desc(), market_uf.c.uf.asc())
+            .limit(limit)
+        ).mappings().all()
+        items = [
+            {
+                "uf": row["uf"],
+                "admissions": row["admissions"],
+                "dismissals": row["dismissals"],
+                "balance": row["balance"],
+                "salary_median_admissions": (
+                    float(row["salary_median_admissions"])
+                    if row["salary_median_admissions"] is not None
+                    else None
+                ),
+            }
+            for row in rows
+        ]
+        return {
+            "competence": release["competence"].strftime("%Y%m"),
+            "source": release["source"],
+            "items": items,
+        }
+
+
+def fetch_by_occupation(
+    database_url: str,
+    *,
+    limit: int,
+) -> dict[str, object] | None:
+    engine = get_engine(database_url)
+    with engine.connect() as connection:
+        release = _latest_release(connection)
+        if release is None:
+            return None
+        rows = connection.execute(
+            select(market_occupation)
+            .where(market_occupation.c.competence == release["competence"])
+            .order_by(
+                market_occupation.c.admissions.desc(),
+                market_occupation.c.cbo_code.asc(),
+            )
+            .limit(limit)
+        ).mappings().all()
+        items = [
+            {
+                "cbo_familia": row["cbo_family"],
+                "cbo_codigo": row["cbo_code"],
+                "admissions": row["admissions"],
+                "dismissals": row["dismissals"],
+                "balance": row["balance"],
+                "salary_median_admissions": (
+                    float(row["salary_median_admissions"])
+                    if row["salary_median_admissions"] is not None
+                    else None
+                ),
+            }
+            for row in rows
+        ]
+        return {
+            "competence": release["competence"].strftime("%Y%m"),
+            "source": release["source"],
+            "items": items,
+        }

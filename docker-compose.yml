@@ -24,6 +24,7 @@ services:
     container_name: mercado-tech-brasil-api
     environment:
       APP_ENV: docker
+      DATA_BACKEND: ${DATA_BACKEND:-postgres}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mercado_tech}:${POSTGRES_PASSWORD:-mercado_tech_dev}@db:5432/${POSTGRES_DB:-mercado_tech}
     ports:
       - "8000:8000"

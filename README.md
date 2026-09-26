@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.7 — governança de publicação em validação**
+**v0.8 — camada PostgreSQL de serving**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -180,7 +180,10 @@ mercado-tech-brasil/
 - [x] testes automatizados;
 - [ ] processar a primeira competência oficial real;
 - [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
-- [ ] carregar os agregados validados no PostgreSQL;
+- [x] carga transacional e idempotente Gold → PostgreSQL implementada;
+- [x] API pode servir indicadores diretamente do PostgreSQL;
+- [x] migrations Alembic para a camada de serving;
+- [ ] carregar a primeira competência oficial aprovada no PostgreSQL;
 - [ ] validar build completo do frontend;
 - [ ] publicar a aplicação em ambiente acessível.
 
@@ -318,3 +321,23 @@ python -m src.cli approve-release 202607 \
 ```
 
 Trocar o arquivo de origem invalida automaticamente a aprovação anterior. O status também fica disponível em `/api/v1/quality/publication-gate/latest`.
+
+
+### PostgreSQL serving layer
+
+Depois que uma competência passa pelo gate e recebe aprovação metodológica, ela pode ser carregada de forma transacional:
+
+```bash
+alembic upgrade head
+python -m src.cli load-postgres 202607
+```
+
+A carga é idempotente: repetir a mesma competência substitui somente aquele mês dentro de uma transação, sem duplicar linhas. Se a verificação pós-carga falhar, a transação é revertida.
+
+Para a API servir do banco:
+
+```bash
+DATA_BACKEND=postgres uvicorn src.api.main:app --reload
+```
+
+O schema de serving atual acompanha o Gold realmente produzido: release por competência, indicadores por UF e indicadores por CBO. O modelo municipal só será adicionado quando o pipeline Gold municipal existir.
