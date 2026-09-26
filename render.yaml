@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: mercado-tech-brasil
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/app/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/system/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATA_BACKEND
+        value: files
