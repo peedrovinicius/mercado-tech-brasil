@@ -6,7 +6,12 @@ from typing import Any
 from sqlalchemy import Engine, create_engine, select
 from sqlalchemy.engine import Connection
 
-from src.db.schema import dataset_release, market_occupation, market_uf
+from src.db.schema import (
+    dataset_release,
+    market_municipality,
+    market_occupation,
+    market_uf,
+)
 
 
 @lru_cache(maxsize=4)
@@ -126,5 +131,94 @@ def fetch_by_occupation(
         return {
             "competence": release["competence"].strftime("%Y%m"),
             "source": release["source"],
+            "items": items,
+        }
+
+
+def fetch_by_municipality(
+    database_url: str,
+    *,
+    limit: int,
+) -> dict[str, object] | None:
+    engine = get_engine(database_url)
+    with engine.connect() as connection:
+        release = _latest_release(connection)
+        if release is None:
+            return None
+
+        rows = connection.execute(
+            select(market_municipality)
+            .where(market_municipality.c.competence == release["competence"])
+            .order_by(
+                market_municipality.c.admissions.desc(),
+                market_municipality.c.municipality_code.asc(),
+            )
+            .limit(limit)
+        ).mappings().all()
+
+        if not rows:
+            return None
+
+        items = [
+            {
+                "municipio_codigo_caged": row["municipality_code"],
+                "admissions": row["admissions"],
+                "dismissals": row["dismissals"],
+                "balance": row["balance"],
+                "salary_mean_admissions": (
+                    float(row["salary_mean_admissions"])
+                    if row["salary_mean_admissions"] is not None
+                    else None
+                ),
+                "salary_median_admissions": (
+                    float(row["salary_median_admissions"])
+                    if row["salary_median_admissions"] is not None
+                    else None
+                ),
+            }
+            for row in rows
+        ]
+        return {
+            "competence": release["competence"].strftime("%Y%m"),
+            "source": release["source"],
+            "code_system": "codigo_municipio_caged",
+            "items": items,
+        }
+
+
+def fetch_trend(database_url: str) -> dict[str, object] | None:
+    engine = get_engine(database_url)
+    with engine.connect() as connection:
+        rows = connection.execute(
+            select(dataset_release)
+            .where(dataset_release.c.publishable.is_(True))
+            .order_by(dataset_release.c.competence.asc())
+        ).mappings().all()
+
+        if not rows:
+            return None
+
+        items = [
+            {
+                "competence": row["competence"].strftime("%Y%m"),
+                "admissions": row["admissions"],
+                "dismissals": row["dismissals"],
+                "balance": row["balance"],
+                "salary_mean_admissions": (
+                    float(row["salary_mean_admissions"])
+                    if row["salary_mean_admissions"] is not None
+                    else None
+                ),
+                "salary_median_admissions": (
+                    float(row["salary_median_admissions"])
+                    if row["salary_median_admissions"] is not None
+                    else None
+                ),
+            }
+            for row in rows
+        ]
+        return {
+            "source": "Novo CAGED / MTE",
+            "scope": "recorte CBO de tecnologia versionado",
             "items": items,
         }
