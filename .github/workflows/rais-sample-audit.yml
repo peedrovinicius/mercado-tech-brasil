@@ -8,9 +8,12 @@ on:
         required: true
         default: "2025"
         type: string
+  push:
+    paths:
+      - ".github/rais-sample-audit.run"
 
 concurrency:
-  group: rais-sample-audit-${{ inputs.year }}
+  group: rais-sample-audit-${{ github.event.inputs.year || '2025' }}
   cancel-in-progress: true
 
 jobs:
@@ -18,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
-      RAIS_YEAR: ${{ inputs.year }}
+      RAIS_YEAR: ${{ github.event.inputs.year || '2025' }}
 
     steps:
       - name: Checkout
@@ -168,15 +171,15 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rais-${{ inputs.year }}-sample-audit
+          name: rais-${{ github.event.inputs.year || '2025' }}-sample-audit
           retention-days: 3
           if-no-files-found: error
           path: |
-            data/bronze/rais/${{ inputs.year }}/archives/download-manifest.json
-            data/bronze/rais/${{ inputs.year }}/archives/*.manifest.json
-            data/bronze/rais/${{ inputs.year }}/extracted/*.manifest.json
-            data/bronze/rais/${{ inputs.year }}/layout-report.json
-            data/bronze/rais/${{ inputs.year }}/semantic-layout-report.json
-            data/bronze/rais/${{ inputs.year }}/value-profile.json
-            data/bronze/rais/${{ inputs.year }}/value-semantics-report.json
-            data/bronze/rais/${{ inputs.year }}/sample-audit-summary.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/archives/download-manifest.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/archives/*.manifest.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/extracted/*.manifest.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/layout-report.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/semantic-layout-report.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/value-profile.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/value-semantics-report.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/sample-audit-summary.json
