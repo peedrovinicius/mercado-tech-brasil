@@ -1,0 +1,182 @@
+name: RAIS sample audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Ano-base da RAIS"
+        required: true
+        default: "2025"
+        type: string
+
+concurrency:
+  group: rais-sample-audit-${{ inputs.year }}
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      RAIS_YEAR: ${{ inputs.year }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate input
+        run: |
+          if [[ ! "$RAIS_YEAR" =~ ^[0-9]{4}$ ]]; then
+            echo "Ano RAIS inválido: $RAIS_YEAR"
+            exit 1
+          fi
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download one official RAIS vínculos archive
+        run: |
+          python - <<'PY'
+          import os
+
+          from src.core.settings import settings
+          from src.ingestion.rais import (
+              discover_files,
+              download_file,
+              write_download_manifest,
+          )
+
+          year = int(os.environ["RAIS_YEAR"])
+          archive_dir = (
+              settings.bronze_path
+              / "rais"
+              / str(year)
+              / "archives"
+          )
+          files = discover_files(year, dataset="vinculos")
+          if not files:
+              raise SystemExit(
+                  f"Nenhum arquivo RAIS vínculos encontrado para {year}."
+              )
+
+          selected = files[0]
+          path = download_file(selected, archive_dir)
+          write_download_manifest(
+              year,
+              [path],
+              archive_dir / "download-manifest.json",
+              dataset="vinculos",
+          )
+          print(
+              f"sample RAIS: arquivo={selected.filename} "
+              f"total_disponível={len(files)}"
+          )
+          PY
+
+      - name: Extract and inspect real layout
+        run: |
+          python - <<'PY'
+          import os
+
+          from src.core.settings import settings
+          from src.ingestion.rais import extract_year
+          from src.transform.rais_schema import inspect_rais_directory
+          from src.transform.rais_semantics import validate_layout_semantics
+
+          year = int(os.environ["RAIS_YEAR"])
+          base = settings.bronze_path / "rais" / str(year)
+          extracted = base / "extracted"
+
+          extract_year(year, base / "archives", extracted)
+          inspect_rais_directory(
+              extracted,
+              year=year,
+              destination=base / "layout-report.json",
+          )
+          semantic = validate_layout_semantics(
+              base / "layout-report.json",
+              settings.root / "config" / "rais_semantic_contract.yml",
+              base / "semantic-layout-report.json",
+          )
+          print(
+              f"semantic_valid={semantic['semantic_valid']} "
+              f"silver_ready={semantic['silver_ready']}"
+          )
+          PY
+
+      - name: Profile real values when schema is valid
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          from src.core.settings import settings
+          from src.transform.rais_profile import profile_rais_values
+          from src.transform.rais_value_semantics import validate_value_semantics
+
+          year = int(os.environ["RAIS_YEAR"])
+          base = settings.bronze_path / "rais" / str(year)
+          semantic_path = base / "semantic-layout-report.json"
+          semantic = json.loads(semantic_path.read_text(encoding="utf-8"))
+
+          summary = {
+              "year": year,
+              "sample_only": True,
+              "schema_ready": semantic.get("silver_ready") is True,
+              "values_ready": False,
+          }
+
+          if semantic.get("silver_ready") is True:
+              profile_rais_values(
+                  base / "extracted",
+                  base / "layout-report.json",
+                  semantic_path,
+                  base / "value-profile.json",
+                  max_rows_per_file=10000,
+              )
+              values = validate_value_semantics(
+                  base / "value-profile.json",
+                  settings.root / "config" / "rais_value_semantics.yml",
+                  base / "value-semantics-report.json",
+                  year=year,
+              )
+              summary["values_ready"] = (
+                  values.get("silver_transform_ready") is True
+              )
+
+          (base / "sample-audit-summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Remove large sample files
+        if: always()
+        run: |
+          find "data/bronze/rais/$RAIS_YEAR" -type f \( -name "*.7z" -o -name "*.comt" -o -name "*.txt" -o -name "*.csv" \) -delete || true
+
+      - name: Upload small audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-${{ inputs.year }}-sample-audit
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            data/bronze/rais/${{ inputs.year }}/archives/download-manifest.json
+            data/bronze/rais/${{ inputs.year }}/archives/*.manifest.json
+            data/bronze/rais/${{ inputs.year }}/extracted/*.manifest.json
+            data/bronze/rais/${{ inputs.year }}/layout-report.json
+            data/bronze/rais/${{ inputs.year }}/semantic-layout-report.json
+            data/bronze/rais/${{ inputs.year }}/value-profile.json
+            data/bronze/rais/${{ inputs.year }}/value-semantics-report.json
+            data/bronze/rais/${{ inputs.year }}/sample-audit-summary.json
