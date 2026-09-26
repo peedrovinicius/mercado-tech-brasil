@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.28.0
+
+- semântica oficial de situação do vínculo em 31/12 registrada em contrato versionado;
+- SIM é tratado como ativo e NÃO como inativo, conforme documentação do MTE;
+- perfil de valores passa a registrar o conjunto completo observado quando há até 50 categorias;
+- códigos desconhecidos no indicador de vínculo bloqueiam o Silver;
+- valores nulos no indicador de vínculo bloqueiam o Silver;
+- ano-base observado precisa coincidir com o ano solicitado;
+- codificações alternativas, como 1/0, não são inferidas automaticamente;
+- CLI ganha comando rais-validate-values;
+- silver_transform_ready só é liberado após validação explícita dos valores;
+- publication_ready permanece falso até qualidade, reconciliação e gate anual;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.27.0
 
 - RAIS ganha perfil amostral de valores antes da transformação Silver;

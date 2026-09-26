@@ -70,12 +70,19 @@ def _value_profile(counter: Counter[str], blanks: int) -> dict[str, object]:
         if value.isdigit()
     )
 
+    observed_values = (
+        sorted(counter)
+        if len(counter) <= 50
+        else None
+    )
+
     return {
         "non_blank": non_blank,
         "blank": blanks,
         "distinct_in_sample": len(counter),
         "digits_only": digits_only,
         "lengths": dict(sorted(length_counts.items())),
+        "observed_values": observed_values,
         "top_values": [
             {"value": value, "count": count}
             for value, count in counter.most_common(25)

@@ -33,6 +33,7 @@ from src.transform.caged import transform_mov_file
 from src.transform.rais_profile import profile_rais_values
 from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
+from src.transform.rais_value_semantics import validate_value_semantics
 from src.validation.publication_gate import (
     approve_competence,
     evaluate_publication_gate,
@@ -443,6 +444,32 @@ def command_rais_profile_values(
     print("rais silver transform: BLOCKED until value semantics are reviewed")
 
 
+def command_rais_validate_values(year: int) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    profile_path = base_dir / "value-profile.json"
+    destination = base_dir / "value-semantics-report.json"
+
+    if not profile_path.exists():
+        raise SystemExit(
+            f"Perfil de valores ausente: {profile_path}. "
+            "Execute rais-profile-values primeiro."
+        )
+
+    payload = validate_value_semantics(
+        profile_path,
+        settings.root / "config" / "rais_value_semantics.yml",
+        destination,
+        year=year,
+    )
+    status = "READY" if payload["silver_transform_ready"] else "BLOCKED"
+    print(
+        f"rais value semantics: status={status} "
+        f"relatório={destination}"
+    )
+    if not payload["silver_transform_ready"]:
+        raise SystemExit(2)
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -618,6 +645,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Máximo de linhas amostradas por arquivo, até 100000.",
     )
 
+    rais_validate_values = sub.add_parser(
+        "rais-validate-values",
+        help="Valida a semântica dos valores RAIS antes do Silver.",
+    )
+    rais_validate_values.add_argument(
+        "year",
+        type=int,
+        help="Ano-base da RAIS.",
+    )
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -710,6 +747,10 @@ def main() -> None:
             args.year,
             max_rows_per_file=args.max_rows_per_file,
         )
+        return
+
+    if args.command == "rais-validate-values":
+        command_rais_validate_values(args.year)
         return
 
     if args.command == "sync-municipalities":

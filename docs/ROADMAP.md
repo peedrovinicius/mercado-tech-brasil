@@ -26,6 +26,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - inspeção de schema anual com assinatura SHA-256 do cabeçalho;
 - contrato semântico RAIS versionado com bloqueio por ausência ou ambiguidade;
 - perfil amostral dos valores RAIS antes do Silver;
+- contrato de valores RAIS para situação do vínculo em 31/12;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -47,8 +48,9 @@ A base necessária para publicar e auditar o produto está implementada:
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
 - executar o contrato semântico sobre o layout real extraído da RAIS 2025;
-- gerar value-profile.json e confirmar a codificação real de vínculo ativo e CBO;
-- revisar aliases caso o de-para oficial revele nomes novos ainda não contemplados;
+- gerar value-profile.json com os microdados reais de 2025;
+- executar rais-validate-values e confirmar SIM/NÃO no arquivo observado;
+- revisar aliases ou valores somente se os microdados reais divergirem da documentação oficial;
 - construir Silver e Gold de estoque anual somente após essa validação;
 - reconciliar o estoque RAIS com referências anuais oficiais antes da publicação;
 - avaliar QBQ para atributos ocupacionais;

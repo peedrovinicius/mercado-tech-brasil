@@ -1,0 +1,23 @@
+version: 1
+dataset: rais_vinculos
+year_reference: 2025
+sources:
+  rais_faq: "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/perguntas-frequentes"
+  rais_2025: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025"
+
+active_3112:
+  description: "Situação do vínculo em 31/12 do ano-base"
+  normalization: "casefold_ascii"
+  active_values:
+    - sim
+  inactive_values:
+    - nao
+  reject_unknown_values: true
+  reject_blank_values: true
+
+year:
+  must_match_requested_year: true
+
+rules:
+  silver_transform_ready_after_validation: true
+  publication_ready_after_validation: false

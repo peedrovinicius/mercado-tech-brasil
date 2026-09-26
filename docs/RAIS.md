@@ -161,6 +161,39 @@ A amostra serve para confirmar a codificação real dos microdados 2025, princip
 
 `silver_transform_ready` e `publication_ready` continuam falsos até revisão explícita dessa semântica.
 
+## Validação dos valores
+
+A documentação oficial do MTE define a variável de situação em 31/12 por categorias:
+
+- `SIM`: vínculo ativo ao final do ano;
+- `NÃO`: vínculo inativo ao final do ano.
+
+O projeto registra essa semântica em:
+
+```text
+config/rais_value_semantics.yml
+```
+
+Depois de gerar o perfil real:
+
+```bash
+python -m src.cli rais-validate-values 2025
+```
+
+O comando gera:
+
+```text
+data/bronze/rais/2025/value-semantics-report.json
+```
+
+A validação normaliza caixa e acentuação apenas para comparação. Valores diferentes de `SIM` e `NÃO`, nulos no indicador ativo ou ano-base divergente bloqueiam o Silver.
+
+Se o microdado real usar outra codificação, como `1/0`, o pipeline não converte automaticamente. O contrato precisa ser revisado de forma explícita antes de qualquer transformação.
+
+Quando a quantidade de valores distintos de um conceito é pequena, `value-profile.json` registra o conjunto completo observado para que códigos raros não fiquem escondidos pelo ranking de frequência.
+
+`silver_transform_ready=true` libera apenas a construção técnica do Silver. A publicação continua bloqueada.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.
