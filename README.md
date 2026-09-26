@@ -88,7 +88,7 @@ flowchart LR
 |---|---|
 | Novo CAGED, MTE | admissões, desligamentos, saldo e remuneração de admissão |
 | CBO, MTE | definição versionada das ocupações de tecnologia |
-| IBGE | base territorial e indicadores normalizados planejados |
+| IBGE | municípios, território e IPCA para valores reais |
 
 A referência oficial de julho de 2026 está versionada em **config/official_reference_202607.json**.
 
@@ -116,6 +116,8 @@ O pipeline mantém:
 - registros rejeitados preservados para auditoria;
 - recorte CBO versionado;
 - metodologia salarial alinhada às regras publicadas pelo MTE;
+- salário real com número índice do IPCA pelo SIDRA/IBGE;
+- ajustes FOR e EXC incorporados como deltas auditáveis;
 - referência externa para reconciliação;
 - gate de publicação vinculado ao hash do arquivo de origem;
 - carga PostgreSQL transacional e idempotente;
@@ -140,7 +142,13 @@ flowchart LR
 | Gate de publicação | Implementado |
 | PostgreSQL serving | Implementado |
 | Reconciliação oficial de julho/2026 | Implementada |
-| Primeira competência tech real | Em processamento metodológico |
+| Transporte FTP com fallback HTTPS | Implementado |
+| Tratamento de MOV, FOR e EXC | Implementado |
+| Agregação municipal | Implementada |
+| Série histórica incremental | Implementada |
+| Salário real por IPCA | Implementado |
+| PostgreSQL gerenciado | Provisionado |
+| Primeira competência tech real | Pipeline preparado para ingestão |
 
 ## Execução local
 
@@ -176,6 +184,13 @@ cd frontend && npm run build
 ~~~
 
 ## Pipeline
+
+Sincronização das referências oficiais:
+
+~~~bash
+python -m src.cli sync-municipalities
+python -m src.cli sync-ipca 202607 --base 202607
+~~~
 
 Processamento por competência:
 

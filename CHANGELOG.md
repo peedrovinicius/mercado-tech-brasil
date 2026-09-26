@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.13.0
+
+- transporte resiliente com FTP do MTE e fallback HTTPS;
+- proveniência de transporte registrada nos manifests;
+- processamento de FOR e EXC com deltas explícitos;
+- reconstrução de competências afetadas por ajustes;
+- Gold municipal;
+- série histórica incremental;
+- integração com municípios pela API oficial do IBGE;
+- integração com IPCA pelo SIDRA;
+- salário nominal e salário real no Gold e no serving;
+- endpoints municipais e de série histórica;
+- PostgreSQL municipal com migrations;
+- PostgreSQL gerenciado provisionado no Render;
+- visualizações de município e histórico no frontend;
+- tipografia editorial justificada para textos corridos;
+- regra automatizada que impede travessões no repositório.
+
+
 ## 0.12.0
 
 - imagem de produção unificada para FastAPI + React;

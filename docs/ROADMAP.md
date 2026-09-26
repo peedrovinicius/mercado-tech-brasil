@@ -1,50 +1,35 @@
 # Roadmap
 
-## Atual
+## Operação de dados
 
-### Primeira competência tech publicada
-- processar o CAGEDMOV oficial;
-- revisar schema, rejeições e salários;
-- validar FOR/EXC;
-- executar reconciliação;
+- executar a primeira competência completa com MOV, FOR e EXC;
+- registrar o relatório de qualidade da execução real;
+- concluir a reconciliação com a referência oficial publicada;
 - aprovar a competência pelo gate;
-- carregar PostgreSQL;
-- liberar indicadores no dashboard.
+- carregar a competência no PostgreSQL gerenciado;
+- ativar o backend PostgreSQL na aplicação pública.
 
-## Próxima etapa
+## Expansão temporal
 
-### Histórico incremental
-- processar competências anteriores e posteriores;
-- séries mensais;
-- variação mês contra mês;
-- variação ano contra ano;
-- atualização incremental.
+- executar competências adicionais;
+- consolidar comparação mensal;
+- consolidar comparação anual;
+- automatizar atualização incremental após publicação oficial.
 
-### Geografia
-- códigos municipais oficiais;
-- indicadores por município;
-- integração territorial do IBGE;
-- métricas por 100 mil habitantes.
+## Expansão analítica
 
-### Remuneração real
-- integração IPCA/IBGE;
-- salário de admissão corrigido pela inflação;
-- comparação temporal em valores reais.
-
-## Expansões
-
-### RAIS
-Adicionar estoque anual de vínculos para complementar os fluxos mensais do Novo CAGED.
-
-### QBQ
-Associar ocupações a conhecimentos, habilidades e atitudes quando a fonte oficial for incorporada ao modelo.
+- incorporar população municipal para indicadores por 100 mil habitantes;
+- adicionar RAIS para estoque anual de vínculos;
+- avaliar QBQ para atributos ocupacionais;
+- ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
 
 ## Critério de inclusão
 
-Novas métricas entram no produto somente quando possuem:
+Uma nova métrica entra no produto quando possui:
 
 1. fonte identificada;
 2. regra de transformação documentada;
 3. teste;
 4. período de referência;
-5. comportamento definido para dados ausentes ou inconsistentes.
+5. comportamento definido para ausência e inconsistência;
+6. contrato de API compatível com a governança de publicação.
