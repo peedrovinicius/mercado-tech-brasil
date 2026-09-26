@@ -2,6 +2,9 @@ name: RAIS v0.35 validation
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/rais-v035-test.run"
 
 permissions:
   contents: read
