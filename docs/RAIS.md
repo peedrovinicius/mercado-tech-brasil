@@ -135,6 +135,32 @@ Cada conceito obrigatório precisa produzir exatamente uma correspondência em c
 
 `silver_ready=true` significa apenas que o layout possui os conceitos mínimos sem ambiguidade. `publication_ready` continua falso até transformação, qualidade, reconciliação anual e gate específico.
 
+## Perfil de valores
+
+Depois de validar o layout semanticamente, o pipeline pode examinar uma amostra controlada dos conceitos obrigatórios:
+
+```bash
+python -m src.cli rais-profile-values 2025
+```
+
+O limite padrão é de 10.000 linhas por arquivo. Para alterar:
+
+```bash
+python -m src.cli rais-profile-values 2025 --max-rows-per-file 50000
+```
+
+O relatório é salvo em:
+
+```text
+data/bronze/rais/2025/value-profile.json
+```
+
+O perfil registra somente os conceitos necessários ao futuro Silver: ano, CBO, município, UF e vínculo ativo em 31/12. Para cada conceito ele informa valores mais frequentes, nulos, quantidade de valores distintos, comprimentos observados e quantos valores são compostos apenas por dígitos.
+
+A amostra serve para confirmar a codificação real dos microdados 2025, principalmente o indicador de vínculo ativo e o formato da CBO. O perfil não escolhe automaticamente qual valor significa ativo.
+
+`silver_transform_ready` e `publication_ready` continuam falsos até revisão explícita dessa semântica.
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.

@@ -30,6 +30,7 @@ from src.reference.population import (
 )
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
+from src.transform.rais_profile import profile_rais_values
 from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
 from src.validation.publication_gate import (
@@ -406,6 +407,42 @@ def command_rais_validate_layout(year: int) -> None:
         raise SystemExit(2)
 
 
+def command_rais_profile_values(
+    year: int,
+    *,
+    max_rows_per_file: int,
+) -> None:
+    base_dir = settings.bronze_path / "rais" / str(year)
+    extracted_dir = base_dir / "extracted"
+    layout_report = base_dir / "layout-report.json"
+    semantic_report = base_dir / "semantic-layout-report.json"
+    destination = base_dir / "value-profile.json"
+
+    if not layout_report.exists():
+        raise SystemExit(
+            f"Relatório de layout ausente: {layout_report}. "
+            "Execute rais-inspect primeiro."
+        )
+    if not semantic_report.exists():
+        raise SystemExit(
+            f"Relatório semântico ausente: {semantic_report}. "
+            "Execute rais-validate-layout primeiro."
+        )
+
+    payload = profile_rais_values(
+        extracted_dir,
+        layout_report,
+        semantic_report,
+        destination,
+        max_rows_per_file=max_rows_per_file,
+    )
+    print(
+        f"rais profile: arquivos={payload['files_profiled']} "
+        f"limite={payload['max_rows_per_file']} relatório={destination}"
+    )
+    print("rais silver transform: BLOCKED until value semantics are reviewed")
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -569,6 +606,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rais_validate_layout.add_argument("year", type=int, help="Ano-base da RAIS.")
 
+    rais_profile = sub.add_parser(
+        "rais-profile-values",
+        help="Perfila valores dos conceitos RAIS antes da transformação Silver.",
+    )
+    rais_profile.add_argument("year", type=int, help="Ano-base da RAIS.")
+    rais_profile.add_argument(
+        "--max-rows-per-file",
+        type=int,
+        default=10000,
+        help="Máximo de linhas amostradas por arquivo, até 100000.",
+    )
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -654,6 +703,13 @@ def main() -> None:
 
     if args.command == "rais-validate-layout":
         command_rais_validate_layout(args.year)
+        return
+
+    if args.command == "rais-profile-values":
+        command_rais_profile_values(
+            args.year,
+            max_rows_per_file=args.max_rows_per_file,
+        )
         return
 
     if args.command == "sync-municipalities":

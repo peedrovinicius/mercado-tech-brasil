@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.27.0
+
+- RAIS ganha perfil amostral de valores antes da transformação Silver;
+- o perfil usa somente conceitos já resolvidos pelo contrato semântico;
+- ano, CBO, município, UF e vínculo ativo em 31/12 recebem frequências, nulos e padrões de formato;
+- limite de amostragem é configurável e protegido para evitar processamento acidental excessivo;
+- value-profile.json não replica linhas individuais nem campos fora do contrato mínimo;
+- a codificação de vínculo ativo não é inferida automaticamente;
+- silver_transform_ready e publication_ready permanecem falsos até revisão explícita;
+- CLI ganha comando rais-profile-values;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.26.0
 
 - contrato semântico RAIS versionado separadamente do layout físico;
