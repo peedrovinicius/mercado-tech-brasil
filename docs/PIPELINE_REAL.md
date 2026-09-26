@@ -2,40 +2,42 @@
 
 ## 1. Descoberta
 
-O downloader acessa o diretório oficial:
+O downloader acessa a estrutura oficial do Novo CAGED por competência e descobre os arquivos disponíveis sem depender de um nome de arquivo fixo inventado no código.
 
-`ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/<ANO>/<AAAAMM>/`
+O transporte primário é FTP do MTE, com fallback HTTPS quando necessário.
 
-e descobre os arquivos `.7z` disponíveis.
+## 2. Arquivos processados
 
-Não há nome de arquivo inventado no código.
+O pipeline reconhece três tipos de arquivo:
 
-## 2. Três tipos de arquivo
+- `MOV`: movimentações da competência;
+- `FOR`: movimentações declaradas fora do prazo;
+- `EXC`: exclusões de movimentações anteriormente informadas.
 
-O pipeline reconhece:
+MOV forma a base da competência. FOR acrescenta movimentações à competência efetiva identificada no arquivo. EXC inverte o efeito da movimentação correspondente.
 
-- `MOV`: movimentações;
-- `FOR`: informações fora do prazo;
-- `EXC`: exclusões.
-
-Na primeira entrega analítica, somente `MOV` gera Silver/Gold. `FOR` e `EXC` já são ingeridos na Bronze, mas **não entram no indicador ajustado até sua semântica ser validada e testada**.
-
-Isso é intencional: é melhor publicar menos do que combinar ajustes de modo incorreto.
+Os ajustes preservam `effective_competence`, permitindo aplicar seus deltas à competência de origem antes da reconstrução dos agregados publicados.
 
 ## 3. Bronze
 
-O arquivo oficial extraído é mantido imutável e recebe manifesto com:
+Os arquivos recebidos da fonte oficial são preservados na camada Bronze durante o processamento.
+
+Cada ingestão registra:
 
 - origem;
 - competência;
-- nome;
+- tipo do arquivo;
+- nome original;
+- transporte;
 - tamanho;
 - SHA-256;
 - timestamp de ingestão.
 
+Os microdados brutos não são versionados no Git. Manifests necessários à rastreabilidade são preservados na publicação.
+
 ## 4. Validação de layout
 
-Antes de qualquer métrica, o pipeline exige campos centrais do layout:
+Antes das métricas, o pipeline valida os campos centrais do layout, incluindo:
 
 - competência;
 - UF;
@@ -45,87 +47,140 @@ Antes de qualquer métrica, o pipeline exige campos centrais do layout:
 - tipo de movimentação;
 - salário.
 
-Se o MTE alterar o layout, o pipeline falha explicitamente.
+Mudança incompatível de schema provoca falha explícita antes da publicação.
 
 ## 5. Silver
 
-O arquivo MOV é:
+MOV, FOR e EXC passam por normalização e validação.
 
-- normalizado;
-- tipado;
-- validado;
-- separado entre registros válidos e rejeitados;
-- filtrado pelo recorte CBO versionado de tecnologia;
-- persistido em Parquet com Zstandard.
+A camada Silver preserva:
 
-O código municipal do CAGED é preservado como `municipio_codigo_caged`; a conversão para código IBGE completo ficará em uma dimensão oficial própria.
+- tipos normalizados;
+- recorte CBO versionado;
+- registros válidos;
+- registros rejeitados;
+- deltas de ajustes;
+- competência efetiva dos ajustes;
+- Parquet com compressão Zstandard.
+
+Registros rejeitados permanecem auditáveis e não são descartados silenciosamente.
 
 ## 6. Gold
 
-A primeira tabela Gold contém:
+A camada Gold contém os artefatos derivados usados pelo produto:
 
-- admissões;
-- desligamentos;
-- saldo;
-- salário médio de admissão;
-- salário mediano de admissão;
+- `overview-AAAAMM.json`;
+- `by-uf-AAAAMM.json`;
+- `by-occupation-AAAAMM.json`;
+- `by-municipality-AAAAMM.json`;
+- `market-AAAAMM.parquet`;
+- `trend.json`;
+- relatórios de qualidade;
+- auditoria nacional do MOV;
+- gate de publicação.
 
-por UF, família CBO e CBO.
+Os agregados incluem admissões, desligamentos, saldo e métricas de remuneração. A dimensão municipal utiliza referência oficial do IBGE e mantém tratamento explícito para a categoria residual Não identificado.
 
-## 7. Reconciliação oficial
+## 7. Remuneração real
 
-Em julho de 2026, o MTE publicou:
+A metodologia salarial aplica os limites documentados para admissões elegíveis e exclui vínculos intermitentes das métricas salariais.
 
-- 2.262.888 admissões;
-- 2.204.320 desligamentos;
-- saldo de 58.568.
+Quando a referência IPCA está disponível, a camada Gold também registra média e mediana reais na competência base configurada.
 
-Esses valores estão registrados em `config/reference_totals.json`.
+## 8. Reconciliação oficial
 
-Eles são uma referência de reconciliação, **não um teste de MOV isolado**, porque o resultado oficial publicado considera ajustes. A reconciliação completa será ativada somente após a lógica MOV/FOR/EXC ser validada.
+Antes da publicação, o MOV nacional da competência é comparado com a referência oficial registrada em `config/reference_totals.json`.
 
-## 8. Execução
+O gate verifica:
 
-```bash
-python -m src.cli pipeline 202607
-```
+- integridade aritmética da referência;
+- igualdade entre MOV nacional e referência oficial;
+- tratamento da categoria Não identificado quando presente;
+- coerência entre overview e artefatos publicados.
 
-Ou por etapas:
-
-```bash
-python -m src.cli download 202607
-python -m src.cli extract 202607
-python -m src.cli transform 202607
-python -m src.cli gold 202607
-```
-
+A série publicada de janeiro a julho de 2026 foi reconciliada competência por competência.
 
 ## 9. Gate de publicação
 
-Depois de gerar Silver e Gold, o projeto executa um gate de liberação:
+Depois do processamento, o projeto executa:
 
 ```bash
 python -m src.cli validate-release 202607
 ```
 
-O gate verifica:
+O gate verifica, entre outros pontos:
 
-- presença dos artefatos esperados;
+- presença dos artefatos obrigatórios;
 - manifesto MOV e SHA-256;
-- coerência da competência;
-- contagens do relatório de qualidade;
+- competência dos relatórios;
+- contagens de qualidade;
 - taxa mínima de registros válidos;
 - identidade `admissões - desligamentos = saldo`;
-- integridade da referência oficial cadastrada;
-- revisão metodológica manual vinculada ao SHA-256 atual.
+- qualidade da dimensão municipal;
+- reconciliação com referência oficial;
+- revisão metodológica vinculada ao SHA-256 atual.
 
-O mês permanece bloqueado até a revisão explícita:
+A aprovação explícita usa:
 
 ```bash
 python -m src.cli approve-release 202607 \
-  --reviewer "Nome do revisor" \
+  --reviewer "responsavel" \
   --notes "Layout, rejeições e metodologia revisados." \
   --acknowledge-methodology-reviewed
 ```
 
-Se o arquivo MOV for substituído, o SHA-256 muda e a aprovação anterior deixa de ser válida automaticamente.
+Se o MOV mudar, o SHA-256 muda e a aprovação anterior deixa de ser válida.
+
+## 10. Auditoria e publicação
+
+A operação mensal separa processamento pesado e publicação.
+
+O workflow `Audit data competence`:
+
+1. sincroniza referências;
+2. baixa MOV e tenta obter FOR e EXC;
+3. transforma e agrega;
+4. executa o gate;
+5. remove microdados brutos;
+6. publica somente o artefato temporário de auditoria.
+
+O workflow `Publish audited data`:
+
+1. recebe o ID da auditoria aprovada;
+2. baixa o artefato derivado;
+3. refaz o gate em modo estrito;
+4. verifica os arquivos obrigatórios;
+5. regenera o dashboard visual do README a partir da camada Gold;
+6. versiona os derivados e o dashboard no mesmo commit.
+
+Essa separação evita reprocessar os microdados na etapa de publicação.
+
+## 11. Dashboard do README
+
+O painel visual é derivado dos próprios artefatos Gold:
+
+```bash
+python scripts/generate_readme_dashboard.py
+```
+
+Ele usa a série histórica, o overview da competência mais recente e os agregados por UF. Assim, acumulados e participações territoriais não precisam ser digitados manualmente no SVG.
+
+## 12. Execução local
+
+Pipeline completo de uma competência:
+
+```bash
+python -m src.cli pipeline 202607
+```
+
+Processamento de arquivo oficial local:
+
+```bash
+python -m src.cli local-pipeline 202607 "/caminho/CAGEDMOV202607.7z" --kind MOV
+```
+
+Validação:
+
+```bash
+python -m src.cli validate-release 202607
+```

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.20.0
+
+- pipeline real documentado novamente a partir da implementação atual;
+- FOR e EXC documentados como ajustes aplicados à competência efetiva antes da reconstrução dos agregados;
+- Gold municipal, série histórica e remuneração real deixam de aparecer como etapas futuras na documentação;
+- publicação mensal passa a regenerar o dashboard do README dentro do workflow já existente;
+- SVG visual entra no mesmo commit dos derivados publicados;
+- Makefile ganha alvo `readme-dashboard` para regeneração local;
+- nenhuma nova execução automática de workflow foi criada;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.6
 
 - dashboard do README passa a ter gerador reproduzível em Python;

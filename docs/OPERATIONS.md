@@ -47,6 +47,8 @@ Entradas:
 
 O workflow baixa o artefato derivado, refaz o gate em modo estrito e só então versiona Gold, auditoria e manifests.
 
+Antes do commit de publicação, o mesmo workflow executa `python scripts/generate_readme_dashboard.py`. O SVG do dashboard é regenerado a partir da camada Gold e entra no mesmo commit da competência, evitando que o visual do README fique defasado.
+
 Os microdados brutos não entram no Git.
 
 ## Regras operacionais

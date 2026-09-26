@@ -104,10 +104,15 @@ jobs:
           )
           PY
 
+      - name: Refresh README dashboard
+        run: python scripts/generate_readme_dashboard.py
+
       - name: Persist derived release
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add assets/readme-dashboard.svg
 
           git add -f             "data/gold/audit-national-mov-$COMPETENCE.json"             "data/gold/by-municipality-$COMPETENCE.json"             "data/gold/by-occupation-$COMPETENCE.json"             "data/gold/by-uf-$COMPETENCE.json"             "data/gold/market-$COMPETENCE.parquet"             "data/gold/overview-$COMPETENCE.json"             "data/gold/publication-gate-$COMPETENCE.json"             "data/gold/quality-$COMPETENCE.json"             "data/gold/trend.json"             "data/bronze/$COMPETENCE/archives/download-manifest.json"             data/bronze/$COMPETENCE/extracted/*.manifest.json
 
