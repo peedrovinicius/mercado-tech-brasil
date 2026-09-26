@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.10 — recorte CBO oficial v2**
+**v0.11 — dashboard visual de portfólio**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -181,13 +181,15 @@ mercado-tech-brasil/
 - [x] referência oficial de julho/2026 por Brasil, região e UF;
 - [x] metodologia salarial do MTE reproduzida e testada;
 - [x] recorte CBO v2 revisado contra a classificação oficial do MTE;
+- [x] contexto visual oficial Brasil/Ceará e gráfico regional;
+- [x] pipeline visual e estado de espera sem dados fictícios;
 - [ ] processar a primeira competência oficial real;
 - [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
 - [x] carga transacional e idempotente Gold → PostgreSQL implementada;
 - [x] API pode servir indicadores diretamente do PostgreSQL;
 - [x] migrations Alembic para a camada de serving;
 - [ ] carregar a primeira competência oficial aprovada no PostgreSQL;
-- [ ] validar build completo do frontend;
+- [ ] validar build completo do frontend no CI visual;
 - [ ] publicar a aplicação em ambiente acessível.
 
 ## Princípios
@@ -368,3 +370,20 @@ O recorte de tecnologia foi revisado contra a CBO oficial e agora inclui:
 A v2 corrige a ausência de 2122 no recorte inicial. A mudança é versionada, justificada e coberta por teste; nenhuma família é incluída silenciosamente.
 
 Veja `docs/CBO_SCOPE.md`.
+
+
+### Dashboard visual v0.11
+
+O frontend deixa de ser apenas uma casca para os futuros indicadores tech e passa a ter valor visual mesmo antes do primeiro microdado processado.
+
+A tela mostra:
+
+- hero de produto e pipeline auditável;
+- status visual das etapas Bronze → Silver → Gold → API;
+- contexto oficial de julho/2026 para Brasil e Ceará;
+- saldo regional em gráfico;
+- link direto para a fonte oficial do MTE;
+- separação visual explícita entre **mercado formal total** e **recorte de tecnologia**;
+- cards e gráficos tech que entram automaticamente quando uma competência aprovada estiver disponível.
+
+Os números de contexto vêm do endpoint `/api/v1/metadata/official-reference/202607`; não existem métricas fictícias no frontend.
