@@ -273,5 +273,6 @@ docker/      imagens de execução
 | [Recorte CBO](docs/CBO_SCOPE.md) | definição ocupacional de tecnologia |
 | [Data lineage](docs/DATA_LINEAGE.md) | origem e transformação dos dados |
 | [Pipeline](docs/PIPELINE_REAL.md) | execução do processamento |
+| [Operação de dados](docs/OPERATIONS.md) | auditoria e publicação mensal |
 | [Deploy](docs/DEPLOY.md) | produção e execução |
 | [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |

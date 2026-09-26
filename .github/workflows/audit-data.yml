@@ -1,0 +1,190 @@
+name: Audit data competence
+
+on:
+  workflow_dispatch:
+    inputs:
+      competence:
+        description: "Competência no formato AAAAMM"
+        required: true
+        type: string
+      ipca_base:
+        description: "Competência base do IPCA"
+        required: true
+        default: "202607"
+        type: string
+
+concurrency:
+  group: audit-data-${{ inputs.competence }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPETENCE: ${{ inputs.competence }}
+      IPCA_BASE: ${{ inputs.ipca_base }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate inputs
+        run: |
+          if [[ ! "$COMPETENCE" =~ ^[0-9]{6}$ ]]; then
+            echo "Competência inválida: $COMPETENCE"
+            exit 1
+          fi
+          if [[ ! "$IPCA_BASE" =~ ^[0-9]{6}$ ]]; then
+            echo "Base IPCA inválida: $IPCA_BASE"
+            exit 1
+          fi
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Sync official references
+        run: |
+          python -m src.cli sync-municipalities
+          python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
+
+      - name: Download official competence
+        run: |
+          python - <<'PY'
+          import os
+
+          from src.core.settings import settings
+          from src.ingestion.https_caged import (
+              download_month_resilient,
+              write_download_manifest,
+          )
+
+          competence = os.environ["COMPETENCE"]
+          archive_dir = settings.bronze_path / competence / "archives"
+          artifacts = []
+
+          for kind in ("MOV", "FOR", "EXC"):
+              try:
+                  found = download_month_resilient(
+                      competence,
+                      archive_dir,
+                      file_types=(kind,),
+                  )
+                  artifacts.extend(found)
+                  for item in found:
+                      print(
+                          f"downloaded competence={competence} "
+                          f"kind={item.kind} transport={item.transport}"
+                      )
+              except Exception as exc:
+                  if kind == "MOV":
+                      raise
+                  print(
+                      f"optional adjustment unavailable "
+                      f"competence={competence} kind={kind}: {exc}"
+                  )
+
+          write_download_manifest(
+              artifacts,
+              archive_dir / "download-manifest.json",
+          )
+          PY
+
+      - name: Process and audit
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          from src.cli import (
+              command_extract,
+              command_gold,
+              command_transform,
+              command_transform_adjustment,
+          )
+          from src.core.settings import settings
+          from src.validation.publication_gate import (
+              evaluate_publication_gate,
+              write_publication_gate,
+          )
+
+          competence = os.environ["COMPETENCE"]
+
+          command_extract(competence)
+          command_transform(competence)
+
+          extracted = settings.bronze_path / competence / "extracted"
+          for kind in ("FOR", "EXC"):
+              marker = f"CAGED{kind}"
+              available = any(
+                  path.is_file()
+                  and marker in path.name.upper()
+                  and path.suffix.lower() == ".txt"
+                  for path in extracted.rglob("*")
+              )
+              if available:
+                  command_transform_adjustment(competence, kind)
+
+          command_gold(competence)
+
+          gate = evaluate_publication_gate(
+              yearmonth=competence,
+              bronze_dir=settings.bronze_path,
+              gold_dir=settings.gold_path,
+              reference_path=settings.reference_totals_path,
+              approvals_path=settings.publication_approvals_path,
+          )
+          write_publication_gate(
+              gate,
+              settings.gold_path / f"publication-gate-{competence}.json",
+          )
+
+          report = {
+              "competence": competence,
+              "source_sha256": gate.source_sha256,
+              "automatic_checks_passed": gate.automatic_checks_passed,
+              "manual_approval_valid": gate.manual_approval_valid,
+              "publishable": gate.publishable,
+              "checks": [
+                  {
+                      "id": item.id,
+                      "passed": item.passed,
+                      "blocking": item.blocking,
+                      "message": item.message,
+                  }
+                  for item in gate.checks
+              ],
+          }
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+
+          for path in extracted.rglob("*.txt"):
+              path.unlink()
+          for path in (
+              settings.bronze_path / competence / "archives"
+          ).glob("*.7z"):
+              path.unlink()
+          PY
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: caged-${{ inputs.competence }}-audit
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            data/gold/*${{ inputs.competence }}*.json
+            data/gold/market-${{ inputs.competence }}.parquet
+            data/gold/trend.json
+            data/bronze/${{ inputs.competence }}/archives/download-manifest.json
+            data/bronze/${{ inputs.competence }}/extracted/*.manifest.json
+            data/reference/ipca.json
+            data/reference/municipalities.json

@@ -1,0 +1,130 @@
+name: Publish audited data
+
+on:
+  workflow_dispatch:
+    inputs:
+      competence:
+        description: "Competência no formato AAAAMM"
+        required: true
+        type: string
+      audit_run_id:
+        description: "Run ID do workflow Audit data competence"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-data-${{ inputs.competence }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      COMPETENCE: ${{ inputs.competence }}
+      AUDIT_RUN_ID: ${{ inputs.audit_run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate inputs
+        run: |
+          if [[ ! "$COMPETENCE" =~ ^[0-9]{6}$ ]]; then
+            echo "Competência inválida: $COMPETENCE"
+            exit 1
+          fi
+          if [[ ! "$AUDIT_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "Run ID inválido: $AUDIT_RUN_ID"
+            exit 1
+          fi
+
+      - name: Download audited artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: caged-${{ inputs.competence }}-audit
+          path: data
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.audit_run_id }}
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Rebuild publication gate
+        run: python -m src.cli validate-release "$COMPETENCE" --strict
+
+      - name: Verify release
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          competence = os.environ["COMPETENCE"]
+          gate_path = Path(
+              f"data/gold/publication-gate-{competence}.json"
+          )
+          gate = json.loads(gate_path.read_text(encoding="utf-8"))
+
+          if gate.get("publishable") is not True:
+              raise SystemExit(
+                  f"Competência não publicável: {competence}"
+              )
+
+          required = [
+              Path(f"data/gold/overview-{competence}.json"),
+              Path(f"data/gold/by-uf-{competence}.json"),
+              Path(f"data/gold/by-occupation-{competence}.json"),
+              Path(f"data/gold/by-municipality-{competence}.json"),
+              Path(f"data/gold/market-{competence}.parquet"),
+          ]
+          missing = [str(path) for path in required if not path.exists()]
+          if missing:
+              raise SystemExit(
+                  "Artefatos obrigatórios ausentes: " + ", ".join(missing)
+              )
+
+          print(
+              "release verified:",
+              competence,
+              gate.get("source_sha256"),
+          )
+          PY
+
+      - name: Persist derived release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -f             "data/gold/audit-national-mov-$COMPETENCE.json"             "data/gold/by-municipality-$COMPETENCE.json"             "data/gold/by-occupation-$COMPETENCE.json"             "data/gold/by-uf-$COMPETENCE.json"             "data/gold/market-$COMPETENCE.parquet"             "data/gold/overview-$COMPETENCE.json"             "data/gold/publication-gate-$COMPETENCE.json"             "data/gold/quality-$COMPETENCE.json"             "data/gold/trend.json"             "data/bronze/$COMPETENCE/archives/download-manifest.json"             data/bronze/$COMPETENCE/extracted/*.manifest.json
+
+          for optional in             "data/gold/quality-for-$COMPETENCE.json"             "data/gold/quality-exc-$COMPETENCE.json"; do
+            if [[ -f "$optional" ]]; then
+              git add -f "$optional"
+            fi
+          done
+
+          if [[ -f data/reference/ipca.json ]]; then
+            git add data/reference/ipca.json
+          fi
+
+          if git diff --cached --quiet; then
+            echo "Release já está versionado."
+            exit 0
+          fi
+
+          git commit -m "data: publish validated $COMPETENCE release [skip ci]"
+          git push
