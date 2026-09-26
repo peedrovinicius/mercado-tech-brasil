@@ -1,0 +1,48 @@
+name: RAIS 2025 stock diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/rais-stock-diagnostic.run"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rais-stock-diagnostic-2025
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install extractor
+        run: |
+          python -m pip install --upgrade pip
+          pip install py7zr
+
+      - name: Diagnose Norte stock filters
+        run: |
+          python scripts/rais_diagnose_stock.py \
+            --region NORTE \
+            --output rais-stock-diagnostic.json
+
+      - name: Upload diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-stock-diagnostic
+          retention-days: 3
+          if-no-files-found: error
+          path: rais-stock-diagnostic.json
