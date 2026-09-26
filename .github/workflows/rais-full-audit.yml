@@ -68,7 +68,7 @@ jobs:
 
       - name: Process regional RAIS part
         run: |
-          python scripts/rais_process_part.py "$RAIS_YEAR"             --filename "$RAIS_FILENAME"             --key "$RAIS_KEY"             --remote-size "$RAIS_REMOTE_SIZE"
+          PYTHONPATH=. python scripts/rais_process_part.py "$RAIS_YEAR"             --filename "$RAIS_FILENAME"             --key "$RAIS_KEY"             --remote-size "$RAIS_REMOTE_SIZE"
 
       - name: Remove raw regional files
         if: always()
