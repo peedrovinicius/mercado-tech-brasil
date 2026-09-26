@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - ".github/workflows/ingest-202607.yml"
+  workflow_dispatch:
 
 concurrency:
   group: ingest-202607
