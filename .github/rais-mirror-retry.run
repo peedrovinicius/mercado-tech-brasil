@@ -1,4 +1,0 @@
-run=rais-2025-mirror-retry-2
-reuse=centro-oeste,norte,ni
-pending=mg-es-rj,nordeste,sp,sul
-fallback=pinned-then-main
