@@ -180,3 +180,22 @@ def test_gate_blocks_when_national_reference_diverges(tmp_path: Path):
         check.id == "national_reference_reconciliation" and not check.passed
         for check in result.checks
     )
+
+
+def test_gate_blocks_without_official_reference(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    _write_json(reference, {})
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert any(
+        check.id == "official_reference_available" and not check.passed
+        for check in result.checks
+    )

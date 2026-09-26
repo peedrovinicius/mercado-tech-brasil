@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.16.0
+
+- referências oficiais nacionais registradas para janeiro a julho de 2026;
+- referência oficial passa a ser obrigatória no gate;
+- backfill histórico de 2026 preparado para execução em lote;
+- MOV de cada mês reconciliado separadamente da série ajustada;
+- FOR e EXC permanecem aplicados às competências de origem;
+- overview passa a registrar deltas de ajustes por tipo;
+- processamento em um único runner para reduzir consumo de Actions.
+
+
 ## 0.15.0
 
 - primeira competência tech real validada para julho/2026;

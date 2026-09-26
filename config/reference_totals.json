@@ -1,9 +1,69 @@
 {
+  "202601": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, janeiro de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged/2026/janeiro/pagina-inicial",
+    "published_at": "2026-03-03",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2208030,
+    "desligamentos": 2095696,
+    "saldo": 112334,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
+  "202602": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, fevereiro de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged/2026/fevereiro/pagina-inicial",
+    "published_at": "2026-03-31",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2381767,
+    "desligamentos": 2126446,
+    "saldo": 255321,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
+  "202603": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, março de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged/2026/marco/pagina-inicial",
+    "published_at": "2026-04-30",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2526660,
+    "desligamentos": 2298452,
+    "saldo": 228208,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
+  "202604": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, abril de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged/2026/abril/pagina-inicial",
+    "published_at": "2026-05-28",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2268655,
+    "desligamentos": 2182767,
+    "saldo": 85888,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
+  "202605": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, maio de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/junho/emprego-formal-gera-72-960-postos-de-trabalho-em-maio",
+    "published_at": "2026-06-30",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2207303,
+    "desligamentos": 2134343,
+    "saldo": 72960,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
+  "202606": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, junho de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/junho",
+    "published_at": "2026-07-29",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2220131,
+    "desligamentos": 2074970,
+    "saldo": 145161,
+    "note": "Totais da competência corrente publicados pelo MTE. Ajustes posteriores são tratados em FOR e EXC."
+  },
   "202607": {
     "source": "Ministério do Trabalho e Emprego: Novo Caged, julho de 2026",
     "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/agosto/mercado-formal-celetista-gera-58-568-empregos-em-julho-e-acumula-972-203-postos-no-ano/",
     "published_at": "2026-08-28",
-    "reference_kind": "published_adjusted",
+    "reference_kind": "published_monthly_mov",
     "admissoes": 2262888,
     "desligamentos": 2204320,
     "saldo": 58568,

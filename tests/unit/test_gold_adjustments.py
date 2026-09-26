@@ -92,5 +92,12 @@ def test_gold_reconciles_for_exc_and_builds_municipality_and_trend(tmp_path: Pat
     assert overview["balance"] == 1
     assert overview["salary_mean_admissions"] == 6000.0
     assert overview["salary_median_admissions"] == 6000.0
+    adjustments = {
+        item["adjustment_kind"]: item
+        for item in overview["adjustments"]
+    }
+    assert adjustments["MOV"]["balance_delta"] == 1
+    assert adjustments["FOR"]["balance_delta"] == 1
+    assert adjustments["EXC"]["balance_delta"] == -1
     assert municipalities["items"][0]["municipio_nome"] == "Fortaleza"
     assert trend["items"][0]["competence"] == "202607"
