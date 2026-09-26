@@ -63,6 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
+| RAIS anual | Descoberta e Bronze auditável implementados; métricas ainda não publicadas |
 
 ## Série publicada
 
@@ -156,6 +157,7 @@ flowchart LR
 | Fonte | Uso |
 |---|---|
 | Novo CAGED, MTE | admissões, desligamentos, saldo e remuneração de admissão |
+| RAIS, MTE | estoque anual de vínculos ativos em 31/12, camada em preparação |
 | CBO, MTE | definição versionada das ocupações de tecnologia |
 | IBGE | municípios, estimativas populacionais, território e IPCA para valores reais |
 
@@ -263,6 +265,10 @@ Sincronização das referências oficiais:
 python -m src.cli sync-municipalities
 python -m src.cli sync-population 2026
 python -m src.cli sync-ipca 202607 --base 202607
+
+# Camada anual RAIS, separada do Novo CAGED
+python -m src.cli rais-discover 2025
+python -m src.cli rais-download 2025
 ~~~
 
 Processamento por competência:
@@ -319,6 +325,7 @@ docker/      imagens de execução
 | [Recorte CBO](docs/CBO_SCOPE.md) | definição ocupacional de tecnologia |
 | [Data lineage](docs/DATA_LINEAGE.md) | origem e transformação dos dados |
 | [Pipeline](docs/PIPELINE_REAL.md) | execução do processamento |
+| [RAIS anual](docs/RAIS.md) | ingestão anual e separação conceitual de estoque |
 | [Operação de dados](docs/OPERATIONS.md) | auditoria e publicação mensal |
 | [Deploy](docs/DEPLOY.md) | produção e execução |
 | [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |

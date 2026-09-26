@@ -21,6 +21,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - consolidação trimestral com identificação de períodos parciais;
 - integração SIDRA para população municipal e cálculo por 100 mil no Gold;
 - ranking municipal normalizado no frontend, ativado somente quando há denominador publicado;
+- descoberta e ingestão Bronze auditável dos microdados anuais da RAIS;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -41,7 +42,8 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão analítica
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
-- adicionar RAIS para análises de estoque anual de vínculos;
+- validar o layout RAIS 2025 e construir Silver e Gold de estoque anual;
+- reconciliar o estoque RAIS com referências anuais oficiais antes da publicação;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
 

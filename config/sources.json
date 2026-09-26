@@ -32,5 +32,13 @@
       "reference_date": "01-07 do ano de referência",
       "api": "https://servicodados.ibge.gov.br/api/v3/agregados"
     }
+  },
+  "rais": {
+    "owner": "Ministério do Trabalho e Emprego",
+    "purpose": "estoque anual de vínculos formais ativos em 31/12",
+    "latest_confirmed_year": 2025,
+    "official_page": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/rais-2025",
+    "official_microdata_page": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged",
+    "official_ftp": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/"
   }
 }

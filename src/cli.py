@@ -13,6 +13,11 @@ from src.ingestion.https_caged import (
 )
 from src.ingestion.local import ingest_local_file
 from src.ingestion.manifest import build_manifest, write_manifest
+from src.ingestion.rais import (
+    discover_files as discover_rais_files,
+    download_year as download_rais_year,
+    write_download_manifest as write_rais_download_manifest,
+)
 from src.reference.ipca import fetch_ipca_indices, save_ipca_cache
 from src.reference.municipalities import (
     fetch_municipalities,
@@ -184,6 +189,7 @@ def command_gold(yearmonth: str) -> None:
         gold_dir=settings.gold_path,
         ipca_cache_path=settings.ipca_cache_path,
         municipalities_cache_path=settings.municipalities_cache_path,
+        population_cache_path=settings.population_cache_path,
     )
     print(f"gold: {parquet}")
     print(f"overview: {overview}")
@@ -297,6 +303,46 @@ def command_approve_release(
         f"sha256={approval['source_sha256']}"
     )
     _run_publication_gate(yearmonth)
+
+
+def command_rais_discover(year: int, dataset: str) -> None:
+    files = discover_rais_files(year, dataset=dataset)
+    if not files:
+        raise SystemExit(
+            f"Nenhum arquivo RAIS {dataset} encontrado para {year}."
+        )
+
+    for item in files:
+        print(
+            f"rais: ano={item.year} dataset={item.dataset} "
+            f"arquivo={item.filename}"
+        )
+
+
+def command_rais_download(year: int, dataset: str) -> None:
+    archive_dir = (
+        settings.bronze_path
+        / "rais"
+        / str(year)
+        / "archives"
+    )
+    files = download_rais_year(
+        year,
+        archive_dir,
+        dataset=dataset,
+    )
+    manifest = archive_dir / "download-manifest.json"
+    write_rais_download_manifest(
+        year,
+        files,
+        manifest,
+        dataset=dataset,
+    )
+    print(
+        f"rais: {len(files)} arquivos baixados para {archive_dir} "
+        f"dataset={dataset}"
+    )
+    print(f"rais manifest: {manifest}")
 
 
 def command_sync_municipalities() -> None:
@@ -422,6 +468,28 @@ def build_parser() -> argparse.ArgumentParser:
         help="Confirma que layout, rejeições e metodologia foram revisados.",
     )
 
+    rais_discover = sub.add_parser(
+        "rais-discover",
+        help="Lista arquivos anuais da RAIS no FTP oficial do MTE.",
+    )
+    rais_discover.add_argument("year", type=int, help="Ano-base da RAIS.")
+    rais_discover.add_argument(
+        "--dataset",
+        choices=["vinculos", "estabelecimentos"],
+        default="vinculos",
+    )
+
+    rais_download = sub.add_parser(
+        "rais-download",
+        help="Baixa a camada Bronze anual da RAIS com manifests SHA-256.",
+    )
+    rais_download.add_argument("year", type=int, help="Ano-base da RAIS.")
+    rais_download.add_argument(
+        "--dataset",
+        choices=["vinculos", "estabelecimentos"],
+        default="vinculos",
+    )
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -487,6 +555,14 @@ def main() -> None:
             notes=args.notes,
             acknowledged=args.acknowledge_methodology_reviewed,
         )
+        return
+
+    if args.command == "rais-discover":
+        command_rais_discover(args.year, args.dataset)
+        return
+
+    if args.command == "rais-download":
+        command_rais_download(args.year, args.dataset)
         return
 
     if args.command == "sync-municipalities":

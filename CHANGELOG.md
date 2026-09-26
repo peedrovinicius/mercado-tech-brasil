@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.24.0
+
+- camada anual RAIS iniciada de forma separada do fluxo mensal do Novo CAGED;
+- descoberta de arquivos RAIS por ano diretamente no FTP oficial do MTE;
+- download padrão seleciona somente arquivos de vínculos e exclui estabelecimentos;
+- dataset de estabelecimentos pode ser solicitado explicitamente;
+- Bronze RAIS usa diretório anual próprio e gera SHA-256, URL oficial e manifests;
+- CLI ganha comandos rais-discover e rais-download;
+- fonte RAIS 2025 registrada no catálogo de fontes oficiais;
+- documentação explicita estoque anual em 31/12 e impede mistura conceitual com admissões e desligamentos;
+- microdados RAIS não entram em workflow automático nesta etapa para preservar custo operacional;
+- nenhuma métrica RAIS é publicada antes de layout, Silver, reconciliação e gate próprios;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.23.0
 
 - endpoint municipal passa a aceitar ranking por admissões absolutas ou admissões por 100 mil habitantes;
