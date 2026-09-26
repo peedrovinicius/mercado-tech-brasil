@@ -1,0 +1,17 @@
+{
+  "source": "Novo CAGED / MTE",
+  "scope": "recorte CBO de tecnologia versionado",
+  "items": [
+    {
+      "competence": "202607",
+      "admissions": 19253,
+      "dismissals": 18347,
+      "balance": 906,
+      "salary_mean_admissions": 6155.046008565752,
+      "salary_median_admissions": 3990.0550000000003,
+      "salary_mean_admissions_real": 6155.046008565752,
+      "salary_median_admissions_real": 3990.0550000000003,
+      "salary_real_base_competence": "202607"
+    }
+  ]
+}

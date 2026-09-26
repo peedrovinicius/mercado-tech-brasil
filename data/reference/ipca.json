@@ -1,0 +1,9 @@
+{
+  "source": "IBGE SIDRA",
+  "table": "1737",
+  "variable": "2266",
+  "base_competence": "202607",
+  "indices": {
+    "202607": "7657.7300000000000"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "source": "novo_caged_mte",
+  "competence": "202607",
+  "original_name": "CAGEDEXC202607.txt",
+  "size_bytes": 1102798,
+  "sha256": "dad53eb4511e30ccebf4b40af52a882cae17974a6f50e2128611df76e340b8b5",
+  "ingested_at_utc": "2026-09-26T08:23:20.409991+00:00",
+  "transport": "ftp_mte",
+  "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202607/CAGEDEXC202607.7z"
+}
