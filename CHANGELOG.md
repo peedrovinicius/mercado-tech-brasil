@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0
+
+- recorte CBO de tecnologia elevado para versão 2;
+- inclusão de 2122 — Engenheiros em computação;
+- manutenção de 2123, 2124, 3171 e 3172;
+- fontes oficiais da CBO registradas no arquivo de configuração;
+- justificativa metodológica do recorte ocupacional;
+- teste de regressão garantindo o conjunto exato de famílias;
+- documentação dedicada em `docs/CBO_SCOPE.md`.
+
+
 ## 0.9.0
 
 - referência oficial de julho/2026 versionada por Brasil, região e UF;
