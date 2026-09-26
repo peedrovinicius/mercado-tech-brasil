@@ -14,6 +14,10 @@ from src.ingestion.https_caged import (
 from src.ingestion.local import ingest_local_file
 from src.ingestion.manifest import build_manifest, write_manifest
 from src.reference.ipca import fetch_ipca_indices, save_ipca_cache
+from src.reference.municipalities import (
+    fetch_municipalities,
+    save_municipalities,
+)
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.validation.publication_gate import (
@@ -141,6 +145,7 @@ def _rebuild_affected_gold(adjustment_path: Path) -> None:
             yearmonth=competence,
             gold_dir=settings.gold_path,
             ipca_cache_path=settings.ipca_cache_path,
+            municipalities_cache_path=settings.municipalities_cache_path,
         )
         print(f"gold reconstruído com ajustes: {competence}")
 
@@ -173,6 +178,7 @@ def command_gold(yearmonth: str) -> None:
         yearmonth=yearmonth,
         gold_dir=settings.gold_path,
         ipca_cache_path=settings.ipca_cache_path,
+        municipalities_cache_path=settings.municipalities_cache_path,
     )
     print(f"gold: {parquet}")
     print(f"overview: {overview}")
@@ -288,6 +294,22 @@ def command_approve_release(
     _run_publication_gate(yearmonth)
 
 
+def command_sync_municipalities() -> None:
+    municipalities = fetch_municipalities()
+    if len(municipalities) < 5000:
+        raise SystemExit(
+            "IBGE retornou uma quantidade inesperadamente baixa de municípios."
+        )
+    save_municipalities(
+        municipalities,
+        settings.municipalities_cache_path,
+    )
+    print(
+        f"municípios: {len(municipalities)} referências salvas em "
+        f"{settings.municipalities_cache_path}"
+    )
+
+
 def command_sync_ipca(periods: list[str], base_competence: str) -> None:
     requested = sorted(set(periods + [base_competence]))
     indices = fetch_ipca_indices(requested)
@@ -378,6 +400,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Confirma que layout, rejeições e metodologia foram revisados.",
     )
 
+    sub.add_parser(
+        "sync-municipalities",
+        help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
+    )
+
     sync_ipca = sub.add_parser(
         "sync-ipca",
         help="Baixa números índice do IPCA no SIDRA para salário real.",
@@ -428,6 +455,10 @@ def main() -> None:
             notes=args.notes,
             acknowledged=args.acknowledge_methodology_reviewed,
         )
+        return
+
+    if args.command == "sync-municipalities":
+        command_sync_municipalities()
         return
 
     if args.command == "sync-ipca":
