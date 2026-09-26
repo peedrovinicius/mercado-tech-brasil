@@ -1,0 +1,21 @@
+name: Stop stale RAIS retry
+
+on:
+  push:
+    paths:
+      - ".github/rais-stop-one.run"
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Cancel stale run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method POST             "repos/${{ github.repository }}/actions/runs/36278464102/cancel"
