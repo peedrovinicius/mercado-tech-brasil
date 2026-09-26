@@ -185,6 +185,9 @@ def build_serving_payload(
                 {
                     "competence": competence,
                     "municipality_code": code,
+                    "municipality_ibge_code": item.get("municipio_codigo_ibge"),
+                    "municipality_name": item.get("municipio_nome"),
+                    "uf": item.get("uf"),
                     "admissions": item["admissions"],
                     "dismissals": item["dismissals"],
                     "balance": item["balance"],
