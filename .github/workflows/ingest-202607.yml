@@ -1,0 +1,159 @@
+name: Ingest July 2026
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ingest-202607.yml"
+
+concurrency:
+  group: ingest-202607
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Sync IBGE references
+        run: |
+          python -m src.cli sync-municipalities || true
+          python -m src.cli sync-ipca 202607 --base 202607 || true
+
+      - name: Download official competence snapshot
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          from src.core.settings import settings
+          from src.ingestion.https_caged import (
+              download_month_resilient,
+              write_download_manifest,
+          )
+
+          yearmonth = "202607"
+          archive_dir = settings.bronze_path / yearmonth / "archives"
+          artifacts = []
+
+          for kind in ("MOV", "FOR", "EXC"):
+              try:
+                  found = download_month_resilient(
+                      yearmonth,
+                      archive_dir,
+                      file_types=(kind,),
+                  )
+                  artifacts.extend(found)
+                  for item in found:
+                      print(
+                          f"downloaded kind={item.kind} "
+                          f"transport={item.transport} "
+                          f"path={item.path}"
+                      )
+              except Exception as exc:
+                  if kind == "MOV":
+                      raise
+                  print(f"optional adjustment unavailable kind={kind}: {exc}")
+
+          write_download_manifest(
+              artifacts,
+              archive_dir / "download-manifest.json",
+          )
+          PY
+
+      - name: Process competence
+        run: |
+          python - <<'PY'
+          from src.cli import (
+              command_extract,
+              command_gold,
+              command_transform,
+              command_transform_adjustment,
+              command_validate_release,
+          )
+          from src.core.settings import settings
+
+          yearmonth = "202607"
+          command_extract(yearmonth)
+          command_transform(yearmonth)
+
+          extracted = settings.bronze_path / yearmonth / "extracted"
+          for kind in ("FOR", "EXC"):
+              marker = f"CAGED{kind}"
+              available = any(
+                  path.is_file()
+                  and marker in path.name.upper()
+                  and path.suffix.lower() == ".txt"
+                  for path in extracted.rglob("*")
+              )
+              if available:
+                  command_transform_adjustment(yearmonth, kind)
+              else:
+                  print(f"adjustment not present kind={kind}")
+
+          command_gold(yearmonth)
+          command_validate_release(
+              yearmonth,
+              min_valid_rate=0.99,
+              strict=False,
+          )
+          PY
+
+      - name: Print audit summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for path in sorted(Path("data/gold").glob("*.json")):
+              if "202607" not in path.name:
+                  continue
+              print(f"\n===== {path} =====")
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+                  print(json.dumps(payload, ensure_ascii=False, indent=2)[:20000])
+              except Exception as exc:
+                  print(f"unable to read {path}: {exc}")
+
+          print("\n===== manifests =====")
+          for path in sorted(Path("data/bronze/202607").rglob("*.manifest.json")):
+              print(path)
+              print(path.read_text(encoding="utf-8")[:5000])
+          PY
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: caged-202607-audit
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            data/gold/*.json
+            data/gold/market-202607.parquet
+            data/silver/caged_tech_202607.parquet
+            data/silver/caged_tech_for_202607.parquet
+            data/silver/caged_tech_exc_202607.parquet
+            data/silver/caged_rejected_202607.parquet
+            data/silver/caged_rejected_for_202607.parquet
+            data/silver/caged_rejected_exc_202607.parquet
+            data/bronze/202607/archives/download-manifest.json
+            data/bronze/202607/extracted/*.manifest.json
+            data/reference/ipca.json
+            data/reference/municipalities.json
