@@ -31,6 +31,12 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
   <img src="assets/readme-dashboard.svg" alt="Dashboard executivo do Mercado Tech Brasil com série publicada de janeiro a julho de 2026" width="100%" />
 </p>
 
+O painel acima é derivado dos artefatos Gold versionados. Para regenerá-lo após uma nova publicação:
+
+~~~bash
+python scripts/generate_readme_dashboard.py
+~~~
+
 <table>
 <tr>
 <td align="center"><strong>134.209</strong><br/><sub>Admissões tech</sub></td>

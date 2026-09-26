@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.6
+
+- dashboard do README passa a ter gerador reproduzível em Python;
+- gerador lê série histórica, overview e agregados por UF diretamente da camada Gold;
+- acumulados, competência mais recente e participações territoriais são recalculados na geração;
+- teste executa o gerador em arquivo temporário e confere os indicadores derivados;
+- README documenta o comando de regeneração do painel;
+- geração permanece manual para não consumir minutos de GitHub Actions;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.5
 
 - README ganha dashboard visual em SVG com dados reais da série publicada;
