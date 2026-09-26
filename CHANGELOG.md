@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.17.0
+
+- série histórica auditada de janeiro a julho de 2026;
+- 134.209 admissões tech, 127.865 desligamentos e saldo acumulado +6.344;
+- reconciliação nacional do MOV em cada uma das sete competências;
+- FOR e EXC aplicados às competências de origem;
+- remuneração real em valores de julho de 2026 pelo IPCA/IBGE;
+- categoria municipal residual 999999 tratada como Não identificado sem inventar código IBGE;
+- qualidade da dimensão municipal incorporada ao gate de publicação;
+- endpoint de registro de releases com estado automático, aprovação e SHA-256;
+- cobertura histórica publicada exposta no dashboard;
+- publicação histórica reutiliza o artefato auditado e evita reprocessamento dos microdados.
+
+
 ## 0.16.0
 
 - referências oficiais nacionais registradas para janeiro a julho de 2026;

@@ -25,22 +25,32 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
 </tr>
 </table>
 
-## Snapshot publicado
+## Série publicada
 
-**Competência: julho de 2026**
+**Período: janeiro a julho de 2026**
 
 <table>
 <tr>
-<td><strong>19.253</strong><br/>admissões tech</td>
-<td><strong>18.347</strong><br/>desligamentos tech</td>
-<td><strong>+906</strong><br/>saldo</td>
-<td><strong>R$ 3.990,06</strong><br/>salário mediano de admissão</td>
+<td><strong>134.209</strong><br/>admissões tech</td>
+<td><strong>127.865</strong><br/>desligamentos tech</td>
+<td><strong>+6.344</strong><br/>saldo acumulado</td>
+<td><strong>7</strong><br/>competências auditadas</td>
 </tr>
 </table>
 
-A primeira competência real foi processada a partir dos microdados oficiais do Novo CAGED. O MOV de julho contém 4.467.208 registros e reconciliou exatamente com os totais nacionais publicados pelo MTE. O recorte tech contém 37.600 movimentações e 1.274 municípios identificados pela referência do IBGE.
+| Competência | Admissões | Desligamentos | Saldo | Mediana real |
+|---|---:|---:|---:|---:|
+| Jan/2026 | 19.633 | 18.041 | +1.592 | R$ 3.839,32 |
+| Fev/2026 | 18.131 | 17.679 | +452 | R$ 3.489,37 |
+| Mar/2026 | 20.415 | 19.517 | +898 | R$ 3.623,57 |
+| Abr/2026 | 19.603 | 19.089 | +514 | R$ 4.032,46 |
+| Mai/2026 | 18.153 | 17.706 | +447 | R$ 4.009,20 |
+| Jun/2026 | 19.021 | 17.486 | +1.535 | R$ 3.902,73 |
+| Jul/2026 | 19.253 | 18.347 | +906 | R$ 3.990,06 |
 
-**SHA-256 do MOV:** `07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f`
+Cada MOV mensal foi reconciliado com a referência nacional publicada pelo MTE. FOR e EXC são aplicados às competências de origem antes da construção dos agregados. As medianas reais estão expressas em valores de julho de 2026 pelo IPCA/IBGE.
+
+Os microdados brutos permanecem fora do Git. O repositório versiona somente os agregados publicados, relatórios de qualidade e manifests necessários para reproduzir a proveniência.
 
 ## Arquitetura
 
@@ -107,7 +117,7 @@ flowchart LR
 | CBO, MTE | definição versionada das ocupações de tecnologia |
 | IBGE | municípios, território e IPCA para valores reais |
 
-A referência oficial de julho de 2026 está versionada em **config/official_reference_202607.json**.
+As referências nacionais de janeiro a julho de 2026 estão versionadas em **config/reference_totals.json**. A referência detalhada de julho permanece em **config/official_reference_202607.json**.
 
 ## Recorte de tecnologia
 
@@ -158,14 +168,14 @@ flowchart LR
 | Bronze / Silver / Gold | Implementado |
 | Gate de publicação | Implementado |
 | PostgreSQL serving | Implementado |
-| Reconciliação oficial de julho/2026 | Implementada |
+| Reconciliação oficial jan-jul/2026 | Implementada |
 | Transporte FTP com fallback HTTPS | Implementado |
 | Tratamento de MOV, FOR e EXC | Implementado |
 | Agregação municipal | Implementada |
-| Série histórica incremental | Implementada |
+| Série histórica publicada | Jan-jul/2026 |
 | Salário real por IPCA | Implementado |
 | PostgreSQL gerenciado | Provisionado |
-| Primeira competência tech real | Julho/2026 validada e publicada |
+| Competências tech publicadas | 7, de jan/2026 a jul/2026 |
 
 ## Execução local
 

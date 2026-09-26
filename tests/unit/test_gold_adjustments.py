@@ -3,7 +3,7 @@ from pathlib import Path
 
 import polars as pl
 
-from src.gold.aggregate import build_gold
+from src.gold.aggregate import build_gold, enrich_municipality_items
 
 
 def test_gold_reconciles_for_exc_and_builds_municipality_and_trend(tmp_path: Path):
@@ -101,3 +101,27 @@ def test_gold_reconciles_for_exc_and_builds_municipality_and_trend(tmp_path: Pat
     assert adjustments["EXC"]["balance_delta"] == -1
     assert municipalities["items"][0]["municipio_nome"] == "Fortaleza"
     assert trend["items"][0]["competence"] == "202607"
+
+
+def test_residual_municipality_is_labeled_as_not_identified(tmp_path: Path):
+    cache = tmp_path / "municipalities.json"
+    cache.write_text(
+        json.dumps({"municipalities": {}}),
+        encoding="utf-8",
+    )
+
+    items = enrich_municipality_items(
+        [
+            {
+                "municipio_codigo_caged": "999999",
+                "admissions": 2,
+                "dismissals": 0,
+                "balance": 2,
+            }
+        ],
+        cache,
+    )
+
+    assert items[0]["municipio_nome"] == "Não identificado"
+    assert items[0]["uf"] == "NI"
+    assert items[0]["municipio_codigo_ibge"] is None

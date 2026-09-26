@@ -262,7 +262,7 @@ def _apply_real_salary(
     return items
 
 
-def _enrich_municipality_items(
+def enrich_municipality_items(
     items: list[dict[str, Any]],
     cache_path: Path | None,
 ) -> list[dict[str, Any]]:
@@ -272,6 +272,16 @@ def _enrich_municipality_items(
     mapping = load_municipalities(cache_path)
     for item in items:
         code = str(item.get("municipio_codigo_caged") or "")
+        if code == "999999":
+            item.update(
+                {
+                    "municipio_codigo_ibge": None,
+                    "municipio_nome": "Não identificado",
+                    "uf": "NI",
+                }
+            )
+            continue
+
         reference = mapping.get(code)
         if reference:
             item.update(reference)
@@ -436,7 +446,7 @@ def build_gold(
             data,
             group_cols=["municipio_codigo_caged"],
         )
-        municipality_items = _enrich_municipality_items(
+        municipality_items = enrich_municipality_items(
             _apply_real_salary(
                 _build_grouped(
                     data,

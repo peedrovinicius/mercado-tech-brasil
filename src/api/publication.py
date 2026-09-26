@@ -37,3 +37,34 @@ def published_json_path(
 ) -> Path | None:
     path = gold_path / f"{prefix}-{competence}.json"
     return path if path.exists() else None
+
+
+def publication_registry(gold_path: Path) -> list[dict[str, object]]:
+    releases: list[dict[str, object]] = []
+
+    for gate_path in sorted(gold_path.glob("publication-gate-*.json")):
+        try:
+            payload = json.loads(gate_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        competence = str(payload.get("competence") or "")
+        if len(competence) != 6 or not competence.isdigit():
+            continue
+
+        releases.append(
+            {
+                "competence": competence,
+                "automatic_checks_passed": bool(
+                    payload.get("automatic_checks_passed")
+                ),
+                "manual_approval_valid": bool(
+                    payload.get("manual_approval_valid")
+                ),
+                "publishable": payload.get("publishable") is True,
+                "source_sha256": payload.get("source_sha256"),
+                "generated_at_utc": payload.get("generated_at_utc"),
+            }
+        )
+
+    return sorted(releases, key=lambda item: str(item["competence"]))

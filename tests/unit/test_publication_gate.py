@@ -46,6 +46,23 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     )
     (gold / "market-202607.parquet").write_bytes(b"parquet-placeholder")
     _write_json(
+        gold / "by-municipality-202607.json",
+        {
+            "competence": "202607",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 10,
+                    "dismissals": 5,
+                    "balance": 5,
+                }
+            ],
+        },
+    )
+    _write_json(
         gold / "audit-national-mov-202607.json",
         {
             "competence": "202607",
@@ -197,5 +214,40 @@ def test_gate_blocks_without_official_reference(tmp_path: Path):
     assert result.automatic_checks_passed is False
     assert any(
         check.id == "official_reference_available" and not check.passed
+        for check in result.checks
+    )
+
+
+def test_gate_blocks_invalid_municipality_dimension(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    _write_json(
+        gold / "by-municipality-202607.json",
+        {
+            "competence": "202607",
+            "items": [
+                {
+                    "municipio_codigo_caged": "999999",
+                    "municipio_codigo_ibge": None,
+                    "municipio_nome": None,
+                    "uf": "NI",
+                    "admissions": 2,
+                    "dismissals": 0,
+                    "balance": 2,
+                }
+            ],
+        },
+    )
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert any(
+        check.id == "municipality_dimension_quality" and not check.passed
         for check in result.checks
     )

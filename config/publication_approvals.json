@@ -1,4 +1,46 @@
 {
+  "202601": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "577814d43f2ff2acf26d34a79fb3a758267ae89fffcec2e24c37cc164dfcc3dc",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
+  "202602": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "5534a81c3469b75a901d1904a02cc589f6945a3fdd12983b913afc7df75c965c",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
+  "202603": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "fbddc1adb38befcf1230a2f2073e94d57543479ccb322bed55a9d1fde8c89e2a",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
+  "202604": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "9c334f22d013cd11b9e47494cb313e475f4d86a8f80d0abf9eccb5c3b859cfc7",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
+  "202605": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "9b6f2652e3e68a2fe6482c022daf77bbd8fb229d810c05cb925b64e38362e7ad",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
+  "202606": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
+    "source_sha256": "ff9ee116b70fd13e3978358f71e48a915d42256c2d1f877adbaa82f0b8610131",
+    "approved_at_utc": "2026-09-26T09:04:04Z"
+  },
   "202607": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",

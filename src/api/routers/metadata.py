@@ -4,6 +4,7 @@ import json
 
 from fastapi import APIRouter, HTTPException
 
+from src.api.publication import publication_registry
 from src.core.settings import settings
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
@@ -57,4 +58,21 @@ def coverage() -> dict[str, object]:
         "status": "loaded",
         "competencies": competencies,
         "files": items,
+    }
+
+
+@router.get("/releases")
+def releases() -> dict[str, object]:
+    items = publication_registry(settings.gold_path)
+    published = [
+        str(item["competence"])
+        for item in items
+        if item["publishable"] is True
+    ]
+    return {
+        "total": len(items),
+        "published_count": len(published),
+        "published_competencies": published,
+        "latest_published_competence": published[-1] if published else None,
+        "items": items,
     }

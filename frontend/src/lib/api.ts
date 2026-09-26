@@ -65,6 +65,23 @@ export type Coverage = {
   message?: string
 }
 
+export type ReleaseItem = {
+  competence: string
+  automatic_checks_passed: boolean
+  manual_approval_valid: boolean
+  publishable: boolean
+  source_sha256?: string | null
+  generated_at_utc?: string | null
+}
+
+export type Releases = {
+  total: number
+  published_count: number
+  published_competencies: string[]
+  latest_published_competence?: string | null
+  items: ReleaseItem[]
+}
+
 export type Provenance = {
   source: string
   competence: string
@@ -164,6 +181,7 @@ export const api = {
     ),
   readiness: () => get<Readiness>('/system/readiness'),
   coverage: () => get<Coverage>('/metadata/coverage'),
+  releases: () => get<Releases>('/metadata/releases'),
   officialReferenceJuly2026: () =>
     get<OfficialReference>('/metadata/official-reference/202607'),
   quality: () => get<QualityReport>('/quality/latest'),

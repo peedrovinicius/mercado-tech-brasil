@@ -19,6 +19,11 @@ export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
 
   const readiness = useQuery({ queryKey: ['readiness'], queryFn: api.readiness })
+  const releases = useQuery({
+    queryKey: ['releases'],
+    queryFn: api.releases,
+    retry: false,
+  })
   const officialReference = useQuery({
     queryKey: ['official-reference-202607'],
     queryFn: api.officialReferenceJuly2026,
@@ -70,6 +75,16 @@ export function Dashboard() {
   const isLoading = readiness.isLoading || (readiness.data?.data_loaded && overview.isLoading)
   const noData = readiness.isSuccess && readiness.data.data_loaded === false
   const hasTechData = overview.isSuccess
+  const publishedCompetencies = releases.data?.published_competencies ?? []
+  const firstPublished = publishedCompetencies[0]
+  const lastPublished = publishedCompetencies[publishedCompetencies.length - 1]
+  const coverageLabel = publishedCompetencies.length
+    ? (
+        publishedCompetencies.length === 1
+          ? formatCompetence(lastPublished)
+          : `${formatCompetence(firstPublished)} a ${formatCompetence(lastPublished)}`
+      )
+    : 'Aguardando publicação'
 
   return (
     <main>
@@ -128,6 +143,7 @@ export function Dashboard() {
           <div className="hero__meta hero__meta--card">
             <div><span>Fonte primária</span><strong>Novo CAGED / MTE</strong></div>
             <div><span>Competência tech</span><strong>{overview.data ? formatCompetence(overview.data.competence) : 'Aguardando microdados'}</strong></div>
+            <div><span>Cobertura publicada</span><strong>{coverageLabel}</strong></div>
             <div><span>Serving</span><strong>FastAPI + PostgreSQL</strong></div>
           </div>
         </div>
@@ -160,7 +176,9 @@ export function Dashboard() {
               <h2>Indicadores do mercado tech formal</h2>
             </div>
             <span className="section-heading__meta">
-              {formatCompetence(overview.data.competence)} · CBO v2
+              {publishedCompetencies.length > 1
+                ? `${publishedCompetencies.length} competências · ${coverageLabel} · CBO v2`
+                : `${formatCompetence(overview.data.competence)} · CBO v2`}
             </span>
           </section>
 
