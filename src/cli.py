@@ -31,6 +31,7 @@ from src.reference.population import (
 )
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
+from src.transform.rais_parts import merge_rais_silver_parts
 from src.transform.rais_profile import profile_rais_values
 from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
@@ -526,6 +527,19 @@ def command_rais_transform(
     print("rais gold: BLOCKED until annual reconciliation and gate")
 
 
+def command_rais_merge_parts(year: int, *, parts_root: str) -> None:
+    paths = merge_rais_silver_parts(
+        year=year,
+        parts_root=Path(parts_root).resolve(),
+        silver_dir=settings.silver_path,
+        bronze_archive_dir=settings.bronze_path / "rais" / str(year) / "archives",
+    )
+    print(f"rais merged silver: {paths['silver']}")
+    print(f"rais merged rejects: {paths['rejects']}")
+    print(f"rais merged quality: {paths['quality']}")
+    print(f"rais merged manifest: {paths['manifest']}")
+
+
 def command_rais_reconcile(year: int) -> None:
     quality_path = settings.silver_path / f"rais_quality_{year}.json"
     destination = settings.silver_path / f"rais_reconciliation_{year}.json"
@@ -859,6 +873,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Linhas por lote de escrita Parquet, entre 1000 e 500000.",
     )
 
+    rais_merge = sub.add_parser(
+        "rais-merge-parts",
+        help="Junta partes regionais RAIS em Silver e qualidade nacionais.",
+    )
+    rais_merge.add_argument("year", type=int, help="Ano-base da RAIS.")
+    rais_merge.add_argument("--parts-root", required=True)
+
     rais_reconcile = sub.add_parser(
         "rais-reconcile",
         help="Reconcilia o estoque nacional bruto da RAIS com a referência oficial.",
@@ -1006,6 +1027,10 @@ def main() -> None:
             args.year,
             batch_size=args.batch_size,
         )
+        return
+
+    if args.command == "rais-merge-parts":
+        command_rais_merge_parts(args.year, parts_root=args.parts_root)
         return
 
     if args.command == "rais-reconcile":

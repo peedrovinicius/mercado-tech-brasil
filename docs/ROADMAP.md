@@ -31,6 +31,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - layout real 2025 confirmado com 62 colunas, latin-1 e delimitador vírgula;
 - codificação real 1/0 do vínculo ativo confirmada em amostra de 10.000 registros;
 - downloader RAIS com retomada FTP e verificação de tamanho;
+- processamento RAIS regional isolado e merge nacional em streaming;
 - transformação Silver RAIS em streaming com rejeições auditáveis;
 - reconciliação nacional RAIS contra referência oficial do MTE;
 - Gold anual RAIS por overview, UF e família CBO;
@@ -56,9 +57,9 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão analítica
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
-- baixar o conjunto completo dos arquivos de vínculos RAIS 2025;
-- executar inspeção e validação em todos os arquivos regionais, não apenas na amostra Norte;
-- executar o Silver completo sobre os microdados reais de 2025;
+- executar o processamento integral dos sete arquivos de vínculos RAIS 2025;
+- confirmar validação em todos os arquivos regionais;
+- consolidar o Silver nacional completo;
 - revisar rejeições reais, inclusive qualquer CBO ou município fora do padrão observado na amostra;
 - executar a reconciliação exata com 59.970.945 vínculos ativos;
 - executar rais-gold 2025 somente depois de gold_ready=true;

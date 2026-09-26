@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Pipeline completo implementado; layout e valores 2025 validados em amostra oficial; release integral ainda não publicada |
+| RAIS anual | Pipeline regional integral preparado; layout e valores 2025 validados em amostra oficial; release nacional ainda não publicada |
 
 ## Série publicada
 

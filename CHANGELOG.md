@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.34.0
+
+- processamento integral RAIS passa a suportar partes regionais independentes;
+- merge nacional concatena Parquets em streaming e soma os relatórios de qualidade;
+- manifesto nacional reúne os SHA-256 de todas as partes;
+- CLI ganha rais-merge-parts;
+- processamento bruto regional pode ser descartado depois da geração dos derivados;
+- nenhuma aprovação metodológica é automática;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.33.0
 
 - primeira validação operacional sobre microdados oficiais reais da RAIS 2025;

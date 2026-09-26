@@ -243,6 +243,18 @@ O ano é fixado pelo contexto anual validado, e a UF é derivada do prefixo muni
 
 O relatório de qualidade registra totais lidos, válidos, rejeitados, ativos, inativos e tech. Mesmo com Silver gerada, `gold_ready` e `publication_ready` permanecem falsos.
 
+## Processamento integral por partes
+
+No processamento nacional, os arquivos de vínculos são tratados como partes regionais independentes. Cada parte passa por download, SHA-256, extração, validação e transformação Silver antes da remoção do bruto regional.
+
+As partes são reunidas com:
+
+```bash
+python -m src.cli rais-merge-parts 2025 --parts-root <diretorio-das-partes>
+```
+
+O merge concatena os Parquets por lotes, soma a qualidade regional e gera um manifesto nacional com os SHA-256 de todas as origens.
+
 ## Reconciliação anual
 
 Antes de qualquer Gold, o estoque nacional bruto de vínculos ativos é comparado com a referência oficial do MTE.
