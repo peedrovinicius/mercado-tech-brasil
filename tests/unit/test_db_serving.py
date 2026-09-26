@@ -113,6 +113,20 @@ def _fixture(tmp_path: Path, *, approved: bool) -> tuple[Path, Path, Path, Path]
     )
     (gold / f"market-{YEAR_MONTH}.parquet").write_bytes(b"placeholder")
     _write_json(
+        gold / f"audit-national-mov-{YEAR_MONTH}.json",
+        {
+            "competence": YEAR_MONTH,
+            "admissions": 3,
+            "dismissals": 1,
+            "balance": 2,
+            "non_identified": {
+                "admissions": 0,
+                "dismissals": 0,
+                "balance": 0,
+            },
+        },
+    )
+    _write_json(
         reference,
         {
             YEAR_MONTH: {
