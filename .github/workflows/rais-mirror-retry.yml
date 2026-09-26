@@ -33,20 +33,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
 
-      - name: Reuse validated Centro-Oeste part
+      - name: Reuse validated Centro-Oeste, Norte and NI parts
         uses: actions/download-artifact@v4
         with:
-          name: rais-part-rais-vinc-pub-centro-oeste
-          path: work/parts/rais-vinc-pub-centro-oeste
+          name: rais-2025-parts-mirror-retry
+          path: work/parts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: peedrovinicius/mercado-tech-brasil
-          run-id: 36273431223
+          run-id: 36275196275
 
-      - name: Process six pending parts through pinned HTTPS mirror
+      - name: Process remaining parts through audited HTTPS mirror
         id: process
         continue-on-error: true
         run: |
-          PYTHONPATH=. python scripts/rais_process_pending_mirror.py 2025             --work-root work/parts             --skip RAIS_VINC_PUB_CENTRO_OESTE.7z
+          PYTHONPATH=. python scripts/rais_process_pending_mirror.py 2025 \
+            --work-root work/parts
 
       - name: Upload collected regional derivatives
         if: always()
