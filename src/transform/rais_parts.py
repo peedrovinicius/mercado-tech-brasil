@@ -21,7 +21,6 @@ SUM_FIELDS = (
     "rows_inactive_source",
     "rows_unknown_status_source",
     "rows_year_mismatch_source",
-    "rows_residual_municipality",
     "rows_tech",
 )
 
@@ -163,6 +162,11 @@ def merge_rais_silver_parts(
     if part_count < 1:
         raise FileNotFoundError(
             f"Nenhuma parte RAIS encontrada em {parts_root}."
+        )
+    if year == 2025 and part_count != 7:
+        raise ValueError(
+            "RAIS 2025 exige exatamente sete partes regionais completas; "
+            f"encontradas: {part_count}."
         )
     if len(tech_paths) != part_count:
         raise ValueError(

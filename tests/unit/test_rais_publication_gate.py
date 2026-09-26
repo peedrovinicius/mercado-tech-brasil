@@ -26,8 +26,8 @@ def _prepare_release(base: Path) -> tuple[Path, Path, Path, Path]:
         bronze / "rais" / "2025" / "archives" / "download-manifest.json",
         {
             "files": [
-                {"sha256": "a" * 64},
-                {"sha256": "b" * 64},
+                {"sha256": f"{index:064x}"}
+                for index in range(1, 8)
             ]
         },
     )
@@ -80,6 +80,28 @@ def _prepare_release(base: Path) -> tuple[Path, Path, Path, Path]:
     pq.write_table(table, gold / "rais-market-2025.parquet")
 
     return bronze, silver, gold, approvals
+
+
+def test_rais_gate_blocks_incomplete_2025_provenance(tmp_path: Path):
+    bronze, silver, gold, approvals = _prepare_release(tmp_path)
+    manifest = (
+        bronze / "rais" / "2025" / "archives" / "download-manifest.json"
+    )
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    payload["files"] = payload["files"][:-1]
+    _write_json(manifest, payload)
+
+    result = evaluate_rais_publication_gate(
+        year=2025,
+        bronze_dir=bronze,
+        silver_dir=silver,
+        gold_dir=gold,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert result.publishable is False
+    assert result.release_sha256 is None
 
 
 def test_rais_gate_requires_manual_approval(tmp_path: Path):

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.34.4
+
+- merge nacional da RAIS 2025 passa a exigir exatamente sete partes regionais completas;
+- gate anual da RAIS 2025 exige sete SHA-256 distintos de origem antes de formar o fingerprint da release;
+- proveniência parcial não pode mais gerar release_sha256;
+- testes cobrem bloqueio de merge incompleto e manifesto anual com menos de sete origens;
+- processamento HTTPS em andamento continua sem aprovação metodológica automática;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.34.3
 
 - espelho RAIS 2025 passa a usar como pin a revisão que já contém os sete arquivos regionais de vínculos;

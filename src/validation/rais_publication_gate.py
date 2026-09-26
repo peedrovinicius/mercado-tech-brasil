@@ -79,7 +79,11 @@ def build_rais_release_sha256(
     source_hashes = _source_hashes(bronze_dir, year)
     artifacts = _release_artifacts(gold_dir, silver_dir, year)
 
-    if not source_hashes or any(not path.exists() for path in artifacts):
+    provenance_complete = bool(source_hashes)
+    if year == 2025:
+        provenance_complete = len(source_hashes) == 7
+
+    if not provenance_complete or any(not path.exists() for path in artifacts):
         return None
 
     digest = hashlib.sha256()
@@ -113,14 +117,21 @@ def evaluate_rais_publication_gate(
     checks: list[RaisGateCheck] = []
 
     source_hashes = _source_hashes(bronze_dir, year)
+    provenance_complete = bool(source_hashes)
+    if year == 2025:
+        provenance_complete = len(source_hashes) == 7
+
     checks.append(
         RaisGateCheck(
             id="source_provenance",
-            passed=bool(source_hashes),
+            passed=provenance_complete,
             message=(
-                f"Proveniência RAIS registrada para {len(source_hashes)} arquivo(s) de origem."
-                if source_hashes
-                else "Manifesto anual RAIS sem SHA-256 de origem."
+                f"Proveniência RAIS completa com {len(source_hashes)} arquivo(s) de origem."
+                if provenance_complete
+                else (
+                    f"Proveniência RAIS incompleta: {len(source_hashes)} arquivo(s) "
+                    "com SHA-256 válido."
+                )
             ),
         )
     )

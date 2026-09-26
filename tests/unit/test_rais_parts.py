@@ -43,7 +43,6 @@ def _write_part(
         "rows_inactive_source": inactive,
         "rows_unknown_status_source": 0,
         "rows_year_mismatch_source": 0,
-        "rows_residual_municipality": 0,
         "rows_tech": len(tech_rows),
         "source_partition_complete": True,
         "rejection_counts": {
@@ -133,6 +132,18 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
         ],
     )
 
+    for key in ("c", "d", "e", "f", "g"):
+        _write_part(
+            parts,
+            key=key,
+            year=2025,
+            source_file=f"RAIS_VINC_{key.upper()}.7z",
+            active=1,
+            inactive=0,
+            tech_rows=[],
+            reject_rows=[],
+        )
+
     paths = merge_rais_silver_parts(
         year=2025,
         parts_root=parts,
@@ -143,17 +154,21 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
     quality = json.loads(
         paths["quality"].read_text(encoding="utf-8")
     )
-    assert quality["parts_merged"] == 2
-    assert quality["rows_read"] == 8
-    assert quality["rows_active_source"] == 5
+    assert quality["parts_merged"] == 7
+    assert quality["rows_read"] == 13
+    assert quality["rows_active_source"] == 10
     assert quality["rows_inactive_source"] == 3
     assert quality["rows_tech"] == 2
     assert quality["rows_rejected"] == 1
-    assert quality["rows_residual_municipality"] == 0
     assert quality["source_partition_complete"] is True
     assert quality["source_archives"] == [
         "RAIS_VINC_A.7z",
         "RAIS_VINC_B.7z",
+        "RAIS_VINC_C.7z",
+        "RAIS_VINC_D.7z",
+        "RAIS_VINC_E.7z",
+        "RAIS_VINC_F.7z",
+        "RAIS_VINC_G.7z",
     ]
 
     tech = pq.read_table(paths["silver"])
@@ -164,4 +179,33 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
     manifest = json.loads(
         paths["manifest"].read_text(encoding="utf-8")
     )
-    assert len(manifest["files"]) == 2
+    assert len(manifest["files"]) == 7
+
+
+def test_merge_rais_2025_blocks_incomplete_parts(tmp_path: Path):
+    parts = tmp_path / "parts"
+    silver = tmp_path / "silver"
+    bronze = tmp_path / "bronze"
+
+    _write_part(
+        parts,
+        key="a",
+        year=2025,
+        source_file="RAIS_VINC_A.7z",
+        active=1,
+        inactive=0,
+        tech_rows=[],
+        reject_rows=[],
+    )
+
+    try:
+        merge_rais_silver_parts(
+            year=2025,
+            parts_root=parts,
+            silver_dir=silver,
+            bronze_archive_dir=bronze,
+        )
+    except ValueError as exc:
+        assert "exatamente sete partes" in str(exc)
+    else:
+        raise AssertionError("Merge RAIS 2025 deveria bloquear partes incompletas.")
