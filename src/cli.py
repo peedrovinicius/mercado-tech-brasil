@@ -7,9 +7,13 @@ from src.core.settings import settings
 from src.db.loader import ReleaseNotApprovedError, load_approved_release
 from src.gold.aggregate import build_gold
 from src.ingestion.archive import extract_7z
-from src.ingestion.ftp_caged import download_month
+from src.ingestion.https_caged import (
+    download_month_resilient,
+    write_download_manifest,
+)
 from src.ingestion.local import ingest_local_file
 from src.ingestion.manifest import build_manifest, write_manifest
+from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.validation.publication_gate import (
     approve_competence,
@@ -20,12 +24,22 @@ from src.validation.publication_gate import (
 
 def command_download(yearmonth: str) -> None:
     month_dir = settings.bronze_path / yearmonth
-    archives = download_month(yearmonth, month_dir / "archives")
-    for archive in archives:
-        print(f"baixado: {archive}")
+    archive_dir = month_dir / "archives"
+    artifacts = download_month_resilient(yearmonth, archive_dir)
+    write_download_manifest(
+        artifacts,
+        archive_dir / "download-manifest.json",
+    )
+    for artifact in artifacts:
+        print(
+            f"baixado: {artifact.path} "
+            f"kind={artifact.kind} transport={artifact.transport}"
+        )
 
 
 def command_extract(yearmonth: str) -> None:
+    import json
+
     archive_dir = settings.bronze_path / yearmonth / "archives"
     extracted_dir = settings.bronze_path / yearmonth / "extracted"
 
@@ -33,10 +47,26 @@ def command_extract(yearmonth: str) -> None:
     if not archives:
         raise SystemExit(f"Nenhum .7z em {archive_dir}")
 
+    download_manifest_path = archive_dir / "download-manifest.json"
+    download_metadata: dict[str, dict[str, str]] = {}
+    if download_manifest_path.exists():
+        payload = json.loads(download_manifest_path.read_text(encoding="utf-8"))
+        download_metadata = {
+            str(item["path"]): item
+            for item in payload.get("files", [])
+        }
+
     for archive in archives:
+        metadata = download_metadata.get(archive.name, {})
         extracted = extract_7z(archive, extracted_dir)
         for file in extracted:
-            manifest = build_manifest(file, "novo_caged", yearmonth)
+            manifest = build_manifest(
+                file,
+                "novo_caged_mte",
+                yearmonth,
+                transport=metadata.get("transport"),
+                source_url=metadata.get("url"),
+            )
             write_manifest(
                 manifest,
                 file.with_suffix(file.suffix + ".manifest.json"),
@@ -44,20 +74,26 @@ def command_extract(yearmonth: str) -> None:
             print(f"extraído: {file}")
 
 
-def _find_mov(yearmonth: str) -> Path:
+def _find_kind(yearmonth: str, kind: str) -> Path:
     extracted_dir = settings.bronze_path / yearmonth / "extracted"
+    marker = f"CAGED{kind.upper()}"
     candidates = [
         path
         for path in extracted_dir.rglob("*")
         if path.is_file()
-        and "CAGEDMOV" in path.name.upper()
+        and marker in path.name.upper()
         and path.suffix.lower() == ".txt"
     ]
     if len(candidates) != 1:
         raise SystemExit(
-            f"Esperado exatamente 1 TXT MOV em {extracted_dir}; encontrados: {len(candidates)}"
+            f"Esperado exatamente 1 TXT {kind.upper()} em {extracted_dir}; "
+            f"encontrados: {len(candidates)}"
         )
     return candidates[0]
+
+
+def _find_mov(yearmonth: str) -> Path:
+    return _find_kind(yearmonth, "MOV")
 
 
 def command_transform(yearmonth: str) -> None:
@@ -75,6 +111,55 @@ def command_transform(yearmonth: str) -> None:
         f"rejeitadas={result.rows_rejected:,} "
         f"tech={result.rows_tech:,}"
     )
+
+
+def _rebuild_affected_gold(adjustment_path: Path) -> None:
+    try:
+        import polars as pl
+    except ImportError as exc:
+        raise RuntimeError("Polars não está instalado.") from exc
+
+    frame = pl.read_parquet(adjustment_path)
+    if "effective_competence" not in frame.columns:
+        return
+
+    competencies = sorted(
+        str(value)
+        for value in frame["effective_competence"].drop_nulls().unique().to_list()
+    )
+    for competence in competencies:
+        base = settings.silver_path / f"caged_tech_{competence}.parquet"
+        if not base.exists():
+            print(
+                f"ajuste preservado: competência base {competence} "
+                "ainda não foi ingerida"
+            )
+            continue
+        build_gold(
+            base,
+            yearmonth=competence,
+            gold_dir=settings.gold_path,
+        )
+        print(f"gold reconstruído com ajustes: {competence}")
+
+
+def command_transform_adjustment(yearmonth: str, kind: str) -> None:
+    source = _find_kind(yearmonth, kind)
+    result = transform_adjustment_file(
+        source,
+        ingest_competence=yearmonth,
+        kind=kind,
+        silver_dir=settings.silver_path,
+        gold_dir=settings.gold_path,
+        cbo_config_path=settings.cbo_config_path,
+    )
+    print(
+        f"ajuste {kind}: lidas={result.rows_read:,} "
+        f"válidas={result.rows_valid:,} "
+        f"rejeitadas={result.rows_rejected:,} "
+        f"tech={result.rows_tech:,}"
+    )
+    _rebuild_affected_gold(result.silver_path)
 
 
 def command_gold(yearmonth: str) -> None:
@@ -127,6 +212,11 @@ def command_pipeline(yearmonth: str) -> None:
     command_download(yearmonth)
     command_extract(yearmonth)
     command_transform(yearmonth)
+    for kind in ("FOR", "EXC"):
+        try:
+            command_transform_adjustment(yearmonth, kind)
+        except SystemExit:
+            print(f"ajuste {kind}: arquivo não disponível para {yearmonth}")
     command_gold(yearmonth)
     _run_publication_gate(yearmonth)
 
@@ -145,15 +235,14 @@ def command_ingest_local(yearmonth: str, file_path: str, kind: str) -> None:
 
 def command_local_pipeline(yearmonth: str, file_path: str, kind: str) -> None:
     command_ingest_local(yearmonth, file_path, kind)
-    if kind.upper() != "MOV":
-        print(
-            "Arquivo preservado na Bronze. "
-            "FOR/EXC ainda não geram Silver/Gold automaticamente."
-        )
+    normalized = kind.upper()
+    if normalized == "MOV":
+        command_transform(yearmonth)
+        command_gold(yearmonth)
+        _run_publication_gate(yearmonth)
         return
-    command_transform(yearmonth)
-    command_gold(yearmonth)
-    _run_publication_gate(yearmonth)
+
+    command_transform_adjustment(yearmonth, normalized)
 
 
 def command_validate_release(
