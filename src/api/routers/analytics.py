@@ -20,6 +20,8 @@ from src.db.repository import (
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
+NORTHEAST_UFS = frozenset({"AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"})
+
 
 def _published_json(prefix: str) -> Path:
     competence = latest_published_competence(settings.gold_path)
@@ -41,8 +43,7 @@ def _published_json(prefix: str) -> Path:
     return path
 
 
-@router.get("/by-uf")
-def by_uf(limit: int = Query(default=27, ge=1, le=27)) -> dict[str, object]:
+def _by_uf_payload(limit: int) -> dict[str, object]:
     if settings.data_backend == "postgres":
         try:
             payload = fetch_by_uf(settings.database_url, limit=limit)
@@ -62,6 +63,89 @@ def by_uf(limit: int = Query(default=27, ge=1, le=27)) -> dict[str, object]:
     return {
         **payload,
         "items": payload.get("items", [])[:limit],
+    }
+
+
+@router.get("/by-uf")
+def by_uf(limit: int = Query(default=27, ge=1, le=27)) -> dict[str, object]:
+    return _by_uf_payload(limit)
+
+
+def _territory_item(
+    *,
+    key: str,
+    label: str,
+    items: list[dict[str, object]],
+    national_admissions: int,
+) -> dict[str, object]:
+    admissions = sum(int(item.get("admissions") or 0) for item in items)
+    dismissals = sum(int(item.get("dismissals") or 0) for item in items)
+    balance = sum(int(item.get("balance") or 0) for item in items)
+
+    return {
+        "key": key,
+        "label": label,
+        "admissions": admissions,
+        "dismissals": dismissals,
+        "balance": balance,
+        "share_national_admissions": (
+            admissions / national_admissions if national_admissions else 0
+        ),
+    }
+
+
+@router.get("/territorial-comparison")
+def territorial_comparison() -> dict[str, object]:
+    payload = _by_uf_payload(27)
+    raw_items = payload.get("items", [])
+    items = [
+        item
+        for item in raw_items
+        if isinstance(item, dict)
+    ]
+
+    brasil_admissions = sum(int(item.get("admissions") or 0) for item in items)
+    nordeste_items = [
+        item for item in items if str(item.get("uf") or "") in NORTHEAST_UFS
+    ]
+    ceara_items = [
+        item for item in items if str(item.get("uf") or "") == "CE"
+    ]
+
+    comparison = [
+        _territory_item(
+            key="BR",
+            label="Brasil",
+            items=items,
+            national_admissions=brasil_admissions,
+        ),
+        _territory_item(
+            key="NE",
+            label="Nordeste",
+            items=nordeste_items,
+            national_admissions=brasil_admissions,
+        ),
+        _territory_item(
+            key="CE",
+            label="Ceará",
+            items=ceara_items,
+            national_admissions=brasil_admissions,
+        ),
+    ]
+
+    nordeste_admissions = int(comparison[1]["admissions"])
+    ceara_admissions = int(comparison[2]["admissions"])
+
+    return {
+        "competence": payload.get("competence"),
+        "source": payload.get("source"),
+        "scope": "recorte CBO de tecnologia versionado",
+        "items": comparison,
+        "ceara_share_northeast_admissions": (
+            ceara_admissions / nordeste_admissions
+            if nordeste_admissions
+            else 0
+        ),
     }
 
 

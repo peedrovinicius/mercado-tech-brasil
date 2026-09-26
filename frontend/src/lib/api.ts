@@ -44,6 +44,23 @@ export type MunicipalityItem = SalaryFields & {
   balance: number
 }
 
+export type TerritorialComparisonItem = {
+  key: 'BR' | 'NE' | 'CE'
+  label: string
+  admissions: number
+  dismissals: number
+  balance: number
+  share_national_admissions: number
+}
+
+export type TerritorialComparison = {
+  competence: string
+  source: string
+  scope: string
+  items: TerritorialComparisonItem[]
+  ceara_share_northeast_admissions: number
+}
+
 export type TrendItem = SalaryFields & {
   competence: string
   admissions: number
@@ -175,6 +192,8 @@ export const api = {
     get<{ competence: string; source: string; items: MunicipalityItem[] }>(
       '/analytics/by-municipality?limit=15',
     ),
+  territorialComparison: () =>
+    get<TerritorialComparison>('/analytics/territorial-comparison'),
   trend: () =>
     get<{ source: string; scope: string; items: TrendItem[] }>(
       '/analytics/trend',

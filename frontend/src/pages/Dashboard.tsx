@@ -14,6 +14,7 @@ import {
 import { ProvenanceCard } from '../components/ProvenanceCard'
 import { ReferenceContext } from '../components/ReferenceContext'
 import { PipelineVisual } from '../components/PipelineVisual'
+import { TerritorialComparison } from '../components/TerritorialComparison'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
@@ -44,6 +45,12 @@ export function Dashboard() {
   const byOccupation = useQuery({
     queryKey: ['by-occupation'],
     queryFn: api.byOccupation,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const territorialComparison = useQuery({
+    queryKey: ['territorial-comparison'],
+    queryFn: api.territorialComparison,
     retry: false,
     enabled: overview.isSuccess,
   })
@@ -210,6 +217,10 @@ export function Dashboard() {
               }
             />
           </section>
+
+          {territorialComparison.data ? (
+            <TerritorialComparison data={territorialComparison.data} />
+          ) : null}
 
           <section className="analysis-grid">
             <article className="panel panel--wide">
