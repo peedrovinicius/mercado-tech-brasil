@@ -73,4 +73,19 @@ def test_project_versions_are_aligned():
         match.group(1),
     }
 
-    assert versions == {"0.19.3"}
+    assert len(versions) == 1
+
+
+def test_production_docs_match_render_serving_backend():
+    render = Path("render.yaml").read_text(encoding="utf-8")
+    readme = Path("README.md").read_text(encoding="utf-8")
+    status = Path("docs/STATUS.md").read_text(encoding="utf-8")
+    deploy = Path("docs/DEPLOY.md").read_text(encoding="utf-8")
+    architecture = Path("docs/ARCHITECTURE.md").read_text(encoding="utf-8")
+
+    assert "value: files" in render
+    assert "| Serving de produção | Arquivos Gold publicados |" in readme
+    assert "- serving ativo: arquivos Gold publicados" in status
+    assert "DATA_BACKEND=files" in deploy
+    assert "DATA_BACKEND=files" in architecture
+    assert "| PostgreSQL gerenciado | Provisionado |" not in readme

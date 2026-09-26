@@ -25,18 +25,36 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
 </tr>
 </table>
 
-## Série publicada
-
-**Período: janeiro a julho de 2026**
+## Dashboard executivo
 
 <table>
 <tr>
-<td><strong>134.209</strong><br/>admissões tech</td>
-<td><strong>127.865</strong><br/>desligamentos tech</td>
-<td><strong>+6.344</strong><br/>saldo acumulado</td>
-<td><strong>7</strong><br/>competências auditadas</td>
+<td align="center"><strong>134.209</strong><br/><sub>Admissões tech</sub></td>
+<td align="center"><strong>127.865</strong><br/><sub>Desligamentos tech</sub></td>
+<td align="center"><strong>+6.344</strong><br/><sub>Saldo acumulado</sub></td>
+<td align="center"><strong>7</strong><br/><sub>Competências publicadas</sub></td>
+</tr>
+<tr>
+<td align="center"><strong>19.253</strong><br/><sub>Admissões em Jul/2026</sub></td>
+<td align="center"><strong>+906</strong><br/><sub>Saldo em Jul/2026</sub></td>
+<td align="center"><strong>10,13%</strong><br/><sub>Nordeste nas admissões nacionais</sub></td>
+<td align="center"><strong>26,76%</strong><br/><sub>Ceará nas admissões do Nordeste</sub></td>
 </tr>
 </table>
+
+| Estado operacional | Situação |
+|---|---|
+| Série publicada | Jan/2026 a Jul/2026 |
+| Pipeline Bronze, Silver e Gold | Implementado |
+| Gate de publicação | Implementado |
+| API e OpenAPI | Implementados |
+| Frontend React | Implementado |
+| Serving de produção | Arquivos Gold publicados |
+| Serving PostgreSQL | Implementado e disponível por configuração |
+
+## Série publicada
+
+**Período: janeiro a julho de 2026**
 
 | Competência | Admissões | Desligamentos | Saldo | Mediana real |
 |---|---:|---:|---:|---:|
@@ -69,9 +87,11 @@ flowchart LR
     A["Fontes oficiais<br/>MTE · CBO · IBGE"] --> B["Bronze<br/>arquivo original + SHA-256"]
     B --> C["Silver<br/>normalização + qualidade"]
     C --> D["Gold<br/>agregados reproduzíveis"]
-    D --> E["PostgreSQL<br/>serving"]
+    D --> E["Arquivos Gold<br/>serving de produção"]
+    D --> P["PostgreSQL<br/>serving opcional"]
     D --> F["DuckDB<br/>validação local"]
     E --> G["FastAPI<br/>API + OpenAPI"]
+    P --> G
     G --> H["React + TypeScript<br/>dashboard"]
 
     classDef source fill:#f2f5ff,stroke:#8ea6ff,color:#15245c
@@ -79,7 +99,7 @@ flowchart LR
     classDef serving fill:#eef9f2,stroke:#75b98b,color:#184d2c
     class A source
     class B,C,D,F data
-    class E,G,H serving
+    class E,P,G,H serving
 ~~~
 
 ### Fluxo de publicação
@@ -92,7 +112,7 @@ flowchart LR
     D --> E["Agregações Gold"]
     E --> F["Gate automático"]
     F --> G["Revisão metodológica"]
-    G --> H["PostgreSQL + API"]
+    G --> H["Serving publicado + API"]
 ~~~
 
 ## Stack
@@ -168,7 +188,8 @@ flowchart LR
     A["Aplicação pública<br/>operacional"] --> B["API + OpenAPI<br/>operacional"]
     B --> C["Pipeline de dados<br/>implementado"]
     C --> D["Gate de publicação<br/>implementado"]
-    D --> E["PostgreSQL serving<br/>implementado"]
+    D --> E["Arquivos Gold<br/>serving ativo"]
+    D --> F["PostgreSQL<br/>serving disponível"]
 ~~~
 
 | Componente | Estado |
@@ -178,14 +199,14 @@ flowchart LR
 | Frontend de produção | Operacional |
 | Bronze / Silver / Gold | Implementado |
 | Gate de publicação | Implementado |
-| PostgreSQL serving | Implementado |
+| Serving ativo em produção | Arquivos Gold publicados |
+| PostgreSQL serving | Implementado e opcional |
 | Reconciliação oficial jan-jul/2026 | Implementada |
 | Transporte FTP com fallback HTTPS | Implementado |
 | Tratamento de MOV, FOR e EXC | Implementado |
 | Agregação municipal | Implementada |
 | Série histórica publicada | Jan-jul/2026 |
 | Salário real por IPCA | Implementado |
-| PostgreSQL gerenciado | Provisionado |
 | Competências tech publicadas | 7, de jan/2026 a jul/2026 |
 
 ## Execução local

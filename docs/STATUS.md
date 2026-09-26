@@ -6,7 +6,8 @@
 - API: https://mercado-tech-brasil.onrender.com/api/v1
 - OpenAPI: https://mercado-tech-brasil.onrender.com/docs
 - runtime: Python 3.11
-- PostgreSQL gerenciado: provisionado no Render
+- serving ativo: arquivos Gold publicados
+- PostgreSQL: suporte implementado e disponível por configuração
 
 ## Série publicada
 
@@ -61,10 +62,11 @@ Em todas as competências processadas:
 
 ## Serving e aplicação
 
-- PostgreSQL;
+- arquivos Gold publicados como backend ativo de produção;
+- PostgreSQL opcional para serving;
 - SQLAlchemy;
 - Alembic;
-- carga transacional e idempotente;
+- carga PostgreSQL transacional e idempotente;
 - API FastAPI;
 - OpenAPI;
 - React e TypeScript;

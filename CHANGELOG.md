@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.4
+
+- README ganha dashboard executivo com indicadores reais da série publicada e estado operacional;
+- arquitetura do README passa a refletir o serving ativo por arquivos Gold e o PostgreSQL como backend opcional;
+- documentação de arquitetura atualizada para município, comparação territorial e série histórica já implementados;
+- status de produção alinhado ao render.yaml e ao Dockerfile atuais;
+- teste de versões deixa de exigir atualização manual do número a cada release;
+- novo guardrail verifica coerência entre documentação de produção e DATA_BACKEND=files;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.3
 
 - documentação do frontend atualizada para refletir a experiência publicada;

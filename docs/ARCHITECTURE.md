@@ -7,9 +7,11 @@ flowchart LR
     A["Fontes oficiais"] --> B["Bronze"]
     B --> C["Silver"]
     C --> D["Gold"]
-    D --> E["PostgreSQL"]
+    D --> E["Arquivos publicados"]
+    D --> P["PostgreSQL opcional"]
     D --> F["DuckDB"]
     E --> G["FastAPI"]
+    P --> G
     G --> H["React"]
 ~~~
 
@@ -50,10 +52,11 @@ O escopo atual implementado inclui:
 
 - overview da competência;
 - indicadores por UF;
-- indicadores por família/ocupação CBO;
-- métricas de remuneração de admissão.
-
-Indicadores municipais e séries temporais entram quando as respectivas etapas de dados estiverem validadas.
+- indicadores por família e ocupação CBO;
+- indicadores por município;
+- comparação territorial Brasil, Nordeste e Ceará;
+- série histórica por competência;
+- métricas nominais e reais de remuneração de admissão.
 
 ## PostgreSQL
 
@@ -81,7 +84,9 @@ FastAPI expõe:
 - qualidade;
 - proveniência;
 - indicadores;
-- analytics por UF e ocupação.
+- analytics por UF, município e ocupação;
+- comparação territorial;
+- série histórica.
 
 A API pública é versionada em /api/v1.
 
@@ -98,14 +103,15 @@ A interface distingue:
 
 ## Produção
 
-A aplicação pública usa um único serviço:
+A aplicação pública usa um único serviço Docker no Render:
 
 ~~~text
 Render
-└── FastAPI
-    ├── /api/v1
-    ├── /docs
-    └── / -> frontend/dist
++-- FastAPI
+    +-- /api/v1
+    +-- /docs
+    +-- / -> frontend/dist
+    +-- data/gold -> serving ativo
 ~~~
 
-A imagem Docker multi-stage permanece disponível como alternativa de execução reproduzível.
+A configuração versionada usa DATA_BACKEND=files em produção. O PostgreSQL permanece implementado como backend alternativo e pode ser ativado por configuração quando a operação exigir serving em banco.
