@@ -1,0 +1,120 @@
+name: RAIS 2025 mirror retry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: rais-mirror-retry-2025
+  cancel-in-progress: false
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RAIS_YEAR: "2025"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Reuse validated Centro-Oeste part
+        uses: actions/download-artifact@v4
+        with:
+          name: rais-part-rais-vinc-pub-centro-oeste
+          path: work/parts/rais-vinc-pub-centro-oeste
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: peedrovinicius/mercado-tech-brasil
+          run-id: 36273431223
+
+      - name: Process six pending parts through pinned HTTPS mirror
+        id: process
+        continue-on-error: true
+        run: |
+          PYTHONPATH=. python scripts/rais_process_pending_mirror.py 2025             --work-root work/parts             --skip RAIS_VINC_PUB_CENTRO_OESTE.7z
+
+      - name: Upload collected regional derivatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-parts-mirror-retry
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            work/parts/**/download-manifest-part.json
+            work/parts/**/archives/*.manifest.json
+            work/parts/**/reports/*.json
+            work/parts/**/silver/*.parquet
+            work/parts/**/silver/*.json
+            work/parts/**/part-summary.json
+            work/mirror-retry-summary.json
+
+      - name: Require all seven parts
+        if: steps.process.outcome == 'success'
+        run: |
+          count="$(find work/parts -name part-summary.json -type f | wc -l)"
+          echo "complete_parts=$count"
+          test "$count" -eq 7
+
+      - name: Merge national Silver
+        if: steps.process.outcome == 'success'
+        run: |
+          python -m src.cli rais-merge-parts 2025             --parts-root work/parts
+
+      - name: Reconcile national active stock
+        id: reconcile
+        if: steps.process.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python -m src.cli rais-reconcile 2025
+
+      - name: Build Gold and automatic gate after exact reconciliation
+        if: steps.reconcile.outcome == 'success'
+        run: |
+          python -m src.cli rais-gold 2025
+          python -m src.cli rais-validate-release 2025
+
+      - name: Build final summary
+        if: always()
+        run: |
+          python scripts/rais_full_summary.py 2025
+
+      - name: Upload national result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-full-audit-mirror
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            rais-full-run-summary.json
+            work/mirror-retry-summary.json
+            data/bronze/rais/2025/archives/download-manifest.json
+            data/silver/rais_tech_2025.parquet
+            data/silver/rais_rejected_2025.parquet
+            data/silver/rais_quality_2025.json
+            data/silver/rais_reconciliation_2025.json
+            data/gold/rais-overview-2025.json
+            data/gold/rais-by-uf-2025.json
+            data/gold/rais-by-cbo-family-2025.json
+            data/gold/rais-market-2025.parquet
+            data/gold/rais-publication-gate-2025.json
+
+      - name: Fail if pending processing failed
+        if: steps.process.outcome == 'failure'
+        run: exit 2
