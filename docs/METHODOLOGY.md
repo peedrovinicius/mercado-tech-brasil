@@ -61,6 +61,24 @@ Para julho de 2026:
 
 Testes verificam a aritmética por UF, por região e o fechamento do total nacional.
 
+## Comparação territorial
+
+A comparação Brasil, Nordeste e Ceará utiliza os mesmos agregados por UF liberados para a competência mais recente publicada.
+
+O Nordeste é formado por AL, BA, CE, MA, PB, PE, PI, RN e SE.
+
+As métricas territoriais seguem as mesmas definições de admissões, desligamentos e saldo usadas no restante do produto.
+
+A participação nas admissões tech nacionais é calculada por:
+
+`participacao_nacional = admissoes_territorio / admissoes_brasil`
+
+A participação do Ceará nas admissões tech do Nordeste é calculada por:
+
+`participacao_ceara_nordeste = admissoes_ceara / admissoes_nordeste`
+
+Os percentuais são derivados em tempo de consulta a partir dos agregados publicados, sem manter uma segunda base manual de valores territoriais.
+
 ## Recorte de tecnologia
 
 O recorte CBO é versionado em `config/cbo_tech.yml`.

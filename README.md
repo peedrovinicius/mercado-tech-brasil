@@ -52,6 +52,16 @@ Cada MOV mensal foi reconciliado com a referência nacional publicada pelo MTE. 
 
 Os microdados brutos permanecem fora do Git. O repositório versiona somente os agregados publicados, relatórios de qualidade e manifests necessários para reproduzir a proveniência.
 
+### Comparação territorial, Jul/2026
+
+| Território | Admissões | Desligamentos | Saldo | Participação nas admissões tech nacionais |
+|---|---:|---:|---:|---:|
+| Brasil | 19.253 | 18.347 | +906 | 100,00% |
+| Nordeste | 1.951 | 1.796 | +155 | 10,13% |
+| Ceará | 522 | 415 | +107 | 2,71% |
+
+O Ceará representa **26,76%** das admissões tech do Nordeste em julho de 2026. A comparação é derivada dos agregados publicados por UF da competência mais recente, mantendo a mesma regra de recorte e publicação aplicada aos demais indicadores.
+
 ## Arquitetura
 
 ~~~mermaid

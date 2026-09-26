@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.0
+
+- documentação técnica sincronizada com o estado real da série publicada;
+- removida a indicação antiga de que julho ainda aguardava publicação;
+- roadmap reestruturado para separar base concluída e próximas entregas;
+- metodologia passa a documentar explicitamente a comparação Brasil, Nordeste e Ceará;
+- README ganha snapshot territorial de julho de 2026 com participações derivadas dos agregados publicados;
+- versão do backend alinhada para 0.19.0;
+- cobertura permanece de janeiro a julho de 2026, sem agosto.
+
 ## 0.18.0
 
 - comparação territorial da competência mais recente entre Brasil, Nordeste e Ceará;
