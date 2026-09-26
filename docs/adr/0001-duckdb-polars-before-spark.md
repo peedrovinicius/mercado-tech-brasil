@@ -1,32 +1,29 @@
-# ADR 0001 — Usar DuckDB e Polars antes de Spark
+# ADR 0001: Usar DuckDB e Polars antes de Spark
 
 **Status:** Aceito
 
 ## Contexto
 
-O projeto processa microdados públicos que podem ser grandes, mas ainda não existe evidência de que o volume exija cluster distribuído.
+O projeto processa microdados públicos de grande volume. A arquitetura deve permanecer simples enquanto o processamento local atender ao tempo e à memória definidos para a operação.
 
 ## Decisão
 
-A primeira arquitetura usa:
+A arquitetura usa:
 
 - Parquet para armazenamento colunar;
 - Polars para transformação;
 - DuckDB para consultas analíticas locais;
-- PostgreSQL apenas para servir agregados Gold.
+- PostgreSQL para servir agregados Gold.
 
-## Consequências
+## Efeitos
 
-### Positivas
 - menos infraestrutura;
 - desenvolvimento local simples;
 - menor custo;
 - pipeline reproduzível;
-- mais fácil de explicar e testar.
+- testes rápidos;
+- adoção de processamento distribuído condicionada a benchmark reproduzível.
 
-### Negativas
-- se o volume ou tempo de processamento ultrapassar os limites aceitáveis, será necessário reavaliar.
+## Critério de evolução
 
-## Critério para rever
-
-Spark só entra quando benchmark reproduzível demonstrar necessidade de processamento distribuído.
+Spark entra quando benchmark demonstrar ganho necessário de processamento distribuído para o volume operacional.
