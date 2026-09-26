@@ -20,14 +20,23 @@ def _key(filename: str) -> str:
     ).strip("-")
 
 
-def _mirror_url(config: dict, filename: str) -> str:
+def _mirror_urls(config: dict, filename: str) -> list[str]:
     dataset = str(config["mirror_dataset"])
-    commit = str(config["mirror_commit"])
     prefix = str(config["mirror_path_prefix"]).strip("/")
-    return (
-        f"https://huggingface.co/datasets/{dataset}/resolve/{commit}/"
-        f"{prefix}/{filename}?download=true"
-    )
+    refs = [
+        str(config["mirror_commit"]),
+        str(config.get("mirror_fallback_ref") or "main"),
+    ]
+
+    urls: list[str] = []
+    for ref in refs:
+        url = (
+            f"https://huggingface.co/datasets/{dataset}/resolve/{ref}/"
+            f"{prefix}/{filename}?download=true"
+        )
+        if url not in urls:
+            urls.append(url)
+    return urls
 
 
 def _download(url: str, destination: Path, expected_size: int) -> None:
@@ -39,10 +48,9 @@ def _download(url: str, destination: Path, expected_size: int) -> None:
         "--fail",
         "--show-error",
         "--retry",
-        "5",
+        "8",
         "--retry-delay",
         "2",
-        "--retry-all-errors",
         "--connect-timeout",
         "20",
         "--speed-limit",
@@ -63,6 +71,44 @@ def _download(url: str, destination: Path, expected_size: int) -> None:
             f"Tamanho do espelho diverge do FTP oficial para "
             f"{destination.name}: {actual_size}/{expected_size}"
         )
+
+
+def _download_candidates(
+    urls: list[str],
+    destination: Path,
+    expected_size: int,
+) -> str:
+    errors: list[str] = []
+
+    for index, url in enumerate(urls):
+        if index:
+            destination.unlink(missing_ok=True)
+        try:
+            _download(url, destination, expected_size)
+        except (subprocess.CalledProcessError, RuntimeError) as exc:
+            errors.append(f"{url}: {exc}")
+            continue
+        return url
+
+    raise RuntimeError(
+        "Nenhuma revisão do espelho forneceu o arquivo esperado. "
+        + " | ".join(errors)
+    )
+
+
+def _completed_archives(work_root: Path) -> set[str]:
+    completed: set[str] = set()
+
+    for summary_path in work_root.rglob("part-summary.json"):
+        try:
+            payload = json.loads(summary_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        archive = str(payload.get("archive") or "")
+        if archive:
+            completed.add(archive)
+
+    return completed
 
 
 def _cleanup_raw(part_dir: Path) -> None:
@@ -100,6 +146,8 @@ def main() -> None:
         raise RuntimeError("Descoberta oficial versionada não possui sete arquivos.")
 
     skip = {str(value) for value in args.skip}
+    skip.update(_completed_archives(args.work_root))
+
     pending = [
         item
         for item in files
@@ -114,13 +162,17 @@ def main() -> None:
         filename = str(item["filename"])
         expected_size = int(item["size_bytes"])
         key = _key(filename)
-        url = _mirror_url(config, filename)
+        urls = _mirror_urls(config, filename)
         local_archive = download_dir / filename
 
         print(
             f"mirror download: arquivo={filename} bytes={expected_size}"
         )
-        _download(url, local_archive, expected_size)
+        url = _download_candidates(
+            urls,
+            local_archive,
+            expected_size,
+        )
 
         summary_path = process_part(
             year=args.year,

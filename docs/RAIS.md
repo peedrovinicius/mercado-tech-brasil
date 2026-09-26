@@ -411,3 +411,12 @@ A futura métrica de estoque tech será apresentada como:
 `estoque anual de vínculos tech ativos em 31/12`
 
 Ela não será chamada de admissão, saldo ou movimentação e não será usada para preencher meses ausentes do Novo CAGED.
+
+
+### Política de revisão do espelho HTTPS
+
+O fallback HTTPS tenta primeiro a revisão pinada registrada em `config/rais_transport_mirror.json`. Se um arquivo não existir nessa revisão, o pipeline pode tentar a referência `main` do mesmo dataset.
+
+A troca de revisão não reutiliza bytes parciais. O arquivo baixado precisa continuar com tamanho exatamente igual ao tamanho descoberto no FTP oficial. A URL efetivamente usada fica registrada no manifesto de proveniência.
+
+Retries posteriores detectam `part-summary.json` já existentes e pulam automaticamente partes regionais concluídas.

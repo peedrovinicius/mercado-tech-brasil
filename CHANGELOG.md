@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.34.2
+
+- retry HTTPS da RAIS passa a tentar primeiro a revisão pinada e depois a referência main quando o arquivo não existe no snapshot;
+- troca de revisão apaga qualquer download parcial antes de iniciar a nova tentativa;
+- tamanho oficial descoberto no FTP continua obrigatório em todas as revisões do espelho;
+- retry detecta automaticamente partes regionais já processadas e não repete trabalho concluído;
+- Norte e NI foram processados com sucesso pelo transporte HTTPS, preservando Centro-Oeste já validado;
+- Nordeste revelou ausência no snapshot pinado, motivando o fallback de revisão;
+- nenhuma publicação anual é liberada por esta mudança;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.34.1
 
 - transporte RAIS passa a distinguir explicitamente fonte oficial e URL efetiva de download;

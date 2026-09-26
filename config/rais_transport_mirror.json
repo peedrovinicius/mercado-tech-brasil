@@ -9,13 +9,34 @@
   "official_discovery": {
     "year": 2025,
     "files": [
-      {"filename": "RAIS_VINC_PUB_CENTRO_OESTE.7z", "size_bytes": 354015896},
-      {"filename": "RAIS_VINC_PUB_MG_ES_RJ.7z", "size_bytes": 766814132},
-      {"filename": "RAIS_VINC_PUB_NI.7z", "size_bytes": 209311},
-      {"filename": "RAIS_VINC_PUB_NORDESTE.7z", "size_bytes": 639823548},
-      {"filename": "RAIS_VINC_PUB_NORTE.7z", "size_bytes": 211992734},
-      {"filename": "RAIS_VINC_PUB_SP.7z", "size_bytes": 1107305918},
-      {"filename": "RAIS_VINC_PUB_SUL.7z", "size_bytes": 704888712}
+      {
+        "filename": "RAIS_VINC_PUB_CENTRO_OESTE.7z",
+        "size_bytes": 354015896
+      },
+      {
+        "filename": "RAIS_VINC_PUB_MG_ES_RJ.7z",
+        "size_bytes": 766814132
+      },
+      {
+        "filename": "RAIS_VINC_PUB_NI.7z",
+        "size_bytes": 209311
+      },
+      {
+        "filename": "RAIS_VINC_PUB_NORDESTE.7z",
+        "size_bytes": 639823548
+      },
+      {
+        "filename": "RAIS_VINC_PUB_NORTE.7z",
+        "size_bytes": 211992734
+      },
+      {
+        "filename": "RAIS_VINC_PUB_SP.7z",
+        "size_bytes": 1107305918
+      },
+      {
+        "filename": "RAIS_VINC_PUB_SUL.7z",
+        "size_bytes": 704888712
+      }
     ]
   },
   "verification": {
@@ -31,6 +52,9 @@
     "O espelho é somente transporte alternativo. A fonte metodológica continua sendo o MTE.",
     "O tamanho do arquivo baixado precisa coincidir exatamente com o tamanho descoberto no FTP oficial.",
     "O SHA-256 do arquivo baixado é registrado no manifesto.",
-    "A release anual só pode avançar se a reconciliação nacional fechar exatamente com a referência oficial."
-  ]
+    "A release anual só pode avançar se a reconciliação nacional fechar exatamente com a referência oficial.",
+    "O commit pinado é tentado primeiro. Se o arquivo não existir nessa revisão, o transporte pode usar main, sempre com validação exata do tamanho oficial.",
+    "Partes regionais já validadas são detectadas automaticamente e não são reprocessadas em retries posteriores."
+  ],
+  "mirror_fallback_ref": "main"
 }
