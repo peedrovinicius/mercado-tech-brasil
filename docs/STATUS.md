@@ -20,7 +20,12 @@
 - Gold agregado;
 - overview JSON consumível pela API;
 - referência oficial de julho/2026;
-- testes de schema e integridade da referência.
+- testes de schema e integridade da referência;
+- gate de publicação vinculado ao SHA-256;
+- camada PostgreSQL de serving;
+- carga Gold → PostgreSQL transacional e idempotente;
+- Alembic configurado;
+- API com backend selecionável entre arquivos e PostgreSQL.
 
 ## Próximos gates
 
@@ -31,5 +36,6 @@
 5. implementar semântica testada de FOR/EXC;
 6. reconciliar totais nacionais ajustados;
 7. validar o build completo do frontend com as dependências instaladas;
-8. conectar o dashboard aos primeiros dados oficiais validados;
-9. preparar deploy público após a reconciliação metodológica.
+8. carregar a primeira competência oficial aprovada no PostgreSQL;
+9. conectar o dashboard aos primeiros dados oficiais validados;
+10. preparar deploy público após a reconciliação metodológica.
