@@ -1,0 +1,91 @@
+name: RAIS 2025 NI refresh
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/rais-ni-refresh.run"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rais-ni-refresh-2025
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Process NI with current residual mapping
+        run: |
+          PYTHONPATH=. python scripts/rais_process_pending_mirror.py 2025 \
+            --work-root work/parts \
+            --skip RAIS_VINC_PUB_CENTRO_OESTE.7z \
+            --skip RAIS_VINC_PUB_MG_ES_RJ.7z \
+            --skip RAIS_VINC_PUB_NORDESTE.7z \
+            --skip RAIS_VINC_PUB_NORTE.7z \
+            --skip RAIS_VINC_PUB_SP.7z \
+            --skip RAIS_VINC_PUB_SUL.7z
+
+      - name: Validate corrected NI quality
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          quality_path = (
+              Path("work/parts/rais-vinc-pub-ni/silver")
+              / "rais_quality_2025.json"
+          )
+          summary_path = (
+              Path("work/parts/rais-vinc-pub-ni")
+              / "part-summary.json"
+          )
+          quality = json.loads(quality_path.read_text(encoding="utf-8"))
+          summary = json.loads(summary_path.read_text(encoding="utf-8"))
+
+          assert summary["archive"] == "RAIS_VINC_PUB_NI.7z"
+          assert quality["rows_read"] == 6208
+          assert quality["rows_rejected"] == 0
+          assert quality["rows_residual_municipality"] == 6208
+          assert quality["source_partition_complete"] is True
+
+          print(json.dumps({
+              "rows_read": quality["rows_read"],
+              "rows_rejected": quality["rows_rejected"],
+              "rows_residual_municipality": quality["rows_residual_municipality"],
+              "rows_active_source": quality["rows_active_source"],
+              "rows_inactive_source": quality["rows_inactive_source"],
+          }, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload corrected NI part
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-ni-corrected
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            work/parts/rais-vinc-pub-ni/download-manifest-part.json
+            work/parts/rais-vinc-pub-ni/archives/*.manifest.json
+            work/parts/rais-vinc-pub-ni/reports/*.json
+            work/parts/rais-vinc-pub-ni/silver/*.parquet
+            work/parts/rais-vinc-pub-ni/silver/*.json
+            work/parts/rais-vinc-pub-ni/part-summary.json
