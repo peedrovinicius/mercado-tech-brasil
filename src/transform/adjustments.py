@@ -66,9 +66,9 @@ def _effective_competence_expr(frame, kind: str, ingest_competence: str):
     import polars as pl
 
     candidates = (
-        ["competencia_declarada", "competencia_mov"]
+        ["competencia_mov", "competencia_declarada"]
         if kind == "FOR"
-        else ["competencia_exclusao", "competencia_declarada", "competencia_mov"]
+        else ["competencia_mov", "competencia_declarada", "competencia_exclusao"]
     )
     existing = [name for name in candidates if name in frame.columns]
 
