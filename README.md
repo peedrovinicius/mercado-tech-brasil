@@ -27,6 +27,10 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
 
 ## Dashboard executivo
 
+<p align="center">
+  <img src="assets/readme-dashboard.svg" alt="Dashboard executivo do Mercado Tech Brasil com série publicada de janeiro a julho de 2026" width="100%" />
+</p>
+
 <table>
 <tr>
 <td align="center"><strong>134.209</strong><br/><sub>Admissões tech</sub></td>

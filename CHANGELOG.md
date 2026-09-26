@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.19.5
+
+- README ganha dashboard visual em SVG com dados reais da série publicada;
+- painel visual resume acumulado, competência mais recente e comparação territorial;
+- o SVG é versionado no repositório e não depende de screenshot;
+- tabela textual do dashboard permanece como fallback acessível e verificável;
+- testes editoriais passam a incluir arquivos SVG;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.4
 
 - README ganha dashboard executivo com indicadores reais da série publicada e estado operacional;

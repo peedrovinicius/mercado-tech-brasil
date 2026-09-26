@@ -14,6 +14,7 @@ TEXT_SUFFIXES = {
     ".tsx",
     ".yaml",
     ".yml",
+    ".svg",
 }
 
 LONG_DASH_CODEPOINTS = (0x2013, 0x2014)
@@ -89,3 +90,18 @@ def test_production_docs_match_render_serving_backend():
     assert "DATA_BACKEND=files" in deploy
     assert "DATA_BACKEND=files" in architecture
     assert "| PostgreSQL gerenciado | Provisionado |" not in readme
+
+
+def test_readme_dashboard_asset_is_versioned():
+    readme = Path("README.md").read_text(encoding="utf-8")
+    dashboard = Path("assets/readme-dashboard.svg")
+
+    assert dashboard.exists()
+    assert 'src="assets/readme-dashboard.svg"' in readme
+
+    svg = dashboard.read_text(encoding="utf-8")
+    assert "134.209" in svg
+    assert "127.865" in svg
+    assert "+6.344" in svg
+    assert "10,13%" in svg
+    assert "26,76%" in svg

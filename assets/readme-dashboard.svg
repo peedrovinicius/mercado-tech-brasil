@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Dashboard executivo do Mercado Tech Brasil</title>
+  <desc id="desc">Resumo visual da série publicada de janeiro a julho de 2026, com indicadores acumulados, evolução mensal e comparação territorial.</desc>
+  <rect width="1200" height="760" rx="28" fill="#f7f7f9"/>
+  <rect x="24" y="24" width="1152" height="712" rx="24" fill="#ffffff" stroke="#dedee4"/>
+
+  <text x="60" y="78" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#6f6f77" letter-spacing="1.8">MERCADO TECH BRASIL</text>
+  <text x="60" y="120" font-family="Inter,Arial,sans-serif" font-size="34" font-weight="800" fill="#171719">Dashboard executivo</text>
+  <text x="60" y="150" font-family="Inter,Arial,sans-serif" font-size="15" fill="#707078">Série publicada: Jan/2026 a Jul/2026</text>
+  <rect x="930" y="70" width="186" height="34" rx="17" fill="#edf1ff" stroke="#d5deff"/>
+  <circle cx="953" cy="87" r="5" fill="#2f63ff"/>
+  <text x="968" y="92" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700" fill="#2459ff">Dados publicados</text>
+
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="60" y="190" width="250" height="108" rx="16" fill="#171719"/>
+    <text x="82" y="220" font-size="12" font-weight="700" fill="#a9a9b1" letter-spacing="1">ADMISSÕES TECH</text>
+    <text x="82" y="264" font-size="34" font-weight="800" fill="#ffffff">134.209</text>
+    <text x="82" y="284" font-size="11" fill="#a9a9b1">acumulado jan-jul</text>
+
+    <rect x="330" y="190" width="250" height="108" rx="16" fill="#f5f5f7" stroke="#e0e0e5"/>
+    <text x="352" y="220" font-size="12" font-weight="700" fill="#7a7a82" letter-spacing="1">DESLIGAMENTOS</text>
+    <text x="352" y="264" font-size="34" font-weight="800" fill="#171719">127.865</text>
+    <text x="352" y="284" font-size="11" fill="#888890">acumulado jan-jul</text>
+
+    <rect x="600" y="190" width="250" height="108" rx="16" fill="#f5f5f7" stroke="#e0e0e5"/>
+    <text x="622" y="220" font-size="12" font-weight="700" fill="#7a7a82" letter-spacing="1">SALDO ACUMULADO</text>
+    <text x="622" y="264" font-size="34" font-weight="800" fill="#17643b">+6.344</text>
+    <text x="622" y="284" font-size="11" fill="#888890">7 competências</text>
+
+    <rect x="870" y="190" width="246" height="108" rx="16" fill="#edf1ff" stroke="#d7e0ff"/>
+    <text x="892" y="220" font-size="12" font-weight="700" fill="#5e6f9b" letter-spacing="1">JUL/2026</text>
+    <text x="892" y="264" font-size="34" font-weight="800" fill="#2459ff">+906</text>
+    <text x="892" y="284" font-size="11" fill="#68769b">saldo da competência</text>
+  </g>
+
+  <text x="60" y="346" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700" fill="#6f6f77" letter-spacing="1">EVOLUÇÃO MENSAL</text>
+  <text x="60" y="372" font-family="Inter,Arial,sans-serif" font-size="23" font-weight="800" fill="#171719">Admissões e desligamentos tech</text>
+
+  <line x1="90" y1="420" x2="790" y2="420" stroke="#eeeeF2"/>
+  <line x1="90" y1="465" x2="790" y2="465" stroke="#eeeeF2"/>
+  <line x1="90" y1="510" x2="790" y2="510" stroke="#eeeeF2"/>
+  <line x1="90" y1="555" x2="790" y2="555" stroke="#eeeeF2"/>
+
+  <polyline points="90,465.4 206.7,552.6 323.3,420 440,467.1 556.7,551.3 673.3,500.9 790,487.4" fill="none" stroke="#171719" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="90,557.8 206.7,578.8 323.3,472.1 440,497 556.7,577.2 673.3,590 790,540" fill="none" stroke="#2459ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g fill="#171719">
+    <circle cx="90" cy="465.4" r="4"/><circle cx="206.7" cy="552.6" r="4"/><circle cx="323.3" cy="420" r="4"/><circle cx="440" cy="467.1" r="4"/><circle cx="556.7" cy="551.3" r="4"/><circle cx="673.3" cy="500.9" r="4"/><circle cx="790" cy="487.4" r="4"/>
+  </g>
+  <g fill="#2459ff">
+    <circle cx="90" cy="557.8" r="4"/><circle cx="206.7" cy="578.8" r="4"/><circle cx="323.3" cy="472.1" r="4"/><circle cx="440" cy="497" r="4"/><circle cx="556.7" cy="577.2" r="4"/><circle cx="673.3" cy="590" r="4"/><circle cx="790" cy="540" r="4"/>
+  </g>
+
+  <g font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">
+    <text x="90" y="618">Jan</text><text x="206.7" y="618">Fev</text><text x="323.3" y="618">Mar</text><text x="440" y="618">Abr</text><text x="556.7" y="618">Mai</text><text x="673.3" y="618">Jun</text><text x="790" y="618">Jul</text>
+  </g>
+  <circle cx="90" cy="647" r="5" fill="#171719"/>
+  <text x="104" y="652" font-family="Inter,Arial,sans-serif" font-size="12" fill="#55555c">Admissões</text>
+  <circle cx="187" cy="647" r="5" fill="#2459ff"/>
+  <text x="201" y="652" font-family="Inter,Arial,sans-serif" font-size="12" fill="#55555c">Desligamentos</text>
+
+  <rect x="840" y="350" width="276" height="318" rx="18" fill="#f7f7f9" stroke="#e1e1e5"/>
+  <text x="866" y="386" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#77777f" letter-spacing="1">RECORTE TERRITORIAL</text>
+  <text x="866" y="418" font-family="Inter,Arial,sans-serif" font-size="21" font-weight="800" fill="#171719">Jul/2026</text>
+
+  <text x="866" y="468" font-family="Inter,Arial,sans-serif" font-size="13" fill="#55555c">Nordeste / Brasil</text>
+  <text x="1082" y="468" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="800" fill="#171719">10,13%</text>
+  <rect x="866" y="482" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
+  <rect x="866" y="482" width="21.9" height="9" rx="4.5" fill="#171719"/>
+
+  <text x="866" y="534" font-family="Inter,Arial,sans-serif" font-size="13" fill="#55555c">Ceará / Brasil</text>
+  <text x="1082" y="534" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="800" fill="#2459ff">2,71%</text>
+  <rect x="866" y="548" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
+  <rect x="866" y="548" width="5.9" height="9" rx="4.5" fill="#2459ff"/>
+
+  <text x="866" y="600" font-family="Inter,Arial,sans-serif" font-size="13" fill="#55555c">Ceará / Nordeste</text>
+  <text x="1082" y="600" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="800" fill="#17643b">26,76%</text>
+  <rect x="866" y="614" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
+  <rect x="866" y="614" width="57.8" height="9" rx="4.5" fill="#17643b"/>
+
+  <text x="60" y="704" font-family="Inter,Arial,sans-serif" font-size="11" fill="#85858d">Fonte: Novo CAGED / MTE. Recorte ocupacional CBO v2. Valores publicados no repositório.</text>
+</svg>
