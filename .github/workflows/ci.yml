@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
   workflow_dispatch:
 
 concurrency:
@@ -35,5 +38,4 @@ jobs:
       - name: Tests
         run: pytest -q
 
-# Intencionalmente não processa microdados.
-# O CI valida somente código/testes para manter baixo o consumo de minutos.
+# Microdados não são processados no CI.
