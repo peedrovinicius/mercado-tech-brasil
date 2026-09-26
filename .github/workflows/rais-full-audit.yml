@@ -8,9 +8,12 @@ on:
         required: true
         default: "2025"
         type: string
+  push:
+    paths:
+      - ".github/rais-full-2025.run"
 
 concurrency:
-  group: rais-full-audit-${{ inputs.year }}
+  group: rais-full-audit-${{ github.event.inputs.year || '2025' }}
   cancel-in-progress: false
 
 jobs:
@@ -28,7 +31,7 @@ jobs:
       - name: Discover official RAIS archives
         id: discover
         run: |
-          python scripts/rais_discover_full.py "${{ inputs.year }}"
+          python scripts/rais_discover_full.py "${{ github.event.inputs.year || '2025' }}"
 
       - name: Upload discovery
         uses: actions/upload-artifact@v4
@@ -46,7 +49,7 @@ jobs:
       max-parallel: 2
       matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
     env:
-      RAIS_YEAR: ${{ inputs.year }}
+      RAIS_YEAR: ${{ github.event.inputs.year || '2025' }}
       RAIS_FILENAME: ${{ matrix.filename }}
       RAIS_KEY: ${{ matrix.key }}
       RAIS_REMOTE_SIZE: ${{ matrix.size }}
@@ -100,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
-      RAIS_YEAR: ${{ inputs.year }}
+      RAIS_YEAR: ${{ github.event.inputs.year || '2025' }}
 
     steps:
       - name: Checkout
@@ -159,15 +162,15 @@ jobs:
           if-no-files-found: warn
           path: |
             rais-full-run-summary.json
-            data/bronze/rais/${{ inputs.year }}/archives/download-manifest.json
-            data/silver/rais_tech_${{ inputs.year }}.parquet
-            data/silver/rais_rejected_${{ inputs.year }}.parquet
-            data/silver/rais_quality_${{ inputs.year }}.json
-            data/silver/rais_reconciliation_${{ inputs.year }}.json
-            data/gold/rais-overview-${{ inputs.year }}.json
-            data/gold/rais-by-uf-${{ inputs.year }}.json
-            data/gold/rais-by-cbo-family-${{ inputs.year }}.json
-            data/gold/rais-market-${{ inputs.year }}.parquet
-            data/gold/rais-publication-gate-${{ inputs.year }}.json
+            data/bronze/rais/${{ github.event.inputs.year || '2025' }}/archives/download-manifest.json
+            data/silver/rais_tech_${{ github.event.inputs.year || '2025' }}.parquet
+            data/silver/rais_rejected_${{ github.event.inputs.year || '2025' }}.parquet
+            data/silver/rais_quality_${{ github.event.inputs.year || '2025' }}.json
+            data/silver/rais_reconciliation_${{ github.event.inputs.year || '2025' }}.json
+            data/gold/rais-overview-${{ github.event.inputs.year || '2025' }}.json
+            data/gold/rais-by-uf-${{ github.event.inputs.year || '2025' }}.json
+            data/gold/rais-by-cbo-family-${{ github.event.inputs.year || '2025' }}.json
+            data/gold/rais-market-${{ github.event.inputs.year || '2025' }}.parquet
+            data/gold/rais-publication-gate-${{ github.event.inputs.year || '2025' }}.json
             work/parts/**/part-summary.json
             work/parts/**/reports/*.json
