@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from src.methodology.salary import add_salary_eligibility, methodology_for_competence
+
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
     path.write_text(
@@ -21,13 +23,22 @@ def build_gold(
         import polars as pl
     except ImportError as exc:
         raise RuntimeError(
-            "Polars não está instalado. Execute `pip install -e .`."
+            "Polars não está instalado. Execute pip install -e ."
         ) from exc
 
     data = pl.read_parquet(silver_path)
+    data = add_salary_eligibility(data, yearmonth=yearmonth)
+    salary_methodology = methodology_for_competence(yearmonth)
 
     admissions = data.filter(pl.col("saldo_movimentacao") == 1)
     dismissals = data.filter(pl.col("saldo_movimentacao") == -1)
+    salary_admissions = data.filter(pl.col("salario_admissao_elegivel"))
+
+    salary_expr = (
+        pl.when(pl.col("salario_admissao_elegivel"))
+        .then(pl.col("salario_mensal"))
+        .otherwise(None)
+    )
 
     summary = (
         data.group_by(["uf", "cbo_familia", "cbo_codigo"])
@@ -35,16 +46,11 @@ def build_gold(
             (pl.col("saldo_movimentacao") == 1).sum().alias("admissoes"),
             (pl.col("saldo_movimentacao") == -1).sum().alias("desligamentos"),
             pl.col("saldo_movimentacao").sum().alias("saldo"),
-            pl.when(pl.col("saldo_movimentacao") == 1)
-            .then(pl.col("salario_mensal"))
-            .otherwise(None)
-            .mean()
-            .alias("salario_medio_admissao"),
-            pl.when(pl.col("saldo_movimentacao") == 1)
-            .then(pl.col("salario_mensal"))
-            .otherwise(None)
-            .median()
-            .alias("salario_mediano_admissao"),
+            salary_expr.mean().alias("salario_medio_admissao"),
+            salary_expr.median().alias("salario_mediano_admissao"),
+            pl.col("salario_admissao_elegivel")
+            .sum()
+            .alias("admissoes_salario_elegivel"),
         )
         .with_columns(pl.lit(yearmonth).alias("competencia"))
         .sort(["uf", "cbo_familia", "cbo_codigo"])
@@ -63,15 +69,24 @@ def build_gold(
         "dismissals": dismissals.height,
         "balance": int(data["saldo_movimentacao"].sum()) if data.height else 0,
         "salary_mean_admissions": (
-            float(admissions["salario_mensal"].mean())
-            if admissions.height and admissions["salario_mensal"].drop_nulls().len()
+            float(salary_admissions["salario_mensal"].mean())
+            if salary_admissions.height
             else None
         ),
         "salary_median_admissions": (
-            float(admissions["salario_mensal"].median())
-            if admissions.height and admissions["salario_mensal"].drop_nulls().len()
+            float(salary_admissions["salario_mensal"].median())
+            if salary_admissions.height
             else None
         ),
+        "salary_eligible_admissions": salary_admissions.height,
+        "salary_excluded_admissions": admissions.height - salary_admissions.height,
+        "salary_methodology": {
+            "minimum_wage_brl": salary_methodology.minimum_wage_brl,
+            "minimum_salary_brl": salary_methodology.minimum_salary_brl,
+            "maximum_salary_brl": salary_methodology.maximum_salary_brl,
+            "exclude_intermittent": True,
+            "source": "MTE — Sumário Executivo Novo Caged",
+        },
         "records_tech": data.height,
         "source": "Novo CAGED / MTE",
         "status": "generated_from_official_microdata",
@@ -84,11 +99,7 @@ def build_gold(
             (pl.col("saldo_movimentacao") == 1).sum().alias("admissions"),
             (pl.col("saldo_movimentacao") == -1).sum().alias("dismissals"),
             pl.col("saldo_movimentacao").sum().alias("balance"),
-            pl.when(pl.col("saldo_movimentacao") == 1)
-            .then(pl.col("salario_mensal"))
-            .otherwise(None)
-            .median()
-            .alias("salary_median_admissions"),
+            salary_expr.median().alias("salary_median_admissions"),
         )
         .sort("admissions", descending=True)
     )
@@ -107,11 +118,7 @@ def build_gold(
             (pl.col("saldo_movimentacao") == 1).sum().alias("admissions"),
             (pl.col("saldo_movimentacao") == -1).sum().alias("dismissals"),
             pl.col("saldo_movimentacao").sum().alias("balance"),
-            pl.when(pl.col("saldo_movimentacao") == 1)
-            .then(pl.col("salario_mensal"))
-            .otherwise(None)
-            .median()
-            .alias("salary_median_admissions"),
+            salary_expr.median().alias("salary_median_admissions"),
         )
         .sort("admissions", descending=True)
     )

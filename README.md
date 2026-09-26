@@ -166,7 +166,7 @@ mercado-tech-brasil/
 
 ## Status
 
-**v0.8 — camada PostgreSQL de serving**
+**v0.9 — reconciliação oficial e metodologia salarial**
 
 - [x] arquitetura Bronze / Silver / Gold;
 - [x] contrato de dados e recorte CBO versionado;
@@ -178,6 +178,8 @@ mercado-tech-brasil/
 - [x] frontend React + TypeScript integrado à API;
 - [x] Docker Compose para PostgreSQL + API + frontend;
 - [x] testes automatizados;
+- [x] referência oficial de julho/2026 por Brasil, região e UF;
+- [x] metodologia salarial do MTE reproduzida e testada;
 - [ ] processar a primeira competência oficial real;
 - [ ] revisar rejeições e reconciliar metodologia MOV/FOR/EXC;
 - [x] carga transacional e idempotente Gold → PostgreSQL implementada;
@@ -341,3 +343,12 @@ DATA_BACKEND=postgres uvicorn src.api.main:app --reload
 ```
 
 O schema de serving atual acompanha o Gold realmente produzido: release por competência, indicadores por UF e indicadores por CBO. O modelo municipal só será adicionado quando o pipeline Gold municipal existir.
+
+
+### Reconciliação oficial
+
+A v0.9 versiona os números publicados no Sumário Executivo do MTE para julho/2026 em `config/official_reference_202607.json`.
+
+Os testes verificam automaticamente que cada UF fecha aritmeticamente, que cada região é a soma das respectivas UFs e que o Brasil fecha exatamente quando se somam as 27 UFs e os registros não identificados.
+
+A metodologia salarial também segue a regra publicada pelo MTE: em 2026, entram apenas admissões não intermitentes com salário entre R$ 486,30 e R$ 243.150,00. As métricas de tecnologia usam esse mesmo filtro, sem confundir o recorte tech com o total do mercado formal.
