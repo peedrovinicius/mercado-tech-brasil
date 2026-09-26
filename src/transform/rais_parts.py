@@ -116,12 +116,19 @@ def _merge_download_manifests(
         entries.append(entry)
 
     entries.sort(key=lambda item: str(item.get("path") or "").upper())
+    transports = sorted(
+        {
+            str(item.get("transport") or "unknown")
+            for item in entries
+        }
+    )
     payload: dict[str, object] = {
         "source": "RAIS / Ministério do Trabalho e Emprego",
         "year": year,
         "dataset": "vinculos",
         "concept": "estoque anual de vínculos formais em 31/12",
-        "transport": "ftp_mte",
+        "transport": transports[0] if len(transports) == 1 else "mixed",
+        "transports": transports,
         "files": entries,
     }
     destination.parent.mkdir(parents=True, exist_ok=True)

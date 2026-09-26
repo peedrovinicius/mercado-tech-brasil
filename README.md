@@ -193,6 +193,7 @@ O pipeline mantém:
 - gate mensal vinculado ao hash do arquivo de origem;
 - gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
 - downloader RAIS retomável após queda de conexão FTP;
+- fallback HTTPS de transporte auditável quando o FTP estiver instável;
 - contrato RAIS 2025 alinhado ao layout real observado;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;

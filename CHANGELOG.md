@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.34.1
+
+- transporte RAIS passa a distinguir explicitamente fonte oficial e URL efetiva de download;
+- timeout de conexão FTP é reduzido para evitar longas esperas em tentativas sem conexão;
+- fallback HTTPS pinado é documentado para casos de instabilidade ou lentidão do FTP;
+- arquivo Centro-Oeste foi validado como byte a byte idêntico entre FTP oficial e espelho pelo SHA-256;
+- tamanho oficial descoberto no FTP continua obrigatório para qualquer arquivo obtido pelo fallback;
+- processador regional aceita arquivo local já baixado e preserva o transporte no manifesto;
+- merge nacional passa a registrar transporte misto quando necessário;
+- script de retry processa somente partes pendentes em ordem crescente de tamanho;
+- fonte metodológica continua sendo exclusivamente o MTE e a reconciliação nacional continua obrigatória;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.34.0
 
 - processamento integral RAIS passa a suportar partes regionais independentes;

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ from src.ingestion.rais import (
     select_remote_files,
     select_smallest_remote_file,
     validate_year,
+    write_download_manifest,
 )
 
 
@@ -206,3 +208,31 @@ def test_download_file_resumes_after_connection_reset(
 
     assert path.read_bytes() == b"abcdef"
     assert rests == [None, 3]
+
+
+
+def test_write_manifest_records_mirror_transport_separately(tmp_path: Path):
+    archive = tmp_path / "RAIS_VINC_PUB_NORTE.7z"
+    archive.write_bytes(b"official-byte-identical-mirror")
+    destination = tmp_path / "download-manifest.json"
+    mirror_url = (
+        "https://huggingface.co/datasets/example/resolve/pinned/"
+        "RAIS/2025/RAIS_VINC_PUB_NORTE.7z"
+    )
+
+    write_download_manifest(
+        2025,
+        [archive],
+        destination,
+        dataset="vinculos",
+        transport="https_huggingface_mirror",
+        transport_url=mirror_url,
+    )
+
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    entry = payload["files"][0]
+
+    assert payload["transport"] == "https_huggingface_mirror"
+    assert entry["transport"] == "https_huggingface_mirror"
+    assert entry["transport_url"] == mirror_url
+    assert entry["source_url"].startswith("ftp://ftp.mtps.gov.br/")

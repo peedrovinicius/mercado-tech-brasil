@@ -40,8 +40,27 @@ Cada arquivo baixado recebe:
 - ano-base;
 - URL oficial;
 - transporte;
+- URL efetiva de transporte, quando diferente da fonte;
 - timestamp de ingestão;
 - dataset RAIS correspondente.
+
+### Fallback de transporte
+
+O FTP do MTE continua sendo a fonte de verdade e também é usado para descobrir nomes e tamanhos oficiais. Em caso de instabilidade ou lentidão do FTP, o pipeline pode usar um espelho HTTPS pinado apenas como transporte.
+
+A configuração auditável fica em:
+
+```text
+config/rais_transport_mirror.json
+```
+
+O arquivo Centro-Oeste foi baixado diretamente do FTP oficial e comparado com o espelho. Ambos produziram exatamente o mesmo SHA-256:
+
+```text
+0e4459ee90c0219d9b40b9d6129e494034b8d6cd4dbe86eeb1f49e54f964d724
+```
+
+O fallback HTTPS só é aceito quando o tamanho baixado coincide exatamente com o tamanho descoberto no FTP oficial. O SHA-256 do arquivo usado é registrado e a release inteira continua obrigada a reconciliar exatamente com o estoque nacional oficial antes de qualquer Gold ou publicação.
 
 ## Descoberta
 

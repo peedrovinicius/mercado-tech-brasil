@@ -26,6 +26,9 @@ def process_part(
     key: str,
     remote_size: int,
     work_root: Path,
+    local_archive: Path | None = None,
+    transport: str = "ftp_mte",
+    transport_url: str | None = None,
 ) -> Path:
     if year != 2025:
         raise ValueError("Este executor integral está travado na RAIS 2025.")
@@ -44,11 +47,21 @@ def process_part(
         dataset="vinculos",
         filename=filename,
     )
-    archive = download_file(
-        remote,
-        archives,
-        max_attempts=5,
-    )
+    if local_archive is not None:
+        if not local_archive.exists():
+            raise FileNotFoundError(local_archive)
+        archives.mkdir(parents=True, exist_ok=True)
+        archive = archives / filename
+        if archive.exists():
+            archive.unlink()
+        shutil.move(str(local_archive), archive)
+    else:
+        archive = download_file(
+            remote,
+            archives,
+            max_attempts=5,
+        )
+
     if archive.stat().st_size != remote_size:
         raise RuntimeError(
             "Tamanho local diverge do remoto: "
@@ -61,6 +74,8 @@ def process_part(
         [archive],
         part_manifest,
         dataset="vinculos",
+        transport=transport,
+        transport_url=transport_url,
     )
 
     extracted_files = extract_year(
@@ -133,6 +148,9 @@ def process_part(
         "archive": filename,
         "remote_size": remote_size,
         "sha256": entry["sha256"],
+        "transport": transport,
+        "transport_url": transport_url or entry.get("source_url"),
+        "official_source_url": entry.get("source_url"),
         "layout_signatures": layout["layout_signatures"],
         "semantic_valid": semantic["semantic_valid"],
         "value_semantics_valid": values["value_semantics_valid"],
@@ -168,6 +186,9 @@ def main() -> None:
     parser.add_argument("--filename", required=True)
     parser.add_argument("--key", required=True)
     parser.add_argument("--remote-size", required=True, type=int)
+    parser.add_argument("--local-archive", type=Path)
+    parser.add_argument("--transport", default="ftp_mte")
+    parser.add_argument("--transport-url")
     parser.add_argument(
         "--work-root",
         type=Path,
@@ -181,6 +202,9 @@ def main() -> None:
         key=args.key,
         remote_size=args.remote_size,
         work_root=args.work_root,
+        local_archive=args.local_archive,
+        transport=args.transport,
+        transport_url=args.transport_url,
     )
     print(summary.read_text(encoding="utf-8"))
 

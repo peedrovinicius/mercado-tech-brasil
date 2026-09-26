@@ -31,6 +31,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - layout real 2025 confirmado com 62 colunas, latin-1 e delimitador vírgula;
 - codificação real 1/0 do vínculo ativo confirmada em amostra de 10.000 registros;
 - downloader RAIS com retomada FTP e verificação de tamanho;
+- fallback HTTPS pinado e auditável para instabilidade do FTP, sem trocar a fonte metodológica;
 - processamento RAIS regional isolado e merge nacional em streaming;
 - transformação Silver RAIS em streaming com rejeições auditáveis;
 - reconciliação nacional RAIS contra referência oficial do MTE;

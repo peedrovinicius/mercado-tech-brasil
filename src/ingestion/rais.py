@@ -144,7 +144,7 @@ def download_file(
     destination_dir: Path,
     *,
     host: str = FTP_HOST,
-    timeout: int = 300,
+    timeout: int = 60,
     max_attempts: int = 5,
 ) -> Path:
     if max_attempts < 1 or max_attempts > 10:
@@ -241,6 +241,8 @@ def write_download_manifest(
     destination: Path,
     *,
     dataset: str = "vinculos",
+    transport: str = "ftp_mte",
+    transport_url: str | None = None,
 ) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
 
@@ -255,7 +257,7 @@ def write_download_manifest(
             path,
             "rais_mte",
             str(year),
-            transport="ftp_mte",
+            transport=transport,
             source_url=remote.url,
         )
         manifest_path = path.with_suffix(path.suffix + ".manifest.json")
@@ -266,6 +268,7 @@ def write_download_manifest(
                 "path": path.name,
                 "manifest": manifest_path.name,
                 "dataset": dataset,
+                "transport_url": transport_url or remote.url,
             }
         )
 
@@ -276,7 +279,7 @@ def write_download_manifest(
                 "year": year,
                 "dataset": dataset,
                 "concept": "estoque anual de vínculos formais em 31/12",
-                "transport": "ftp_mte",
+                "transport": transport,
                 "files": entries,
             },
             ensure_ascii=False,

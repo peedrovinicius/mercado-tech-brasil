@@ -1,0 +1,36 @@
+{
+  "purpose": "Fallback de transporte para os microdados RAIS 2025 quando o FTP oficial estiver instável ou lento.",
+  "source_of_truth": "Ministério do Trabalho e Emprego",
+  "official_ftp_base": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/",
+  "mirror_provider": "Hugging Face",
+  "mirror_dataset": "selenelindsay/rais-caged-bronze",
+  "mirror_commit": "298640dfa9ff8f6ebc0ba4c931df67f11571d11e",
+  "mirror_path_prefix": "RAIS/2025",
+  "official_discovery": {
+    "year": 2025,
+    "files": [
+      {"filename": "RAIS_VINC_PUB_CENTRO_OESTE.7z", "size_bytes": 354015896},
+      {"filename": "RAIS_VINC_PUB_MG_ES_RJ.7z", "size_bytes": 766814132},
+      {"filename": "RAIS_VINC_PUB_NI.7z", "size_bytes": 209311},
+      {"filename": "RAIS_VINC_PUB_NORDESTE.7z", "size_bytes": 639823548},
+      {"filename": "RAIS_VINC_PUB_NORTE.7z", "size_bytes": 211992734},
+      {"filename": "RAIS_VINC_PUB_SP.7z", "size_bytes": 1107305918},
+      {"filename": "RAIS_VINC_PUB_SUL.7z", "size_bytes": 704888712}
+    ]
+  },
+  "verification": {
+    "RAIS_VINC_PUB_CENTRO_OESTE.7z": {
+      "size_bytes": 354015896,
+      "official_ftp_sha256": "0e4459ee90c0219d9b40b9d6129e494034b8d6cd4dbe86eeb1f49e54f964d724",
+      "mirror_sha256": "0e4459ee90c0219d9b40b9d6129e494034b8d6cd4dbe86eeb1f49e54f964d724",
+      "byte_identical": true,
+      "verified_on": "2026-09-26"
+    }
+  },
+  "rules": [
+    "O espelho é somente transporte alternativo. A fonte metodológica continua sendo o MTE.",
+    "O tamanho do arquivo baixado precisa coincidir exatamente com o tamanho descoberto no FTP oficial.",
+    "O SHA-256 do arquivo baixado é registrado no manifesto.",
+    "A release anual só pode avançar se a reconciliação nacional fechar exatamente com a referência oficial."
+  ]
+}
