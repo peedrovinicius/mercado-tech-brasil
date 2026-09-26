@@ -5,7 +5,12 @@ import { formatCompetence, formatCurrency, formatNumber, formatPercent } from '.
 import { MetricCard } from '../components/MetricCard'
 import { EmptyState } from '../components/EmptyState'
 import { MethodologyPanel } from '../components/MethodologyPanel'
-import { OccupationChart, UfChart } from '../components/Charts'
+import {
+  MunicipalityChart,
+  OccupationChart,
+  TrendChart,
+  UfChart,
+} from '../components/Charts'
 import { ProvenanceCard } from '../components/ProvenanceCard'
 import { ReferenceContext } from '../components/ReferenceContext'
 import { PipelineVisual } from '../components/PipelineVisual'
@@ -34,6 +39,18 @@ export function Dashboard() {
   const byOccupation = useQuery({
     queryKey: ['by-occupation'],
     queryFn: api.byOccupation,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const byMunicipality = useQuery({
+    queryKey: ['by-municipality'],
+    queryFn: api.byMunicipality,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const trend = useQuery({
+    queryKey: ['trend'],
+    queryFn: api.trend,
     retry: false,
     enabled: overview.isSuccess,
   })
@@ -157,9 +174,22 @@ export function Dashboard() {
               tone={overview.data.balance >= 0 ? 'positive' : 'negative'}
             />
             <MetricCard
-              label="Salário mediano de admissão"
-              value={formatCurrency(overview.data.salary_median_admissions)}
-              detail="metodologia salarial MTE"
+              label={
+                overview.data.salary_median_admissions_real != null
+                  ? 'Salário mediano real'
+                  : 'Salário mediano de admissão'
+              }
+              value={formatCurrency(
+                overview.data.salary_median_admissions_real
+                  ?? overview.data.salary_median_admissions,
+              )}
+              detail={
+                overview.data.salary_real_base_competence
+                  ? `valores de ${formatCompetence(
+                      overview.data.salary_real_base_competence,
+                    )}, IPCA/IBGE`
+                  : 'metodologia salarial MTE'
+              }
             />
           </section>
 
@@ -179,6 +209,36 @@ export function Dashboard() {
               {byOccupation.data ? <OccupationChart items={byOccupation.data.items} /> : <div className="chart-placeholder" />}
             </article>
           </section>
+
+          {(byMunicipality.data || (trend.data?.items.length ?? 0) > 1) ? (
+            <section className="analysis-grid">
+              {byMunicipality.data ? (
+                <article className="panel panel--wide">
+                  <div className="panel__heading">
+                    <div>
+                      <p className="eyebrow">Municípios</p>
+                      <h2>Admissões tech por município</h2>
+                    </div>
+                    <span>Top 12</span>
+                  </div>
+                  <MunicipalityChart items={byMunicipality.data.items} />
+                </article>
+              ) : null}
+
+              {(trend.data?.items.length ?? 0) > 1 ? (
+                <article className="panel">
+                  <div className="panel__heading">
+                    <div>
+                      <p className="eyebrow">Série histórica</p>
+                      <h2>Evolução mensal</h2>
+                    </div>
+                    <span>{trend.data?.items.length} competências</span>
+                  </div>
+                  <TrendChart items={trend.data?.items ?? []} />
+                </article>
+              ) : null}
+            </section>
+          ) : null}
 
           <section className="quality-section" id="qualidade">
             <div>
