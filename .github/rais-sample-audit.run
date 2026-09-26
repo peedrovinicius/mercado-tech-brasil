@@ -1,2 +1,3 @@
-run=2025-sample-audit-1
+run=2025-sample-audit-2
 purpose=validate-real-layout-and-values
+strategy=smallest-region-resumable-ftp

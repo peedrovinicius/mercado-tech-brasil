@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import asdict, dataclass
-from ftplib import FTP
+from ftplib import FTP, all_errors, error_perm
 from pathlib import Path
 
 from src.ingestion.archive import extract_7z
@@ -81,29 +82,139 @@ def discover_files(
     return select_remote_files(year, filenames, dataset=dataset)
 
 
+def remote_file_size(
+    remote: RaisRemoteFile,
+    *,
+    host: str = FTP_HOST,
+    timeout: int = 60,
+) -> int | None:
+    with FTP(host=host, timeout=timeout) as ftp:
+        ftp.login()
+        ftp.cwd(remote.remote_dir)
+        ftp.voidcmd("TYPE I")
+        try:
+            size = ftp.size(remote.filename)
+        except error_perm:
+            return None
+    return int(size) if size is not None else None
+
+
+def select_smallest_remote_file(
+    remotes: list[RaisRemoteFile],
+    sizes: dict[str, int | None],
+    *,
+    exclude_residual: bool = True,
+) -> RaisRemoteFile:
+    if not remotes:
+        raise ValueError("Nenhum arquivo RAIS disponível para seleção.")
+
+    candidates = remotes
+    if exclude_residual:
+        regular = [
+            item
+            for item in remotes
+            if "_NI." not in item.filename.upper()
+        ]
+        if regular:
+            candidates = regular
+
+    known = [
+        item
+        for item in candidates
+        if isinstance(sizes.get(item.filename), int)
+        and int(sizes[item.filename] or 0) > 0
+    ]
+    if known:
+        return min(
+            known,
+            key=lambda item: (
+                int(sizes[item.filename] or 0),
+                item.filename.upper(),
+            ),
+        )
+
+    return sorted(
+        candidates,
+        key=lambda item: item.filename.upper(),
+    )[0]
+
+
 def download_file(
     remote: RaisRemoteFile,
     destination_dir: Path,
     *,
     host: str = FTP_HOST,
     timeout: int = 300,
+    max_attempts: int = 5,
 ) -> Path:
+    if max_attempts < 1 or max_attempts > 10:
+        raise ValueError("max_attempts deve estar entre 1 e 10.")
+
     destination_dir.mkdir(parents=True, exist_ok=True)
     destination = destination_dir / remote.filename
     temporary = destination.with_suffix(destination.suffix + ".part")
+    last_error: BaseException | None = None
 
-    with FTP(host=host, timeout=timeout) as ftp:
-        ftp.login()
-        ftp.cwd(remote.remote_dir)
-        with temporary.open("wb") as target:
-            ftp.retrbinary(f"RETR {remote.filename}", target.write)
+    for attempt in range(1, max_attempts + 1):
+        offset = temporary.stat().st_size if temporary.exists() else 0
 
-    if temporary.stat().st_size <= 0:
-        temporary.unlink(missing_ok=True)
-        raise RuntimeError(f"Download RAIS vazio: {remote.filename}")
+        try:
+            with FTP(host=host, timeout=timeout) as ftp:
+                ftp.login()
+                ftp.cwd(remote.remote_dir)
+                ftp.voidcmd("TYPE I")
 
-    temporary.replace(destination)
-    return destination
+                try:
+                    remote_size = ftp.size(remote.filename)
+                except error_perm:
+                    remote_size = None
+
+                if remote_size is not None and offset > remote_size:
+                    temporary.unlink(missing_ok=True)
+                    offset = 0
+
+                if remote_size is not None and offset == remote_size and offset > 0:
+                    temporary.replace(destination)
+                    return destination
+
+                mode = "ab" if offset else "wb"
+                with temporary.open(mode) as target:
+                    ftp.retrbinary(
+                        f"RETR {remote.filename}",
+                        target.write,
+                        blocksize=1024 * 1024,
+                        rest=offset if offset else None,
+                    )
+
+            downloaded_size = temporary.stat().st_size
+            if downloaded_size <= 0:
+                last_error = RuntimeError(
+                    f"Download RAIS vazio: {remote.filename}"
+                )
+            elif remote_size is not None and downloaded_size != remote_size:
+                last_error = RuntimeError(
+                    "Download RAIS incompleto: "
+                    f"{remote.filename} bytes={downloaded_size}/{remote_size}"
+                )
+            else:
+                temporary.replace(destination)
+                return destination
+
+        except error_perm as exc:
+            last_error = exc
+            if offset:
+                temporary.unlink(missing_ok=True)
+        except all_errors as exc:
+            last_error = exc
+
+        if attempt < max_attempts:
+            time.sleep(min(2 ** (attempt - 1), 8))
+
+    partial_size = temporary.stat().st_size if temporary.exists() else 0
+    raise RuntimeError(
+        f"Falha ao baixar RAIS após {max_attempts} tentativas: "
+        f"{remote.filename}; bytes_parciais={partial_size}"
+    ) from last_error
 
 
 def download_year(

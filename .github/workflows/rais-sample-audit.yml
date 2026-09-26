@@ -54,6 +54,8 @@ jobs:
           from src.ingestion.rais import (
               discover_files,
               download_file,
+              remote_file_size,
+              select_smallest_remote_file,
               write_download_manifest,
           )
 
@@ -70,8 +72,27 @@ jobs:
                   f"Nenhum arquivo RAIS vínculos encontrado para {year}."
               )
 
-          selected = files[0]
-          path = download_file(selected, archive_dir)
+          sizes = {}
+          for item in files:
+              try:
+                  sizes[item.filename] = remote_file_size(item)
+              except Exception as exc:
+                  sizes[item.filename] = None
+                  print(
+                      f"size unavailable: arquivo={item.filename} erro={exc}"
+                  )
+
+          selected = select_smallest_remote_file(files, sizes)
+          print(
+              f"sample selection: arquivo={selected.filename} "
+              f"bytes={sizes.get(selected.filename)} "
+              f"total_disponível={len(files)}"
+          )
+          path = download_file(
+              selected,
+              archive_dir,
+              max_attempts=5,
+          )
           write_download_manifest(
               year,
               [path],
