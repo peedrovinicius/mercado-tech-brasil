@@ -21,6 +21,7 @@ SUM_FIELDS = (
     "rows_inactive_source",
     "rows_unknown_status_source",
     "rows_year_mismatch_source",
+    "rows_residual_municipality",
     "rows_tech",
 )
 

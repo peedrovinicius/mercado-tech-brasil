@@ -92,6 +92,7 @@ def test_cbo_and_uf_normalization():
     assert uf_from_municipality_code("230440") == "CE"
     assert uf_from_municipality_code("355030") == "SP"
     assert uf_from_municipality_code("330455") == "RJ"
+    assert uf_from_municipality_code("999999") == "NI"
     assert uf_from_municipality_code("990000") is None
 
 
@@ -146,6 +147,50 @@ def test_transform_rais_year_filters_active_and_tech(tmp_path: Path):
     assert set(table.column("municipio_codigo").to_pylist()) == {"230440"}
 
 
+def test_transform_rais_year_preserves_residual_municipality(tmp_path: Path):
+    extracted = tmp_path / "extracted"
+    silver = tmp_path / "silver"
+    extracted.mkdir()
+
+    (extracted / "RAIS_VINC_TESTE.COMT").write_text(
+        "CBO 2002 Ocupação - Código,Município - Código,"
+        "Ind Vínculo Ativo 31/12 - Código\n"
+        "212405,999999,1\n",
+        encoding="utf-8",
+    )
+    layout, semantic, values = _prepare_reports(tmp_path)
+    cbo = tmp_path / "cbo.yml"
+    cbo.write_text(
+        'families:\n  "2124": "Analistas de tecnologia da informação"\n',
+        encoding="utf-8",
+    )
+
+    result = transform_rais_year(
+        year=2025,
+        extracted_dir=extracted,
+        layout_report_path=layout,
+        semantic_report_path=semantic,
+        value_semantics_report_path=values,
+        cbo_config_path=cbo,
+        silver_dir=silver,
+        batch_size=1000,
+    )
+
+    assert result.rows_rejected == 0
+    assert result.rows_residual_municipality == 1
+    assert pq.read_table(result.silver_path).to_pylist() == [
+        {
+            "year": 2025,
+            "cbo_codigo": "212405",
+            "cbo_familia": "2124",
+            "municipio_codigo": "999999",
+            "uf": "NI",
+            "active_3112": True,
+            "source_file": "RAIS_VINC_TESTE.COMT",
+        }
+    ]
+
+
 def test_transform_rais_year_preserves_rejections(tmp_path: Path):
     extracted = tmp_path / "extracted"
     silver = tmp_path / "silver"
@@ -181,6 +226,7 @@ def test_transform_rais_year_preserves_rejections(tmp_path: Path):
     assert result.rows_inactive_source == 0
     assert result.rows_unknown_status_source == 1
     assert result.rows_year_mismatch_source == 0
+    assert result.rows_residual_municipality == 0
     rejected = pq.read_table(result.reject_path).to_pylist()
     assert len(rejected) == 1
     assert "invalid_active_status" in rejected[0]["reason"]

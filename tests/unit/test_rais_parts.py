@@ -43,6 +43,7 @@ def _write_part(
         "rows_inactive_source": inactive,
         "rows_unknown_status_source": 0,
         "rows_year_mismatch_source": 0,
+        "rows_residual_municipality": 0,
         "rows_tech": len(tech_rows),
         "source_partition_complete": True,
         "rejection_counts": {
@@ -148,6 +149,7 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
     assert quality["rows_inactive_source"] == 3
     assert quality["rows_tech"] == 2
     assert quality["rows_rejected"] == 1
+    assert quality["rows_residual_municipality"] == 0
     assert quality["source_partition_complete"] is True
     assert quality["source_archives"] == [
         "RAIS_VINC_A.7z",

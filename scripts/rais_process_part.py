@@ -158,6 +158,7 @@ def process_part(
         "rows_active_source": result.rows_active_source,
         "rows_inactive_source": result.rows_inactive_source,
         "rows_unknown_status_source": result.rows_unknown_status_source,
+        "rows_residual_municipality": result.rows_residual_municipality,
         "rows_rejected": result.rows_rejected,
         "rows_tech": result.rows_tech,
     }

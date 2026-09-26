@@ -13,6 +13,8 @@ import yaml
 
 from src.transform.rais_value_semantics import normalize_value
 
+RESIDUAL_MUNICIPALITY_CODE = "999999"
+
 IBGE_UF_BY_PREFIX = {
     "11": "RO",
     "12": "AC",
@@ -53,6 +55,7 @@ class RaisSilverResult:
     rows_inactive_source: int
     rows_unknown_status_source: int
     rows_year_mismatch_source: int
+    rows_residual_municipality: int
     rows_valid: int
     rows_rejected: int
     rows_tech: int
@@ -172,6 +175,8 @@ def normalize_municipality_code(value: object) -> str | None:
 def uf_from_municipality_code(code: str | None) -> str | None:
     if not code or len(code) != 6:
         return None
+    if code == RESIDUAL_MUNICIPALITY_CODE:
+        return "NI"
     return IBGE_UF_BY_PREFIX.get(code[:2])
 
 
@@ -273,6 +278,7 @@ def transform_rais_year(
     rows_inactive_source = 0
     rows_unknown_status_source = 0
     rows_year_mismatch_source = 0
+    rows_residual_municipality = 0
     rows_valid = 0
     rows_rejected = 0
     rows_tech = 0
@@ -322,6 +328,8 @@ def transform_rais_year(
                         municipality_raw
                     )
                     uf = uf_from_municipality_code(municipality_code)
+                    if municipality_code == RESIDUAL_MUNICIPALITY_CODE:
+                        rows_residual_municipality += 1
 
                     if active_normalized in active_values:
                         rows_active_source += 1
@@ -416,6 +424,7 @@ def transform_rais_year(
         "rows_inactive_source": rows_inactive_source,
         "rows_unknown_status_source": rows_unknown_status_source,
         "rows_year_mismatch_source": rows_year_mismatch_source,
+        "rows_residual_municipality": rows_residual_municipality,
         "source_partition_complete": (
             rows_read
             == rows_active_source
@@ -452,6 +461,7 @@ def transform_rais_year(
         rows_inactive_source=rows_inactive_source,
         rows_unknown_status_source=rows_unknown_status_source,
         rows_year_mismatch_source=rows_year_mismatch_source,
+        rows_residual_municipality=rows_residual_municipality,
         rows_valid=rows_valid,
         rows_rejected=rows_rejected,
         rows_tech=rows_tech,
