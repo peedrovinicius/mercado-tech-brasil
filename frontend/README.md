@@ -4,11 +4,12 @@ Interface React + TypeScript para consumir exclusivamente a API do projeto.
 
 ## Princípios
 
-- nenhum indicador é fixado no frontend;
-- sem dados oficiais, a interface mostra um estado vazio explícito;
+- nenhum indicador tech é fixado no frontend;
+- sem microdados tech aprovados, a interface continua útil com contexto oficial separado;
+- contexto do mercado formal total nunca é apresentado como recorte de tecnologia;
 - erros de backend têm estado visual próprio;
-- gráficos só aparecem quando endpoints Gold estão disponíveis;
-- metodologia e rastreabilidade ficam acessíveis na própria experiência.
+- metodologia e rastreabilidade ficam acessíveis na própria experiência;
+- responsividade para desktop, tablet e mobile.
 
 ## Executar
 
@@ -37,14 +38,18 @@ Defina `VITE_API_BASE_URL`.
 npm run build
 ```
 
-## Telas/estados implementados
+## Experiência v0.11
 
-- dashboard principal;
-- loading/skeleton;
-- API indisponível;
-- pipeline sem dados publicados;
-- indicadores reais;
-- admissões por UF;
+- hero de produto;
+- pipeline visual;
+- contexto oficial Brasil/Ceará;
+- gráfico de saldo por região;
+- estado de espera elegante;
+- indicadores tech quando publicados;
+- admissões tech por UF;
 - saldo por CBO;
 - painel de qualidade;
-- modal “Como este número foi calculado?”.
+- proveniência por SHA-256;
+- modal de metodologia.
+
+O contexto oficial vem da API e é claramente rotulado como **mercado formal total**, não como indicador de tecnologia.
