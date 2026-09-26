@@ -109,15 +109,19 @@ O contrato versionado fica em:
 config/rais_semantic_contract.yml
 ```
 
-Ele define conceitos de negócio em vez de depender de um único nome literal de coluna. São obrigatórios:
+Ele define conceitos de negócio em vez de depender de um único nome literal de coluna.
 
-- ano-base;
-- ocupação CBO 2002;
-- município;
-- UF;
-- indicador de vínculo ativo em 31/12.
+A validação com uma amostra oficial real da RAIS 2025 confirmou o layout atual de vínculos. Os campos físicos obrigatórios são:
 
-Remuneração de dezembro e remuneração média são opcionais nesta etapa.
+- `CBO 2002 Ocupação - Código`;
+- `Município - Código`;
+- `Ind Vínculo Ativo 31/12 - Código`.
+
+O ano-base não existe como coluna no arquivo regional de vínculos e é derivado do contexto anual do pipeline. A UF também não existe como coluna física e é derivada do prefixo do código municipal.
+
+`Município Trab - Código` é preservado como conceito opcional e não substitui `Município - Código` como dimensão territorial principal nesta etapa.
+
+Remuneração de dezembro e remuneração média permanecem opcionais.
 
 Executar a validação:
 
@@ -155,18 +159,29 @@ O relatório é salvo em:
 data/bronze/rais/2025/value-profile.json
 ```
 
-O perfil registra somente os conceitos necessários ao futuro Silver: ano, CBO, município, UF e vínculo ativo em 31/12. Para cada conceito ele informa valores mais frequentes, nulos, quantidade de valores distintos, comprimentos observados e quantos valores são compostos apenas por dígitos.
+O perfil registra os conceitos físicos CBO, município e vínculo ativo, além do ano derivado do contexto anual. Para cada conceito ele informa valores mais frequentes, nulos, quantidade de valores distintos, comprimentos observados e quantos valores são compostos apenas por dígitos.
 
-A amostra serve para confirmar a codificação real dos microdados 2025, principalmente o indicador de vínculo ativo e o formato da CBO. O perfil não escolhe automaticamente qual valor significa ativo.
+Na amostra oficial de 10.000 registros do arquivo `RAIS_VINC_PUB_NORTE.COMT`:
 
-`silver_transform_ready` e `publication_ready` continuam falsos até revisão explícita dessa semântica.
+- o indicador de vínculo ativo apresentou apenas `1` e `0`;
+- `1` apareceu em 7.227 registros;
+- `0` apareceu em 2.773 registros;
+- não houve valor nulo ou terceiro código;
+- o município apareceu em seis dígitos em todos os 10.000 registros;
+- a CBO foi numérica em todos os registros, com códigos de cinco e seis dígitos observados.
+
+A CBO 2002 define ocupações em seis dígitos. Por isso, códigos numéricos de cinco dígitos são normalizados com zero à esquerda antes da derivação da família ocupacional.
+
+`publication_ready` continua falso até o ciclo anual completo.
 
 ## Validação dos valores
 
-A documentação oficial do MTE define a variável de situação em 31/12 por categorias:
+A consulta oficial da RAIS apresenta a situação em 31/12 pelas categorias SIM e NÃO. Nos microdados, a amostra oficial de 2025 confirmou a codificação numérica usada no arquivo de vínculos:
 
-- `SIM`: vínculo ativo ao final do ano;
-- `NÃO`: vínculo inativo ao final do ano.
+- `1`: vínculo ativo em 31/12;
+- `0`: vínculo inativo em 31/12.
+
+Essa codificação também é consistente com documentação técnica que utiliza a variável de vínculo ativo igual a `1` para selecionar o estoque de 31 de dezembro.
 
 O projeto registra essa semântica em:
 
@@ -186,9 +201,9 @@ O comando gera:
 data/bronze/rais/2025/value-semantics-report.json
 ```
 
-A validação normaliza caixa e acentuação apenas para comparação. Valores diferentes de `SIM` e `NÃO`, nulos no indicador ativo ou ano-base divergente bloqueiam o Silver.
+Para a RAIS 2025, valores diferentes de `1` e `0`, valores nulos no indicador ativo ou ano-base contextual divergente bloqueiam o Silver.
 
-Se o microdado real usar outra codificação, como `1/0`, o pipeline não converte automaticamente. O contrato precisa ser revisado de forma explícita antes de qualquer transformação.
+A codificação não é inferida em tempo de execução. Ela está versionada em `config/rais_value_semantics.yml` e qualquer código novo ou desconhecido exige revisão explícita.
 
 Quando a quantidade de valores distintos de um conceito é pequena, `value-profile.json` registra o conjunto completo observado para que códigos raros não fiquem escondidos pelo ranking de frequência.
 
@@ -224,7 +239,7 @@ O Silver tech contém somente:
 
 Somente vínculos ativos em 31/12 entram no estoque. Depois disso, o recorte CBO tech v2 é aplicado pelas famílias 2122, 2123, 2124, 3171 e 3172.
 
-Registros com ano divergente, situação do vínculo desconhecida, CBO inválida, município ausente ou UF inválida são preservados no Parquet de rejeições com a razão correspondente.
+O ano é fixado pelo contexto anual validado, e a UF é derivada do prefixo municipal oficial. Registros com situação de vínculo desconhecida, CBO inválida, município inválido ou prefixo de UF desconhecido são preservados no Parquet de rejeições com a razão correspondente.
 
 O relatório de qualidade registra totais lidos, válidos, rejeitados, ativos, inativos e tech. Mesmo com Silver gerada, `gold_ready` e `publication_ready` permanecem falsos.
 

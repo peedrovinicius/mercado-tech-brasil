@@ -1,22 +1,30 @@
-version: 1
+version: 2
 dataset: rais_vinculos
 year_reference: 2025
 sources:
   rais_faq: "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/perguntas-frequentes"
   rais_2025: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025"
+  coding_reference: "https://www2.senado.leg.br/bdsf/bitstream/handle/id/574054/NT44.pdf"
 
 active_3112:
   description: "Situação do vínculo em 31/12 do ano-base"
-  normalization: "casefold_ascii"
+  normalization: "string"
   active_values:
-    - sim
+    - "1"
   inactive_values:
-    - nao
+    - "0"
   reject_unknown_values: true
   reject_blank_values: true
+  observed_2025_sample:
+    archive: "RAIS_VINC_PUB_NORTE.7z"
+    rows_profiled: 10000
+    active_count: 7227
+    inactive_count: 2773
+    other_count: 0
 
 year:
   must_match_requested_year: true
+  source: annual_context
 
 rules:
   silver_transform_ready_after_validation: true

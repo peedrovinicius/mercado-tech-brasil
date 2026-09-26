@@ -13,6 +13,36 @@ import yaml
 
 from src.transform.rais_value_semantics import normalize_value
 
+IBGE_UF_BY_PREFIX = {
+    "11": "RO",
+    "12": "AC",
+    "13": "AM",
+    "14": "RR",
+    "15": "PA",
+    "16": "AP",
+    "17": "TO",
+    "21": "MA",
+    "22": "PI",
+    "23": "CE",
+    "24": "RN",
+    "25": "PB",
+    "26": "PE",
+    "27": "AL",
+    "28": "SE",
+    "29": "BA",
+    "31": "MG",
+    "32": "ES",
+    "33": "RJ",
+    "35": "SP",
+    "41": "PR",
+    "42": "SC",
+    "43": "RS",
+    "50": "MS",
+    "51": "MT",
+    "52": "GO",
+    "53": "DF",
+}
+
 
 @dataclass(frozen=True)
 class RaisSilverResult:
@@ -46,10 +76,10 @@ SILVER_SCHEMA = pa.schema(
 REJECT_SCHEMA = pa.schema(
     [
         ("source_file", pa.string()),
-        ("year_raw", pa.string()),
+        ("year_context", pa.string()),
         ("cbo_raw", pa.string()),
         ("municipio_raw", pa.string()),
-        ("uf_raw", pa.string()),
+        ("uf_derived", pa.string()),
         ("active_raw", pa.string()),
         ("reason", pa.string()),
     ]
@@ -98,7 +128,7 @@ def _column_mapping(
 
     result: dict[str, str] = {}
     required = semantic_item.get("required") or {}
-    for concept in ("year", "cbo_occupation", "municipality", "uf", "active_3112"):
+    for concept in ("cbo_occupation", "municipality", "active_3112"):
         item = required.get(concept) or {}
         matches = item.get("matches") or []
         if item.get("status") != "matched" or len(matches) != 1:
@@ -119,6 +149,30 @@ def _column_mapping(
 
 def _digits(value: object) -> str:
     return re.sub(r"\D", "", str(value or "").strip())
+
+
+def normalize_cbo_code(value: object) -> str | None:
+    digits = _digits(value)
+    if len(digits) == 5:
+        return digits.zfill(6)
+    if len(digits) == 6:
+        return digits
+    return None
+
+
+def normalize_municipality_code(value: object) -> str | None:
+    digits = _digits(value)
+    if len(digits) == 6:
+        return digits
+    if len(digits) == 7:
+        return digits[:6]
+    return None
+
+
+def uf_from_municipality_code(code: str | None) -> str | None:
+    if not code or len(code) != 6:
+        return None
+    return IBGE_UF_BY_PREFIX.get(code[:2])
 
 
 def _flush(
@@ -223,10 +277,9 @@ def transform_rais_year(
     rows_rejected = 0
     rows_tech = 0
     rejection_counts: dict[str, int] = {
-        "invalid_year": 0,
         "invalid_active_status": 0,
         "invalid_cbo": 0,
-        "missing_municipality": 0,
+        "invalid_municipality": 0,
         "invalid_uf": 0,
     }
 
@@ -257,22 +310,20 @@ def transform_rais_year(
                 for row in reader:
                     rows_read += 1
 
-                    year_raw = str(row.get(columns["year"]) or "").strip()
                     cbo_raw = str(row.get(columns["cbo_occupation"]) or "").strip()
                     municipality_raw = str(
                         row.get(columns["municipality"]) or ""
                     ).strip()
-                    uf_raw = str(row.get(columns["uf"]) or "").strip()
                     active_raw = str(row.get(columns["active_3112"]) or "").strip()
 
                     active_normalized = normalize_value(active_raw)
-                    cbo_code = _digits(cbo_raw)
-                    municipality_code = _digits(municipality_raw)
-                    uf = uf_raw.strip().upper()
+                    cbo_code = normalize_cbo_code(cbo_raw)
+                    municipality_code = normalize_municipality_code(
+                        municipality_raw
+                    )
+                    uf = uf_from_municipality_code(municipality_code)
 
-                    if year_raw != str(year):
-                        rows_year_mismatch_source += 1
-                    elif active_normalized in active_values:
+                    if active_normalized in active_values:
                         rows_active_source += 1
                     elif active_normalized in inactive_values:
                         rows_inactive_source += 1
@@ -280,15 +331,13 @@ def transform_rais_year(
                         rows_unknown_status_source += 1
 
                     reasons: list[str] = []
-                    if year_raw != str(year):
-                        reasons.append("invalid_year")
                     if active_normalized not in active_values | inactive_values:
                         reasons.append("invalid_active_status")
-                    if len(cbo_code) < 4:
+                    if cbo_code is None:
                         reasons.append("invalid_cbo")
-                    if not municipality_code:
-                        reasons.append("missing_municipality")
-                    if len(uf) != 2 or not uf.isalpha():
+                    if municipality_code is None:
+                        reasons.append("invalid_municipality")
+                    if municipality_code is not None and uf is None:
                         reasons.append("invalid_uf")
 
                     if reasons:
@@ -298,10 +347,10 @@ def transform_rais_year(
                         reject_buffer.append(
                             {
                                 "source_file": filename,
-                                "year_raw": year_raw,
+                                "year_context": str(year),
                                 "cbo_raw": cbo_raw,
                                 "municipio_raw": municipality_raw,
-                                "uf_raw": uf_raw,
+                                "uf_derived": uf or "",
                                 "active_raw": active_raw,
                                 "reason": ",".join(reasons),
                             }
@@ -316,6 +365,10 @@ def transform_rais_year(
                         continue
 
                     rows_active += 1
+                    assert cbo_code is not None
+                    assert municipality_code is not None
+                    assert uf is not None
+
                     family = cbo_code[:4]
                     if family not in tech_families:
                         continue
@@ -374,6 +427,9 @@ def transform_rais_year(
         "valid_rate": round(rows_valid / rows_read, 8) if rows_read else 0,
         "rejection_counts": rejection_counts,
         "cbo_families": sorted(tech_families),
+        "year_source": "annual_context",
+        "uf_source": "municipality_code_prefix",
+        "cbo_normalization": "5 digit numeric codes are left padded to 6 digits",
         "silver_path": silver_path.name,
         "reject_path": reject_path.name,
         "gold_ready": False,

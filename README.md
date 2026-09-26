@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Pipeline até gate anual implementado; serving exige publishable=true |
+| RAIS anual | Pipeline completo implementado; layout e valores 2025 validados em amostra oficial; release integral ainda não publicada |
 
 ## Série publicada
 
@@ -157,7 +157,7 @@ flowchart LR
 | Fonte | Uso |
 |---|---|
 | Novo CAGED, MTE | admissões, desligamentos, saldo e remuneração de admissão |
-| RAIS, MTE | estoque anual de vínculos ativos em 31/12, camada em preparação |
+| RAIS, MTE | estoque anual de vínculos ativos em 31/12, layout 2025 validado em amostra oficial |
 | CBO, MTE | definição versionada das ocupações de tecnologia |
 | IBGE | municípios, estimativas populacionais, território e IPCA para valores reais |
 
@@ -192,6 +192,8 @@ O pipeline mantém:
 - referência externa para reconciliação;
 - gate mensal vinculado ao hash do arquivo de origem;
 - gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
+- downloader RAIS retomável após queda de conexão FTP;
+- contrato RAIS 2025 alinhado ao layout real observado;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;

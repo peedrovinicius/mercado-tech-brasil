@@ -45,10 +45,10 @@ A RAIS usa contrato próprio e separado do Novo CAGED.
 
 | Conceito | Obrigatório | Uso |
 |---|---:|---|
-| ano-base | sim | referência anual |
+| ano-base | derivado | contexto anual do pipeline |
 | CBO ocupação 2002 | sim | recorte ocupacional tech |
-| município | sim | dimensão territorial |
-| UF | sim | dimensão territorial |
+| município | sim | dimensão territorial principal |
+| UF | derivado | prefixo do código municipal |
 | vínculo ativo em 31/12 | sim | definição do estoque anual |
 | remuneração de dezembro | não | análise salarial futura |
 | remuneração média | não | análise salarial futura |
@@ -68,15 +68,17 @@ Arquivo esperado:
 
 | Campo | Tipo lógico | Regra |
 |---|---|---|
-| year | inteiro | ano-base validado |
-| cbo_codigo | texto | somente dígitos, mínimo 4 posições |
-| cbo_familia | texto | quatro primeiros dígitos da CBO |
-| municipio_codigo | texto | código observado no microdado, sem caracteres não numéricos |
-| uf | texto | sigla de duas letras |
+| year | inteiro | ano-base derivado do contexto anual validado |
+| cbo_codigo | texto | CBO 2002 normalizada para seis dígitos |
+| cbo_familia | texto | quatro primeiros dígitos da CBO normalizada |
+| municipio_codigo | texto | código municipal normalizado para seis dígitos |
+| uf | texto | sigla derivada dos dois primeiros dígitos do município |
 | active_3112 | booleano | sempre verdadeiro no Silver tech |
 | source_file | texto | arquivo RAIS de origem |
 
-O Silver representa apenas vínculos ativos em 31/12 pertencentes ao recorte ocupacional tech. Vínculos inativos são contabilizados na qualidade, mas não entram no Parquet tech.
+O Silver representa apenas vínculos ativos em 31/12 pertencentes ao recorte ocupacional tech. Na RAIS 2025, o código `1` representa ativo e `0` representa inativo. Vínculos inativos são contabilizados na qualidade, mas não entram no Parquet tech.
+
+A amostra real de 2025 confirmou município em seis dígitos. Códigos CBO numéricos de cinco dígitos recebem zero à esquerda porque a ocupação CBO 2002 é definida em seis dígitos.
 
 Registros estruturalmente inválidos são gravados em `rais_rejected_<ano>.parquet`. A geração do Silver não equivale a publicação.
 

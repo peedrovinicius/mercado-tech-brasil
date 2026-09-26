@@ -7,11 +7,11 @@ from src.transform.rais_value_semantics import (
 )
 
 
-CONTRACT = """version: 1
+CONTRACT = """version: 2
 dataset: rais_vinculos
 active_3112:
-  active_values: [sim]
-  inactive_values: [nao]
+  active_values: ["1"]
+  inactive_values: ["0"]
   reject_unknown_values: true
   reject_blank_values: true
 """
@@ -45,17 +45,12 @@ def _write_profile(
     )
 
 
-def test_normalize_value_is_case_and_accent_insensitive():
-    assert normalize_value(" SIM ") == "sim"
-    assert normalize_value("NÃO") == "nao"
-
-
-def test_value_semantics_accepts_official_sim_nao(tmp_path: Path):
+def test_value_semantics_accepts_observed_2025_codes(tmp_path: Path):
     profile = tmp_path / "profile.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "values.json"
 
-    _write_profile(profile, active_values=["SIM", "NÃO"])
+    _write_profile(profile, active_values=["0", "1"])
     contract.write_text(CONTRACT, encoding="utf-8")
 
     payload = validate_value_semantics(
@@ -68,17 +63,17 @@ def test_value_semantics_accepts_official_sim_nao(tmp_path: Path):
     assert payload["value_semantics_valid"] is True
     assert payload["silver_transform_ready"] is True
     assert payload["publication_ready"] is False
+    assert payload["active_3112"]["active_observed"] == ["1"]
+    assert payload["active_3112"]["inactive_observed"] == ["0"]
     assert payload["active_3112"]["unknown_values"] == []
 
 
-def test_value_semantics_blocks_numeric_codes_without_manual_mapping(
-    tmp_path: Path,
-):
+def test_value_semantics_blocks_unknown_code(tmp_path: Path):
     profile = tmp_path / "profile.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "values.json"
 
-    _write_profile(profile, active_values=["1", "0"])
+    _write_profile(profile, active_values=["0", "1", "9"])
     contract.write_text(CONTRACT, encoding="utf-8")
 
     payload = validate_value_semantics(
@@ -90,7 +85,7 @@ def test_value_semantics_blocks_numeric_codes_without_manual_mapping(
 
     assert payload["value_semantics_valid"] is False
     assert payload["silver_transform_ready"] is False
-    assert payload["active_3112"]["unknown_values"] == ["0", "1"]
+    assert payload["active_3112"]["unknown_values"] == ["9"]
 
 
 def test_value_semantics_blocks_blank_active_status(tmp_path: Path):
@@ -100,7 +95,7 @@ def test_value_semantics_blocks_blank_active_status(tmp_path: Path):
 
     _write_profile(
         profile,
-        active_values=["SIM", "NÃO"],
+        active_values=["0", "1"],
         active_blank=1,
     )
     contract.write_text(CONTRACT, encoding="utf-8")
@@ -122,7 +117,7 @@ def test_value_semantics_blocks_wrong_year(tmp_path: Path):
 
     _write_profile(
         profile,
-        active_values=["SIM", "NÃO"],
+        active_values=["0", "1"],
         years=["2024"],
     )
     contract.write_text(CONTRACT, encoding="utf-8")

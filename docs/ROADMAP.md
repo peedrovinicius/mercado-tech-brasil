@@ -27,6 +27,10 @@ A base necessária para publicar e auditar o produto está implementada:
 - contrato semântico RAIS versionado com bloqueio por ausência ou ambiguidade;
 - perfil amostral dos valores RAIS antes do Silver;
 - contrato de valores RAIS para situação do vínculo em 31/12;
+- amostra oficial RAIS 2025 validada em arquivo regional real;
+- layout real 2025 confirmado com 62 colunas, latin-1 e delimitador vírgula;
+- codificação real 1/0 do vínculo ativo confirmada em amostra de 10.000 registros;
+- downloader RAIS com retomada FTP e verificação de tamanho;
 - transformação Silver RAIS em streaming com rejeições auditáveis;
 - reconciliação nacional RAIS contra referência oficial do MTE;
 - Gold anual RAIS por overview, UF e família CBO;
@@ -52,11 +56,10 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão analítica
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
-- executar o contrato semântico sobre o layout real extraído da RAIS 2025;
-- gerar value-profile.json com os microdados reais de 2025;
-- executar rais-validate-values e confirmar SIM/NÃO no arquivo observado;
-- revisar aliases ou valores somente se os microdados reais divergirem da documentação oficial;
-- executar o Silver sobre os microdados reais de 2025 após as validações;
+- baixar o conjunto completo dos arquivos de vínculos RAIS 2025;
+- executar inspeção e validação em todos os arquivos regionais, não apenas na amostra Norte;
+- executar o Silver completo sobre os microdados reais de 2025;
+- revisar rejeições reais, inclusive qualquer CBO ou município fora do padrão observado na amostra;
 - executar a reconciliação exata com 59.970.945 vínculos ativos;
 - executar rais-gold 2025 somente depois de gold_ready=true;
 - executar o gate anual sobre os artefatos reais da RAIS 2025;

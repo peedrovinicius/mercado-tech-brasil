@@ -12,7 +12,7 @@ class Settings:
     root: Path = ROOT
     environment: str = os.getenv("APP_ENV", "development")
     project_name: str = "Mercado Tech Brasil"
-    version: str = "0.32.0"
+    version: str = "0.33.0"
     data_backend: str = os.getenv("DATA_BACKEND", "files").lower()
     database_url: str = os.getenv(
         "DATABASE_URL",

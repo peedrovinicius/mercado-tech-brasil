@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.33.0
+
+- primeira validação operacional sobre microdados oficiais reais da RAIS 2025;
+- amostra regional oficial confirmou arquivo COMT com 62 colunas, latin-1 e delimitador vírgula;
+- contrato semântico RAIS evolui para versão 2 com aliases dos nomes reais observados;
+- ano-base passa a ser derivado do contexto anual em vez de exigir coluna inexistente;
+- UF passa a ser derivada do prefixo do código municipal;
+- Município - Código é adotado como dimensão territorial principal e Município Trab - Código permanece opcional;
+- amostra de 10.000 registros confirmou códigos 1 e 0 para situação do vínculo em 31/12, sem nulos ou terceiro valor;
+- contrato de valores RAIS evolui para versão 2 com 1 como ativo e 0 como inativo;
+- município foi observado com seis dígitos em todos os registros da amostra;
+- CBO 2002 é normalizada para seis dígitos, preservando zero à esquerda quando o arquivo fornece cinco dígitos;
+- downloader FTP da RAIS ganha retomada por offset, novas tentativas e validação pelo tamanho remoto;
+- workflow de amostra volta a ser exclusivamente manual após a validação;
+- publicação RAIS continua bloqueada até processamento integral, reconciliação, Gold e gate anual;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.32.0
 
 - gate anual de publicação RAIS implementado e separado do gate mensal do Novo CAGED;
