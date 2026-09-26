@@ -23,7 +23,7 @@ def build_gold(
         import polars as pl
     except ImportError as exc:
         raise RuntimeError(
-            "Polars não está instalado. Execute `pip install -e .`."
+            "Polars não está instalado. Execute pip install -e ."
         ) from exc
 
     data = pl.read_parquet(silver_path)

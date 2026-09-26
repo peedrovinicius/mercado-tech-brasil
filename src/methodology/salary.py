@@ -47,7 +47,7 @@ def add_salary_eligibility(frame, *, yearmonth: str):
         import polars as pl
     except ImportError as exc:
         raise RuntimeError(
-            "Polars não está instalado. Execute `pip install -e .`."
+            "Polars não está instalado. Execute pip install -e ."
         ) from exc
 
     required = {
