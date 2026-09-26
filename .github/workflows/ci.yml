@@ -2,9 +2,14 @@ name: CI
 
 on:
   pull_request:
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "config/**"
+      - "alembic/**"
+      - "scripts/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 concurrency:

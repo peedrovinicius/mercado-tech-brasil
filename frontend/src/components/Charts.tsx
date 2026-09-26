@@ -1,4 +1,21 @@
-import ReactECharts from 'echarts-for-react'
+import { BarChart, LineChart } from 'echarts/charts'
+import {
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+} from 'echarts/components'
+import * as echarts from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import ReactEChartsCore from 'echarts-for-react/lib/core'
+
+echarts.use([
+  BarChart,
+  LineChart,
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+  CanvasRenderer,
+])
 import type {
   MunicipalityItem,
   OccupationItem,
@@ -34,7 +51,7 @@ export function UfChart({ items }: { items: UfItem[] }) {
       },
     ],
   }
-  return <ReactECharts option={option} style={{ height: 310 }} />
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 310 }} />
 }
 
 export function OccupationChart({ items }: { items: OccupationItem[] }) {
@@ -63,7 +80,7 @@ export function OccupationChart({ items }: { items: OccupationItem[] }) {
       },
     ],
   }
-  return <ReactECharts option={option} style={{ height: 310 }} />
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 310 }} />
 }
 
 export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
@@ -105,7 +122,7 @@ export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
       },
     ],
   }
-  return <ReactECharts option={option} style={{ height: 340 }} />
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 340 }} />
 }
 
 export function TrendChart({ items }: { items: TrendItem[] }) {
@@ -161,7 +178,7 @@ export function TrendChart({ items }: { items: TrendItem[] }) {
     ],
   }
 
-  return <ReactECharts option={option} style={{ height: 340 }} />
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 340 }} />
 }
 
 type RegionItem = {
@@ -208,5 +225,5 @@ export function ReferenceRegionChart({ items }: { items: RegionItem[] }) {
     ],
   }
 
-  return <ReactECharts option={option} style={{ height: 270 }} />
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 270 }} />
 }
