@@ -6,15 +6,33 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ['react', 'react-dom', '@tanstack/react-query'],
-          charts: [
-            'echarts/core',
-            'echarts/charts',
-            'echarts/components',
-            'echarts/renderers',
-            'echarts-for-react/lib/core',
-          ],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+          if (id.includes('/zrender/')) {
+            return 'zrender'
+          }
+          if (id.includes('/echarts-for-react/')) {
+            return 'echarts-react'
+          }
+          if (id.includes('/echarts/lib/chart/')) {
+            return 'echarts-charts'
+          }
+          if (id.includes('/echarts/lib/component/')) {
+            return 'echarts-components'
+          }
+          if (id.includes('/echarts/')) {
+            return 'echarts-core'
+          }
+          if (
+            id.includes('/react/') ||
+            id.includes('/react-dom/') ||
+            id.includes('/@tanstack/react-query/')
+          ) {
+            return 'react'
+          }
+          return undefined
         },
       },
     },
