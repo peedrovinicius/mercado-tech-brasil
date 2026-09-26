@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 from src.methodology.salary import add_salary_eligibility, methodology_for_competence
+from src.reference.ipca import load_ipca_cache
 
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
@@ -191,6 +193,15 @@ def _rebuild_trend(gold_dir: Path) -> Path:
                 "balance": payload.get("balance"),
                 "salary_mean_admissions": payload.get("salary_mean_admissions"),
                 "salary_median_admissions": payload.get("salary_median_admissions"),
+                "salary_mean_admissions_real": payload.get(
+                    "salary_mean_admissions_real"
+                ),
+                "salary_median_admissions_real": payload.get(
+                    "salary_median_admissions_real"
+                ),
+                "salary_real_base_competence": payload.get(
+                    "salary_real_base_competence"
+                ),
             }
         )
 
@@ -206,11 +217,56 @@ def _rebuild_trend(gold_dir: Path) -> Path:
     return destination
 
 
+def _load_real_salary_factor(
+    ipca_cache_path: Path | None,
+    *,
+    yearmonth: str,
+) -> tuple[Decimal, str] | None:
+    if ipca_cache_path is None or not ipca_cache_path.exists():
+        return None
+
+    payload = load_ipca_cache(ipca_cache_path)
+    base_competence = str(payload.get("base_competence") or "")
+    indices = payload.get("indices")
+    if not isinstance(indices, dict):
+        return None
+    if yearmonth not in indices or base_competence not in indices:
+        return None
+
+    observation = Decimal(str(indices[yearmonth]))
+    base = Decimal(str(indices[base_competence]))
+    if observation <= 0 or base <= 0:
+        return None
+    return base / observation, base_competence
+
+
+def _apply_real_salary(
+    items: list[dict[str, Any]],
+    factor: Decimal | None,
+) -> list[dict[str, Any]]:
+    if factor is None:
+        return items
+
+    for item in items:
+        for nominal_key, real_key in (
+            ("salary_mean_admissions", "salary_mean_admissions_real"),
+            ("salary_median_admissions", "salary_median_admissions_real"),
+        ):
+            nominal = item.get(nominal_key)
+            item[real_key] = (
+                float(Decimal(str(nominal)) * factor)
+                if nominal is not None
+                else None
+            )
+    return items
+
+
 def build_gold(
     silver_path: Path,
     *,
     yearmonth: str,
     gold_dir: Path,
+    ipca_cache_path: Path | None = None,
 ) -> tuple[Path, Path]:
     try:
         import polars as pl
@@ -244,6 +300,13 @@ def build_gold(
     overall_salary = _salary_stats(data, group_cols=[])
     salary = overall_salary.get((), {})
 
+    real_salary = _load_real_salary_factor(
+        ipca_cache_path,
+        yearmonth=yearmonth,
+    )
+    real_factor = real_salary[0] if real_salary is not None else None
+    real_base_competence = real_salary[1] if real_salary is not None else None
+
     gold_dir.mkdir(parents=True, exist_ok=True)
     parquet_path = gold_dir / f"market-{yearmonth}.parquet"
     overview_path = gold_dir / f"overview-{yearmonth}.json"
@@ -275,6 +338,17 @@ def build_gold(
         "balance": balance,
         "salary_mean_admissions": salary.get("mean"),
         "salary_median_admissions": salary.get("median"),
+        "salary_mean_admissions_real": (
+            float(Decimal(str(salary["mean"])) * real_factor)
+            if salary.get("mean") is not None and real_factor is not None
+            else None
+        ),
+        "salary_median_admissions_real": (
+            float(Decimal(str(salary["median"])) * real_factor)
+            if salary.get("median") is not None and real_factor is not None
+            else None
+        ),
+        "salary_real_base_competence": real_base_competence,
         "salary_eligible_admissions": salary.get("count", 0),
         "salary_methodology": {
             "minimum_wage_brl": salary_methodology.minimum_wage_brl,
@@ -291,16 +365,21 @@ def build_gold(
     _write_json(overview_path, overview)
 
     uf_salary = _salary_stats(data, group_cols=["uf"])
+    uf_items = _apply_real_salary(
+        _build_grouped(
+            data,
+            group_cols=["uf"],
+            salary_stats=uf_salary,
+        ),
+        real_factor,
+    )
     _write_json(
         gold_dir / f"by-uf-{yearmonth}.json",
         {
             "competence": yearmonth,
             "source": "Novo CAGED / MTE",
-            "items": _build_grouped(
-                data,
-                group_cols=["uf"],
-                salary_stats=uf_salary,
-            ),
+            "salary_real_base_competence": real_base_competence,
+            "items": uf_items,
         },
     )
 
@@ -308,16 +387,21 @@ def build_gold(
         data,
         group_cols=["cbo_familia", "cbo_codigo"],
     )
+    occupation_items = _apply_real_salary(
+        _build_grouped(
+            data,
+            group_cols=["cbo_familia", "cbo_codigo"],
+            salary_stats=occupation_salary,
+        ),
+        real_factor,
+    )
     _write_json(
         gold_dir / f"by-occupation-{yearmonth}.json",
         {
             "competence": yearmonth,
             "source": "Novo CAGED / MTE",
-            "items": _build_grouped(
-                data,
-                group_cols=["cbo_familia", "cbo_codigo"],
-                salary_stats=occupation_salary,
-            ),
+            "salary_real_base_competence": real_base_competence,
+            "items": occupation_items,
         },
     )
 
@@ -326,17 +410,22 @@ def build_gold(
             data,
             group_cols=["municipio_codigo_caged"],
         )
+        municipality_items = _apply_real_salary(
+            _build_grouped(
+                data,
+                group_cols=["municipio_codigo_caged"],
+                salary_stats=municipality_salary,
+            ),
+            real_factor,
+        )
         _write_json(
             gold_dir / f"by-municipality-{yearmonth}.json",
             {
                 "competence": yearmonth,
                 "source": "Novo CAGED / MTE",
                 "code_system": "codigo_municipio_caged",
-                "items": _build_grouped(
-                    data,
-                    group_cols=["municipio_codigo_caged"],
-                    salary_stats=municipality_salary,
-                ),
+                "salary_real_base_competence": real_base_competence,
+                "items": municipality_items,
             },
         )
 
