@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0
+
+- camada PostgreSQL alinhada ao Gold real por competência, UF e CBO;
+- carga transacional e idempotente;
+- bloqueio da carga quando o gate de publicação não está aprovado;
+- consultas da API diretamente no PostgreSQL via `DATA_BACKEND=postgres`;
+- migrations Alembic;
+- schema SQL atualizado;
+- testes de serving com SQLite para manter o CI leve;
+- Docker preparado para API usando PostgreSQL.
+
+
 ## 0.7.0
 
 - gate de publicação por competência;
