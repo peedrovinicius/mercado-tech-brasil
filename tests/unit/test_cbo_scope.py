@@ -2,7 +2,6 @@ from pathlib import Path
 
 import yaml
 
-
 EXPECTED_V2_FAMILIES = {
     "2122": "Engenheiros em computação",
     "2123": "Administradores de tecnologia da informação",
