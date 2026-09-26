@@ -1,6 +1,6 @@
 [project]
 name = "mercado-tech-brasil"
-version = "0.20.0"
+version = "0.21.0"
 description = "Produto de dados sobre o mercado formal de trabalho em tecnologia no Brasil."
 requires-python = ">=3.11"
 dependencies = [

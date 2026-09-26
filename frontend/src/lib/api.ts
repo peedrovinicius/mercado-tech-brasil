@@ -69,6 +69,36 @@ export type TrendItem = SalaryFields & {
   salary_real_base_competence?: string | null
 }
 
+export type TemporalPeriod = {
+  key: string
+  label: string
+  year: number
+  quarter: number
+  competencies: string[]
+  start_competence: string
+  end_competence: string
+  published_months: number
+  complete: boolean
+  admissions: number
+  dismissals: number
+  balance: number
+  average_monthly_balance: number
+}
+
+export type TemporalSummary = {
+  source: string
+  scope: string
+  published_from: string
+  published_to: string
+  published_months: number
+  cumulative: {
+    admissions: number
+    dismissals: number
+    balance: number
+  }
+  periods: TemporalPeriod[]
+}
+
 export type Readiness = {
   api: string
   data_loaded: boolean
@@ -198,6 +228,8 @@ export const api = {
     get<{ source: string; scope: string; items: TrendItem[] }>(
       '/analytics/trend',
     ),
+  temporalSummary: () =>
+    get<TemporalSummary>('/analytics/temporal-summary'),
   readiness: () => get<Readiness>('/system/readiness'),
   coverage: () => get<Coverage>('/metadata/coverage'),
   releases: () => get<Releases>('/metadata/releases'),

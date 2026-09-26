@@ -58,6 +58,27 @@ def test_published_analytics_are_served():
     assert by_key["NE"]["balance"] == 155
     assert by_key["CE"]["balance"] == 107
 
+    temporal = client.get("/api/v1/analytics/temporal-summary")
+    assert temporal.status_code == 200
+    temporal_payload = temporal.json()
+    assert temporal_payload["published_months"] == 7
+    assert temporal_payload["cumulative"] == {
+        "admissions": 134209,
+        "dismissals": 127865,
+        "balance": 6344,
+    }
+
+    periods = {item["key"]: item for item in temporal_payload["periods"]}
+    assert periods["2026Q1"]["admissions"] == 58179
+    assert periods["2026Q1"]["balance"] == 2942
+    assert periods["2026Q1"]["complete"] is True
+    assert periods["2026Q2"]["admissions"] == 56777
+    assert periods["2026Q2"]["balance"] == 2496
+    assert periods["2026Q2"]["complete"] is True
+    assert periods["2026Q3"]["published_months"] == 1
+    assert periods["2026Q3"]["balance"] == 906
+    assert periods["2026Q3"]["complete"] is False
+
 
 def test_overview_refuses_without_published_release(monkeypatch):
     monkeypatch.setattr(

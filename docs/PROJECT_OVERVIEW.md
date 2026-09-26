@@ -46,7 +46,7 @@ Competências aprovadas podem ser carregadas no PostgreSQL por uma operação tr
 
 ### API e frontend
 
-FastAPI expõe contratos versionados. React + TypeScript consome a API e apresenta indicadores nacionais, territoriais, por UF, município, ocupação, série histórica, qualidade e proveniência.
+FastAPI expõe contratos versionados. React + TypeScript consome a API e apresenta indicadores nacionais, territoriais, por UF, município, ocupação, série histórica, consolidação trimestral, qualidade e proveniência.
 
 ## Decisões principais
 

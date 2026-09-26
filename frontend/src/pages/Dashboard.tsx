@@ -15,6 +15,7 @@ import { ProvenanceCard } from '../components/ProvenanceCard'
 import { ReferenceContext } from '../components/ReferenceContext'
 import { PipelineVisual } from '../components/PipelineVisual'
 import { TerritorialComparison } from '../components/TerritorialComparison'
+import { TemporalSummary } from '../components/TemporalSummary'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
@@ -63,6 +64,12 @@ export function Dashboard() {
   const trend = useQuery({
     queryKey: ['trend'],
     queryFn: api.trend,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const temporalSummary = useQuery({
+    queryKey: ['temporal-summary'],
+    queryFn: api.temporalSummary,
     retry: false,
     enabled: overview.isSuccess,
   })
@@ -235,6 +242,10 @@ export function Dashboard() {
 
           {territorialComparison.data ? (
             <TerritorialComparison data={territorialComparison.data} />
+          ) : null}
+
+          {temporalSummary.data ? (
+            <TemporalSummary data={temporalSummary.data} />
           ) : null}
 
           <section className="analysis-grid">

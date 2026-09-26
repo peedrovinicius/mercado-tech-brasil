@@ -61,6 +61,7 @@ python scripts/generate_readme_dashboard.py
 | Frontend React | Implementado |
 | Serving de produção | Arquivos Gold publicados |
 | Serving PostgreSQL | Implementado e disponível por configuração |
+| Consolidação temporal | Trimestres completos e parciais |
 
 ## Série publicada
 

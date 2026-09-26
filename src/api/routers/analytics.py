@@ -203,8 +203,7 @@ def by_municipality(
     }
 
 
-@router.get("/trend")
-def trend() -> dict[str, object]:
+def _trend_payload() -> dict[str, object]:
     if settings.data_backend == "postgres":
         try:
             payload = fetch_trend(settings.database_url)
@@ -232,7 +231,8 @@ def trend() -> dict[str, object]:
     items = [
         item
         for item in payload.get("items", [])
-        if str(item.get("competence") or "") in approved
+        if isinstance(item, dict)
+        and str(item.get("competence") or "") in approved
     ]
     if not items:
         raise HTTPException(
@@ -240,3 +240,89 @@ def trend() -> dict[str, object]:
             detail="Série histórica não possui competências aprovadas.",
         )
     return {**payload, "items": items}
+
+
+@router.get("/trend")
+def trend() -> dict[str, object]:
+    return _trend_payload()
+
+
+@router.get("/temporal-summary")
+def temporal_summary() -> dict[str, object]:
+    payload = _trend_payload()
+    raw_items = payload.get("items", [])
+    items = [
+        item
+        for item in raw_items
+        if isinstance(item, dict)
+        and len(str(item.get("competence") or "")) == 6
+    ]
+
+    periods: dict[str, dict[str, object]] = {}
+    for item in sorted(items, key=lambda value: str(value["competence"])):
+        competence = str(item["competence"])
+        year = int(competence[:4])
+        month = int(competence[4:6])
+        quarter = ((month - 1) // 3) + 1
+        key = f"{year}Q{quarter}"
+
+        bucket = periods.setdefault(
+            key,
+            {
+                "key": key,
+                "label": f"{quarter}º trimestre de {year}",
+                "year": year,
+                "quarter": quarter,
+                "competencies": [],
+                "admissions": 0,
+                "dismissals": 0,
+                "balance": 0,
+            },
+        )
+        competencies = bucket["competencies"]
+        if isinstance(competencies, list):
+            competencies.append(competence)
+        bucket["admissions"] = int(bucket["admissions"]) + int(
+            item.get("admissions") or 0
+        )
+        bucket["dismissals"] = int(bucket["dismissals"]) + int(
+            item.get("dismissals") or 0
+        )
+        bucket["balance"] = int(bucket["balance"]) + int(item.get("balance") or 0)
+
+    period_items: list[dict[str, object]] = []
+    for bucket in periods.values():
+        competencies = bucket["competencies"]
+        if not isinstance(competencies, list) or not competencies:
+            continue
+        published_months = len(competencies)
+        balance = int(bucket["balance"])
+        period_items.append(
+            {
+                **bucket,
+                "start_competence": competencies[0],
+                "end_competence": competencies[-1],
+                "published_months": published_months,
+                "complete": published_months == 3,
+                "average_monthly_balance": round(balance / published_months, 2),
+            }
+        )
+
+    admissions = sum(int(item.get("admissions") or 0) for item in items)
+    dismissals = sum(int(item.get("dismissals") or 0) for item in items)
+    balance = sum(int(item.get("balance") or 0) for item in items)
+    competencies = [str(item["competence"]) for item in items]
+
+    return {
+        "source": payload.get("source"),
+        "scope": payload.get("scope"),
+        "published_from": competencies[0],
+        "published_to": competencies[-1],
+        "published_months": len(competencies),
+        "cumulative": {
+            "admissions": admissions,
+            "dismissals": dismissals,
+            "balance": balance,
+        },
+        "periods": period_items,
+    }

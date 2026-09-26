@@ -18,6 +18,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - serving por arquivos e PostgreSQL;
 - API FastAPI e frontend React;
 - comparação Brasil, Nordeste e Ceará;
+- consolidação trimestral com identificação de períodos parciais;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -32,7 +33,7 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão temporal
 
 - incorporar novas competências sem alterar a metodologia já publicada;
-- consolidar comparações trimestrais e anuais quando houver cobertura suficiente;
+- consolidar comparações anuais quando houver cobertura suficiente;
 - documentar revisões oficiais que alterem competências anteriores.
 
 ### Expansão analítica

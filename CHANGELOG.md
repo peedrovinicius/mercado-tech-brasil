@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.21.0
+
+- novo endpoint de consolidação temporal derivado exclusivamente da série publicada;
+- competências são agrupadas automaticamente por trimestre;
+- períodos incompletos são identificados explicitamente como parciais;
+- API expõe acumulado publicado, totais trimestrais e média mensal do saldo;
+- frontend ganha bloco visual de leitura trimestral;
+- testes cobrem acumulado, primeiro e segundo trimestres completos e período parcial mais recente;
+- roadmap passa a tratar consolidação trimestral como funcionalidade concluída;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.20.0
 
 - pipeline real documentado novamente a partir da implementação atual;
