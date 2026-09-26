@@ -92,6 +92,11 @@ export function Dashboard() {
           : `${formatCompetence(firstPublished)} a ${formatCompetence(lastPublished)}`
       )
     : 'Aguardando publicação'
+  const latestCompetenceLabel = overview.data
+    ? formatCompetence(overview.data.competence)
+    : lastPublished
+      ? formatCompetence(lastPublished)
+      : null
 
   return (
     <main>
@@ -103,7 +108,7 @@ export function Dashboard() {
             <small>Dados oficiais. Metodologia aberta.</small>
           </span>
         </a>
-        <nav className="topbar__actions">
+        <nav className="topbar__actions" aria-label="Navegação principal">
           <a href="#contexto">Contexto</a>
           <a href="#analise">Análise</a>
           <a href="#qualidade">Qualidade</a>
@@ -119,6 +124,11 @@ export function Dashboard() {
             <span className="status-badge status-badge--dark">Open data</span>
             <span className="status-badge">Brasil</span>
             <span className="status-badge">CBO v2</span>
+            {latestCompetenceLabel ? (
+              <span className="status-badge status-badge--accent">
+                Atualizado {latestCompetenceLabel}
+              </span>
+            ) : null}
           </div>
           <h1>O mercado formal de tecnologia, explicado com dados verificáveis.</h1>
           <p>
@@ -151,7 +161,12 @@ export function Dashboard() {
             <div><span>Fonte primária</span><strong>Novo CAGED / MTE</strong></div>
             <div><span>Competência tech</span><strong>{overview.data ? formatCompetence(overview.data.competence) : 'Aguardando microdados'}</strong></div>
             <div><span>Cobertura publicada</span><strong>{coverageLabel}</strong></div>
-            <div><span>Serving</span><strong>FastAPI + PostgreSQL</strong></div>
+            <div>
+              <span>Serving</span>
+              <strong>
+                FastAPI + {readiness.data?.backend === 'postgres' ? 'PostgreSQL' : 'Gold publicado'}
+              </strong>
+            </div>
           </div>
         </div>
       </section>
@@ -271,7 +286,7 @@ export function Dashboard() {
 
           <section className="quality-section" id="qualidade">
             <div>
-              <p className="eyebrow">Data quality</p>
+              <p className="eyebrow">Qualidade dos dados</p>
               <h2>O número só entra no dashboard depois de passar pelas validações.</h2>
               <p>
                 O pipeline mantém registros rejeitados auditáveis e expõe a taxa de validade da competência.
@@ -295,7 +310,7 @@ export function Dashboard() {
         <section className="error-state">
           <p className="eyebrow">API indisponível</p>
           <h2>Não foi possível conectar ao backend.</h2>
-          <p>Inicie a API FastAPI em <code>localhost:8000</code> e recarregue a página.</p>
+          <p>Verifique sua conexão e recarregue a página. Os dados publicados permanecem preservados no pipeline.</p>
         </section>
       ) : null}
 
@@ -306,9 +321,21 @@ export function Dashboard() {
       ) : null}
 
       <footer className="footer">
-        <span>Mercado Tech Brasil</span>
-        <span>Fonte principal: Ministério do Trabalho e Emprego</span>
-        <button onClick={() => setMethodologyOpen(true)}>Como os números são calculados?</button>
+        <div className="footer__identity">
+          <strong>Mercado Tech Brasil</strong>
+          <span>Fonte principal: Novo CAGED / Ministério do Trabalho e Emprego</span>
+        </div>
+        <nav className="footer__links" aria-label="Links técnicos">
+          <a href="/docs" target="_blank" rel="noreferrer">API / OpenAPI</a>
+          <a
+            href="https://github.com/peedrovinicius/mercado-tech-brasil"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Código-fonte
+          </a>
+          <button type="button" onClick={() => setMethodologyOpen(true)}>Metodologia</button>
+        </nav>
       </footer>
 
       <MethodologyPanel

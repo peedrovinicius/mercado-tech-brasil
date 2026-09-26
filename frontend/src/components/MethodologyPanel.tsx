@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 type MethodologyPanelProps = {
   open: boolean
   onClose: () => void
@@ -5,6 +7,23 @@ type MethodologyPanelProps = {
 }
 
 export function MethodologyPanel({ open, onClose, competence }: MethodologyPanelProps) {
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open, onClose])
+
   if (!open) return null
 
   return (
@@ -21,7 +40,7 @@ export function MethodologyPanel({ open, onClose, competence }: MethodologyPanel
             <p className="eyebrow">Rastreabilidade</p>
             <h2 id="methodology-title">Como este número foi calculado?</h2>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label="Fechar">
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Fechar" autoFocus>
             ×
           </button>
         </div>
@@ -44,7 +63,13 @@ export function MethodologyPanel({ open, onClose, competence }: MethodologyPanel
           <h3>Salário</h3>
           <p>
             Média e mediana são calculadas apenas sobre admissões com salário válido. Registros inválidos
-            ficam auditáveis em uma saída separada; não são descartados silenciosamente.
+            ficam auditáveis em uma saída separada e não são descartados silenciosamente. Quando disponível,
+            o valor real é corrigido pelo IPCA/IBGE para a competência base informada no painel.
+          </p>
+          <h3>Ajustes posteriores</h3>
+          <p>
+            Arquivos FOR e EXC são aplicados à competência original antes da reconstrução dos agregados,
+            preservando a rastreabilidade das revisões oficiais.
           </p>
         </div>
       </section>

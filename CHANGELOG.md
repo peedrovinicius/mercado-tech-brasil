@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.19.1
+
+- refinamento visual e responsivo do frontend público;
+- competência mais recente passa a aparecer no conjunto de badges do hero;
+- serving exibido no hero respeita o backend informado pela readiness;
+- mensagem de erro pública deixa de sugerir localhost;
+- terminologia de qualidade padronizada em português;
+- valores ausentes de moeda passam a exibir N/D;
+- modal de metodologia fecha com Escape, bloqueia o scroll de fundo e recebe foco inicial;
+- rodapé passa a expor API, código-fonte e metodologia;
+- metadados de descrição, indexação e compartilhamento aprimorados;
+- foco visível, redução de movimento e ajustes para telas pequenas adicionados;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.0
 
 - documentação técnica sincronizada com o estado real da série publicada;
