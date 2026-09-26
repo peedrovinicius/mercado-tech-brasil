@@ -259,9 +259,16 @@ def evaluate_publication_gate(
                     id="official_reference_available",
                     passed=False,
                     message="Não há referência oficial registrada para a competência.",
-                    blocking=False,
                 )
             )
+    else:
+        checks.append(
+            GateCheck(
+                id="official_reference_available",
+                passed=False,
+                message="Arquivo de referências oficiais não encontrado.",
+            )
+        )
 
     automatic_checks_passed = all(check.passed for check in checks if check.blocking)
 

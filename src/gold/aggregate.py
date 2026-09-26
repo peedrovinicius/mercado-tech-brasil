@@ -343,7 +343,12 @@ def build_gold(
 
     adjustment_counts = (
         data.group_by("adjustment_kind")
-        .len()
+        .agg(
+            pl.len().alias("rows"),
+            pl.col("admissions_delta").sum().alias("admissions_delta"),
+            pl.col("dismissals_delta").sum().alias("dismissals_delta"),
+            pl.col("balance_delta").sum().alias("balance_delta"),
+        )
         .sort("adjustment_kind")
         .to_dicts()
     )
