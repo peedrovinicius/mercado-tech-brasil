@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.30.0
+
+- referência oficial da RAIS 2025 versionada com 59.970.945 vínculos ativos;
+- Silver passa a preservar contagens nacionais da fonte antes do recorte CBO e das validações territoriais;
+- fonte é particionada em ativos, inativos, status desconhecido e ano divergente;
+- a partição precisa fechar exatamente o total de linhas lidas;
+- reconciliação usa o estoque bruto ativo, não o subconjunto tech;
+- qualquer diferença em relação ao total oficial mantém Gold bloqueado;
+- status desconhecido ou ano divergente também bloqueiam a reconciliação;
+- CLI ganha comando rais-reconcile;
+- reconciliação aprovada libera gold_ready, mas publication_ready permanece falso;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.29.0
 
 - transformação Silver anual da RAIS implementada após as travas de schema e valores;

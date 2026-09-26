@@ -19,6 +19,10 @@ class RaisSilverResult:
     rows_read: int
     rows_active: int
     rows_inactive: int
+    rows_active_source: int
+    rows_inactive_source: int
+    rows_unknown_status_source: int
+    rows_year_mismatch_source: int
     rows_valid: int
     rows_rejected: int
     rows_tech: int
@@ -211,6 +215,10 @@ def transform_rais_year(
     rows_read = 0
     rows_active = 0
     rows_inactive = 0
+    rows_active_source = 0
+    rows_inactive_source = 0
+    rows_unknown_status_source = 0
+    rows_year_mismatch_source = 0
     rows_valid = 0
     rows_rejected = 0
     rows_tech = 0
@@ -261,6 +269,15 @@ def transform_rais_year(
                     cbo_code = _digits(cbo_raw)
                     municipality_code = _digits(municipality_raw)
                     uf = uf_raw.strip().upper()
+
+                    if year_raw != str(year):
+                        rows_year_mismatch_source += 1
+                    elif active_normalized in active_values:
+                        rows_active_source += 1
+                    elif active_normalized in inactive_values:
+                        rows_inactive_source += 1
+                    else:
+                        rows_unknown_status_source += 1
 
                     reasons: list[str] = []
                     if year_raw != str(year):
@@ -342,6 +359,17 @@ def transform_rais_year(
         "rows_rejected": rows_rejected,
         "rows_active": rows_active,
         "rows_inactive": rows_inactive,
+        "rows_active_source": rows_active_source,
+        "rows_inactive_source": rows_inactive_source,
+        "rows_unknown_status_source": rows_unknown_status_source,
+        "rows_year_mismatch_source": rows_year_mismatch_source,
+        "source_partition_complete": (
+            rows_read
+            == rows_active_source
+            + rows_inactive_source
+            + rows_unknown_status_source
+            + rows_year_mismatch_source
+        ),
         "rows_tech": rows_tech,
         "valid_rate": round(rows_valid / rows_read, 8) if rows_read else 0,
         "rejection_counts": rejection_counts,
@@ -364,6 +392,10 @@ def transform_rais_year(
         rows_read=rows_read,
         rows_active=rows_active,
         rows_inactive=rows_inactive,
+        rows_active_source=rows_active_source,
+        rows_inactive_source=rows_inactive_source,
+        rows_unknown_status_source=rows_unknown_status_source,
+        rows_year_mismatch_source=rows_year_mismatch_source,
         rows_valid=rows_valid,
         rows_rejected=rows_rejected,
         rows_tech=rows_tech,

@@ -1,0 +1,10 @@
+{
+  "2025": {
+    "source": "Ministério do Trabalho e Emprego: RAIS 2025, Sumário Executivo",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/sumario-executivo_rais-2025.pdf",
+    "reference_kind": "annual_active_stock_3112",
+    "scope": "Brasil, vínculos formais ativos em 31/12/2025",
+    "active_links": 59970945,
+    "note": "O total nacional é usado somente para reconciliar o estoque bruto de vínculos ativos antes do recorte CBO tech."
+  }
+}

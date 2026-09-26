@@ -40,6 +40,10 @@ from src.validation.publication_gate import (
     evaluate_publication_gate,
     write_publication_gate,
 )
+from src.validation.rais_reconciliation import (
+    evaluate_rais_reconciliation,
+    write_rais_reconciliation,
+)
 
 
 def command_download(yearmonth: str) -> None:
@@ -516,6 +520,35 @@ def command_rais_transform(
     print("rais gold: BLOCKED until annual reconciliation and gate")
 
 
+def command_rais_reconcile(year: int) -> None:
+    quality_path = settings.silver_path / f"rais_quality_{year}.json"
+    destination = settings.silver_path / f"rais_reconciliation_{year}.json"
+
+    if not quality_path.exists():
+        raise SystemExit(
+            f"Relatório de qualidade RAIS ausente: {quality_path}. "
+            "Execute rais-transform primeiro."
+        )
+
+    result = evaluate_rais_reconciliation(
+        year=year,
+        quality_path=quality_path,
+        reference_path=settings.rais_reference_totals_path,
+    )
+    write_rais_reconciliation(result, destination)
+
+    status = "PASS" if result.reconciled else "FAIL"
+    print(
+        f"rais reconciliation: {status} "
+        f"observado={result.observed_active:,} "
+        f"oficial={result.expected_active:,} "
+        f"diferença={result.difference:+,}"
+    )
+    print(f"rais reconciliation report: {destination}")
+    if not result.gold_ready:
+        raise SystemExit(2)
+
+
 def command_sync_municipalities() -> None:
     municipalities = fetch_municipalities()
     if len(municipalities) < 5000:
@@ -713,6 +746,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Linhas por lote de escrita Parquet, entre 1000 e 500000.",
     )
 
+    rais_reconcile = sub.add_parser(
+        "rais-reconcile",
+        help="Reconcilia o estoque nacional bruto da RAIS com a referência oficial.",
+    )
+    rais_reconcile.add_argument("year", type=int, help="Ano-base da RAIS.")
+
     sub.add_parser(
         "sync-municipalities",
         help="Atualiza nomes e códigos municipais pela API oficial do IBGE.",
@@ -816,6 +855,10 @@ def main() -> None:
             args.year,
             batch_size=args.batch_size,
         )
+        return
+
+    if args.command == "rais-reconcile":
+        command_rais_reconcile(args.year)
         return
 
     if args.command == "sync-municipalities":

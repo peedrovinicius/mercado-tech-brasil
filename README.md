@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Bronze e transformação Silver implementados com travas semânticas; Gold ainda não publicado |
+| RAIS anual | Silver e reconciliação nacional implementados; Gold condicionado a fechamento exato |
 
 ## Série publicada
 
@@ -275,6 +275,7 @@ python -m src.cli rais-validate-layout 2025
 python -m src.cli rais-profile-values 2025
 python -m src.cli rais-validate-values 2025
 python -m src.cli rais-transform 2025
+python -m src.cli rais-reconcile 2025
 ~~~
 
 Processamento por competência:

@@ -228,6 +228,47 @@ Registros com ano divergente, situação do vínculo desconhecida, CBO inválida
 
 O relatório de qualidade registra totais lidos, válidos, rejeitados, ativos, inativos e tech. Mesmo com Silver gerada, `gold_ready` e `publication_ready` permanecem falsos.
 
+## Reconciliação anual
+
+Antes de qualquer Gold, o estoque nacional bruto de vínculos ativos é comparado com a referência oficial do MTE.
+
+Para 2025, o Sumário Executivo da RAIS informa:
+
+`59.970.945 vínculos ativos`
+
+A referência versionada fica em:
+
+```text
+config/rais_reference_totals.json
+```
+
+Executar:
+
+```bash
+python -m src.cli rais-reconcile 2025
+```
+
+A transformação Silver registra uma partição da fonte antes do recorte CBO:
+
+- vínculos ativos do ano solicitado;
+- vínculos inativos;
+- status desconhecido;
+- registros com ano divergente.
+
+Essas categorias precisam fechar exatamente o total de linhas lidas. O gate exige também zero status desconhecido e zero ano divergente.
+
+O total comparado com o MTE é `rows_active_source`, calculado antes das validações de CBO, município e UF. Assim, registros territoriais rejeitados não reduzem artificialmente o estoque nacional usado na reconciliação.
+
+A diferença precisa ser exatamente zero. Qualquer divergência mantém `gold_ready=false`.
+
+Quando a reconciliação passa, `gold_ready=true`, mas `publication_ready` continua falso.
+
+O relatório é salvo em:
+
+```text
+data/silver/rais_reconciliation_2025.json
+```
+
 ## Regra de publicação
 
 A existência do Bronze RAIS não autoriza a publicação de métricas.

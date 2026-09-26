@@ -79,3 +79,20 @@ Arquivo esperado:
 O Silver representa apenas vínculos ativos em 31/12 pertencentes ao recorte ocupacional tech. Vínculos inativos são contabilizados na qualidade, mas não entram no Parquet tech.
 
 Registros estruturalmente inválidos são gravados em `rais_rejected_<ano>.parquet`. A geração do Silver não equivale a publicação.
+
+
+### Reconciliação RAIS
+
+O relatório `rais_quality_<ano>.json` preserva contagens nacionais anteriores ao recorte CBO:
+
+| Campo | Regra |
+|---|---|
+| rows_active_source | vínculos do ano com situação oficial ativa |
+| rows_inactive_source | vínculos do ano com situação oficial inativa |
+| rows_unknown_status_source | vínculos do ano com situação não reconhecida |
+| rows_year_mismatch_source | registros fora do ano solicitado |
+| source_partition_complete | soma das categorias igual ao total lido |
+
+A reconciliação usa `rows_active_source`, não `rows_tech` nem `rows_active` após validações territoriais.
+
+Para 2025, `rows_active_source` precisa ser exatamente 59.970.945 antes de o Gold anual ser liberado.

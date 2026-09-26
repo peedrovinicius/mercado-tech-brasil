@@ -28,6 +28,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - perfil amostral dos valores RAIS antes do Silver;
 - contrato de valores RAIS para situação do vínculo em 31/12;
 - transformação Silver RAIS em streaming com rejeições auditáveis;
+- reconciliação nacional RAIS contra referência oficial do MTE;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -53,8 +54,8 @@ A base necessária para publicar e auditar o produto está implementada:
 - executar rais-validate-values e confirmar SIM/NÃO no arquivo observado;
 - revisar aliases ou valores somente se os microdados reais divergirem da documentação oficial;
 - executar o Silver sobre os microdados reais de 2025 após as validações;
-- reconciliar o estoque RAIS com referências anuais oficiais;
-- construir o Gold anual somente depois da reconciliação;
+- executar a reconciliação exata com 59.970.945 vínculos ativos;
+- construir o Gold anual somente depois de gold_ready=true;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
 
