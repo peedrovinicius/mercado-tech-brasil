@@ -44,6 +44,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
 
+      - name: Normalize municipality dimension
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from src.gold.aggregate import enrich_municipality_items
+          from src.core.settings import settings
+
+          for path in sorted(Path("data/gold").glob("by-municipality-2026*.json")):
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              payload["items"] = enrich_municipality_items(
+                  payload.get("items", []),
+                  settings.municipalities_cache_path,
+              )
+              path.write_text(
+                  json.dumps(payload, ensure_ascii=False, indent=2),
+                  encoding="utf-8",
+              )
+              print("normalized:", path.name)
+          PY
+
       - name: Rebuild publication gates
         run: |
           for competence in 202601 202602 202603 202604 202605 202606 202607; do
