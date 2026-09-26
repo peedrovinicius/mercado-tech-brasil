@@ -135,7 +135,14 @@ def build_serving_payload(
                 "admissions": item["admissions"],
                 "dismissals": item["dismissals"],
                 "balance": item["balance"],
+                "salary_mean_admissions": item.get("salary_mean_admissions"),
                 "salary_median_admissions": item.get("salary_median_admissions"),
+                "salary_mean_admissions_real": item.get(
+                    "salary_mean_admissions_real"
+                ),
+                "salary_median_admissions_real": item.get(
+                    "salary_median_admissions_real"
+                ),
             }
         )
 
@@ -156,7 +163,14 @@ def build_serving_payload(
                 "admissions": item["admissions"],
                 "dismissals": item["dismissals"],
                 "balance": item["balance"],
+                "salary_mean_admissions": item.get("salary_mean_admissions"),
                 "salary_median_admissions": item.get("salary_median_admissions"),
+                "salary_mean_admissions_real": item.get(
+                    "salary_mean_admissions_real"
+                ),
+                "salary_median_admissions_real": item.get(
+                    "salary_median_admissions_real"
+                ),
             }
         )
 
@@ -178,6 +192,12 @@ def build_serving_payload(
                     "salary_median_admissions": item.get(
                         "salary_median_admissions"
                     ),
+                    "salary_mean_admissions_real": item.get(
+                        "salary_mean_admissions_real"
+                    ),
+                    "salary_median_admissions_real": item.get(
+                        "salary_median_admissions_real"
+                    ),
                 }
             )
 
@@ -192,6 +212,15 @@ def build_serving_payload(
         "records_tech": int(overview.get("records_tech") or 0),
         "salary_mean_admissions": overview.get("salary_mean_admissions"),
         "salary_median_admissions": overview.get("salary_median_admissions"),
+        "salary_mean_admissions_real": overview.get(
+            "salary_mean_admissions_real"
+        ),
+        "salary_median_admissions_real": overview.get(
+            "salary_median_admissions_real"
+        ),
+        "salary_real_base_competence": overview.get(
+            "salary_real_base_competence"
+        ),
         "valid_rate": float(quality.get("valid_rate") or 0),
         "loaded_at_utc": datetime.now(UTC),
     }
