@@ -1,5 +1,6 @@
 import { BarChart, LineChart } from 'echarts/charts'
 import {
+  AriaComponent,
   GridComponent,
   LegendComponent,
   TooltipComponent,
@@ -11,11 +12,13 @@ import ReactEChartsCore from 'echarts-for-react/lib/core'
 echarts.use([
   BarChart,
   LineChart,
+  AriaComponent,
   GridComponent,
   LegendComponent,
   TooltipComponent,
   CanvasRenderer,
 ])
+
 import type {
   MunicipalityItem,
   OccupationItem,
@@ -24,23 +27,44 @@ import type {
 } from '../lib/api'
 import { formatCompetence, formatNumber } from '../lib/format'
 
+const axisLabelColor = '#686870'
+const categoryLabelColor = '#44444b'
+const gridLineColor = '#ececf0'
+const axisLineColor = '#d9d9de'
+
+const numberTooltip = {
+  trigger: 'axis',
+  confine: true,
+  valueFormatter: (value: number) => formatNumber(value),
+}
+
+const valueAxis = {
+  type: 'value',
+  axisLabel: {
+    color: axisLabelColor,
+    formatter: (value: number) => formatNumber(value),
+  },
+  splitLine: { lineStyle: { color: gridLineColor } },
+}
+
 export function UfChart({ items }: { items: UfItem[] }) {
   const top = items.slice(0, 10)
   const option = {
-    animationDuration: 500,
-    grid: { left: 44, right: 16, top: 18, bottom: 32 },
-    tooltip: { trigger: 'axis' },
+    animationDuration: 450,
+    aria: { show: true },
+    grid: { left: 54, right: 14, top: 18, bottom: 34, containLabel: true },
+    tooltip: {
+      ...numberTooltip,
+      axisPointer: { type: 'shadow' },
+    },
     xAxis: {
       type: 'category',
       data: top.map((item) => item.uf),
       axisTick: { show: false },
-      axisLine: { lineStyle: { color: '#d9d9de' } },
+      axisLine: { lineStyle: { color: axisLineColor } },
+      axisLabel: { color: categoryLabelColor },
     },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: '#696970' },
-      splitLine: { lineStyle: { color: '#ececf0' } },
-    },
+    yAxis: valueAxis,
     series: [
       {
         name: 'Admissões',
@@ -50,25 +74,46 @@ export function UfChart({ items }: { items: UfItem[] }) {
         barMaxWidth: 30,
       },
     ],
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 8, right: 8, top: 18, bottom: 28, containLabel: true },
+          xAxis: { axisLabel: { fontSize: 10, interval: 0 } },
+          yAxis: { axisLabel: { fontSize: 10 } },
+          series: [{ barMaxWidth: 22 }],
+        },
+      },
+    ],
   }
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 310 }} />
+
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 310 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
 }
 
 export function OccupationChart({ items }: { items: OccupationItem[] }) {
   const top = items.slice(0, 8).reverse()
   const option = {
-    animationDuration: 500,
-    grid: { left: 88, right: 16, top: 8, bottom: 22 },
-    tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'value',
-      splitLine: { lineStyle: { color: '#ececf0' } },
+    animationDuration: 450,
+    aria: { show: true },
+    grid: { left: 92, right: 14, top: 8, bottom: 22, containLabel: true },
+    tooltip: {
+      ...numberTooltip,
+      axisPointer: { type: 'shadow' },
     },
+    xAxis: valueAxis,
     yAxis: {
       type: 'category',
       data: top.map((item) => item.cbo_codigo),
       axisTick: { show: false },
       axisLine: { show: false },
+      axisLabel: { color: categoryLabelColor },
     },
     series: [
       {
@@ -79,8 +124,26 @@ export function OccupationChart({ items }: { items: OccupationItem[] }) {
         barMaxWidth: 18,
       },
     ],
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 6, right: 8, top: 8, bottom: 18, containLabel: true },
+          xAxis: { axisLabel: { fontSize: 10 } },
+          yAxis: { axisLabel: { fontSize: 10 } },
+        },
+      },
+    ],
   }
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 310 }} />
+
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 310 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
 }
 
 export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
@@ -90,24 +153,21 @@ export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
     return item.uf ? `${name} / ${item.uf}` : name
   })
   const option = {
-    animationDuration: 500,
-    grid: { left: 142, right: 20, top: 12, bottom: 24 },
+    animationDuration: 450,
+    aria: { show: true },
+    grid: { left: 150, right: 16, top: 12, bottom: 24, containLabel: true },
     tooltip: {
-      trigger: 'axis',
-      valueFormatter: (value: number) => formatNumber(value),
+      ...numberTooltip,
+      axisPointer: { type: 'shadow' },
     },
-    xAxis: {
-      type: 'value',
-      splitLine: { lineStyle: { color: '#ececf0' } },
-      axisLabel: { color: '#74747c' },
-    },
+    xAxis: valueAxis,
     yAxis: {
       type: 'category',
       data: labels,
       axisTick: { show: false },
       axisLine: { show: false },
       axisLabel: {
-        color: '#4d4d54',
+        color: categoryLabelColor,
         width: 128,
         overflow: 'truncate',
       },
@@ -121,8 +181,32 @@ export function MunicipalityChart({ items }: { items: MunicipalityItem[] }) {
         barMaxWidth: 18,
       },
     ],
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 6, right: 8, top: 12, bottom: 20, containLabel: true },
+          xAxis: { axisLabel: { fontSize: 10 } },
+          yAxis: {
+            axisLabel: {
+              width: 92,
+              fontSize: 10,
+              overflow: 'truncate',
+            },
+          },
+        },
+      },
+    ],
   }
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 340 }} />
+
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 350 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
 }
 
 export function TrendChart({ items }: { items: TrendItem[] }) {
@@ -130,55 +214,85 @@ export function TrendChart({ items }: { items: TrendItem[] }) {
     a.competence.localeCompare(b.competence),
   )
   const option = {
-    animationDuration: 600,
-    grid: { left: 50, right: 22, top: 28, bottom: 42 },
+    animationDuration: 500,
+    aria: { show: true },
+    grid: { left: 52, right: 18, top: 42, bottom: 40, containLabel: true },
     tooltip: {
-      trigger: 'axis',
-      valueFormatter: (value: number) => formatNumber(value),
+      ...numberTooltip,
+      axisPointer: { type: 'line' },
     },
     legend: {
       top: 0,
       data: ['Admissões', 'Desligamentos', 'Saldo'],
-      textStyle: { color: '#67676f' },
+      itemWidth: 14,
+      itemHeight: 8,
+      textStyle: { color: '#67676f', fontSize: 11 },
     },
     xAxis: {
       type: 'category',
+      boundaryGap: true,
       data: ordered.map((item) => formatCompetence(item.competence)),
       axisTick: { show: false },
-      axisLine: { lineStyle: { color: '#d9d9de' } },
+      axisLine: { lineStyle: { color: axisLineColor } },
+      axisLabel: { color: categoryLabelColor },
     },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: '#74747c' },
-      splitLine: { lineStyle: { color: '#ececf0' } },
-    },
+    yAxis: valueAxis,
     series: [
       {
         name: 'Admissões',
         type: 'line',
         smooth: true,
         showSymbol: ordered.length < 18,
+        symbolSize: 6,
         data: ordered.map((item) => item.admissions),
         lineStyle: { width: 2 },
+        emphasis: { focus: 'series' },
       },
       {
         name: 'Desligamentos',
         type: 'line',
         smooth: true,
         showSymbol: ordered.length < 18,
+        symbolSize: 6,
         data: ordered.map((item) => item.dismissals),
         lineStyle: { width: 2 },
+        emphasis: { focus: 'series' },
       },
       {
         name: 'Saldo',
         type: 'bar',
         data: ordered.map((item) => item.balance),
-        barMaxWidth: 18,
+        barMaxWidth: 16,
+        emphasis: { focus: 'series' },
+      },
+    ],
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 6, right: 8, top: 58, bottom: 28, containLabel: true },
+          legend: {
+            top: 0,
+            left: 0,
+            right: 0,
+            itemGap: 10,
+            textStyle: { fontSize: 10 },
+          },
+          xAxis: { axisLabel: { fontSize: 10 } },
+          yAxis: { axisLabel: { fontSize: 10 } },
+        },
       },
     ],
   }
 
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 340 }} />
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 350 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
 }
 
 type RegionItem = {
@@ -191,23 +305,20 @@ type RegionItem = {
 export function ReferenceRegionChart({ items }: { items: RegionItem[] }) {
   const ordered = [...items].sort((a, b) => b.balance - a.balance)
   const option = {
-    animationDuration: 600,
-    grid: { left: 94, right: 20, top: 18, bottom: 20 },
+    animationDuration: 450,
+    aria: { show: true },
+    grid: { left: 96, right: 16, top: 18, bottom: 20, containLabel: true },
     tooltip: {
-      trigger: 'axis',
-      valueFormatter: (value: number) => new Intl.NumberFormat('pt-BR').format(value),
+      ...numberTooltip,
+      axisPointer: { type: 'shadow' },
     },
-    xAxis: {
-      type: 'value',
-      splitLine: { lineStyle: { color: '#ececf0' } },
-      axisLabel: { color: '#74747c' },
-    },
+    xAxis: valueAxis,
     yAxis: {
       type: 'category',
       data: ordered.map((item) => item.region),
       axisTick: { show: false },
       axisLine: { show: false },
-      axisLabel: { color: '#4d4d54' },
+      axisLabel: { color: categoryLabelColor },
     },
     series: [
       {
@@ -223,7 +334,24 @@ export function ReferenceRegionChart({ items }: { items: RegionItem[] }) {
         barMaxWidth: 22,
       },
     ],
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 6, right: 8, top: 16, bottom: 16, containLabel: true },
+          xAxis: { axisLabel: { fontSize: 10 } },
+          yAxis: { axisLabel: { fontSize: 10 } },
+        },
+      },
+    ],
   }
 
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: 270 }} />
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 270 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
 }

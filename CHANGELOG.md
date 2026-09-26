@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.2
+
+- gráficos com tooltips confinados à área visível para melhor uso em telas pequenas;
+- eixos passam a formatar números no padrão pt-BR;
+- recuos e rótulos recebem configuração responsiva para celular;
+- acessibilidade nativa do ECharts ativada com descrições ARIA;
+- foco de série adicionado à evolução mensal para facilitar leitura interativa;
+- tamanhos de legenda e barras refinados para reduzir poluição visual;
+- cobertura de dados permanece de janeiro a julho de 2026.
+
 ## 0.19.1
 
 - refinamento visual e responsivo do frontend público;
@@ -22,7 +32,7 @@
 - metodologia passa a documentar explicitamente a comparação Brasil, Nordeste e Ceará;
 - README ganha snapshot territorial de julho de 2026 com participações derivadas dos agregados publicados;
 - versão do backend alinhada para 0.19.0;
-- cobertura permanece de janeiro a julho de 2026, sem agosto.
+- cobertura permanece de janeiro a julho de 2026.
 
 ## 0.18.0
 
