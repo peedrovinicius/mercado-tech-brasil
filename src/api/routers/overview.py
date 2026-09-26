@@ -5,6 +5,7 @@ import json
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 
+from src.api.publication import latest_published_competence
 from src.core.settings import settings
 from src.db.repository import fetch_overview
 
@@ -28,8 +29,8 @@ def overview() -> dict[str, object]:
             )
         return payload
 
-    files = sorted(settings.gold_path.glob("overview-*.json"))
-    if not files:
+    competence = latest_published_competence(settings.gold_path)
+    if competence is None:
         raise HTTPException(
             status_code=503,
             detail=(
@@ -38,4 +39,11 @@ def overview() -> dict[str, object]:
             ),
         )
 
-    return json.loads(files[-1].read_text(encoding="utf-8"))
+    path = settings.gold_path / f"overview-{competence}.json"
+    if not path.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="A competência aprovada não possui overview Gold disponível.",
+        )
+
+    return json.loads(path.read_text(encoding="utf-8"))
