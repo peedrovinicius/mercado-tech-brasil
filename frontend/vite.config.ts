@@ -7,28 +7,30 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (!id.includes('node_modules')) {
+          const has = (fragment: string) => id.indexOf(fragment) >= 0
+
+          if (!has('node_modules')) {
             return undefined
           }
-          if (id.includes('/zrender/')) {
+          if (has('/zrender/')) {
             return 'zrender'
           }
-          if (id.includes('/echarts-for-react/')) {
+          if (has('/echarts-for-react/')) {
             return 'echarts-react'
           }
-          if (id.includes('/echarts/lib/chart/')) {
+          if (has('/echarts/lib/chart/')) {
             return 'echarts-charts'
           }
-          if (id.includes('/echarts/lib/component/')) {
+          if (has('/echarts/lib/component/')) {
             return 'echarts-components'
           }
-          if (id.includes('/echarts/')) {
+          if (has('/echarts/')) {
             return 'echarts-core'
           }
           if (
-            id.includes('/react/') ||
-            id.includes('/react-dom/') ||
-            id.includes('/@tanstack/react-query/')
+            has('/react/') ||
+            has('/react-dom/') ||
+            has('/@tanstack/react-query/')
           ) {
             return 'react'
           }
