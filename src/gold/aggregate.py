@@ -8,6 +8,7 @@ from typing import Any
 
 from src.methodology.salary import add_salary_eligibility, methodology_for_competence
 from src.reference.ipca import load_ipca_cache
+from src.reference.municipalities import load_municipalities
 
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
@@ -261,12 +262,29 @@ def _apply_real_salary(
     return items
 
 
+def _enrich_municipality_items(
+    items: list[dict[str, Any]],
+    cache_path: Path | None,
+) -> list[dict[str, Any]]:
+    if cache_path is None or not cache_path.exists():
+        return items
+
+    mapping = load_municipalities(cache_path)
+    for item in items:
+        code = str(item.get("municipio_codigo_caged") or "")
+        reference = mapping.get(code)
+        if reference:
+            item.update(reference)
+    return items
+
+
 def build_gold(
     silver_path: Path,
     *,
     yearmonth: str,
     gold_dir: Path,
     ipca_cache_path: Path | None = None,
+    municipalities_cache_path: Path | None = None,
 ) -> tuple[Path, Path]:
     try:
         import polars as pl
@@ -410,13 +428,16 @@ def build_gold(
             data,
             group_cols=["municipio_codigo_caged"],
         )
-        municipality_items = _apply_real_salary(
-            _build_grouped(
-                data,
-                group_cols=["municipio_codigo_caged"],
-                salary_stats=municipality_salary,
+        municipality_items = _enrich_municipality_items(
+            _apply_real_salary(
+                _build_grouped(
+                    data,
+                    group_cols=["municipio_codigo_caged"],
+                    salary_stats=municipality_salary,
+                ),
+                real_factor,
             ),
-            real_factor,
+            municipalities_cache_path,
         )
         _write_json(
             gold_dir / f"by-municipality-{yearmonth}.json",
