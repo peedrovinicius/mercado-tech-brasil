@@ -86,7 +86,10 @@ button { cursor: pointer; }
   max-width: 760px;
   color: #5f5f67;
   font-size: 18px;
-  line-height: 1.65;
+  line-height: 1.72;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 .hero__badges { display: flex; flex-wrap: wrap; gap: 8px; }
 .status-badge {
@@ -250,7 +253,10 @@ button { cursor: pointer; }
 .reference-section__heading p:last-child {
   max-width: 760px;
   color: #65656d;
-  line-height: 1.65;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 .source-link {
   padding-bottom: 4px;
@@ -321,7 +327,10 @@ button { cursor: pointer; }
   background: #f3f3f5;
   color: #67676f;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.5;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 .reference-chart-card { padding: 22px; }
 .reference-chart-card h3 { margin: 6px 0 0; font-size: 18px; }
@@ -405,7 +414,14 @@ button { cursor: pointer; }
   border-top: 1px solid #e0e0e4;
 }
 .quality-section h2 { max-width: 720px; margin: 8px 0 16px; font-size: clamp(30px, 4vw, 50px); letter-spacing: -.04em; }
-.quality-section > div > p:last-child { max-width: 680px; color: #62626a; line-height: 1.65; }
+.quality-section > div > p:last-child {
+  max-width: 680px;
+  color: #62626a;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
 .quality-card { background: #171719; color: #fff; border-radius: 20px; padding: 26px; }
 .quality-card > span { color: #a9a9b0; font-size: 13px; }
 .quality-card > strong { display: block; margin: 12px 0 28px; font-size: 54px; letter-spacing: -.05em; }
@@ -434,7 +450,16 @@ button { cursor: pointer; }
   font-weight: 800;
 }
 .empty-state h2, .error-state h2 { margin: 7px 0 10px; }
-.empty-state p, .error-state p { color: #66666d; line-height: 1.6; }
+.empty-state p, .error-state p {
+  color: #66666d;
+  line-height: 1.65;
+}
+.empty-state p:not(.eyebrow),
+.error-state p:not(.eyebrow) {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
 .empty-state__hint { font-size: 13px; }
 .error-state { grid-template-columns: 1fr; margin-top: 20px; }
 .error-state code { background: #efeff2; padding: 2px 6px; border-radius: 5px; }
@@ -465,7 +490,14 @@ button { cursor: pointer; }
 .methodology-grid span { color: #77777e; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .methodology-grid strong { margin-top: 8px; font-size: 13px; }
 .methodology-copy h3 { margin: 28px 0 8px; }
-.methodology-copy p { margin: 0; color: #66666e; line-height: 1.65; }
+.methodology-copy p {
+  margin: 0;
+  color: #66666e;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
 
 .footer {
   display: flex;
@@ -541,4 +573,30 @@ button { cursor: pointer; }
 @media (max-width: 520px) {
   .provenance-section { padding-left: 20px; padding-right: 20px; }
   .provenance-card dl { grid-template-columns: 1fr; }
+}
+
+
+/* Tipografia editorial para textos corridos */
+.hero__copy > p,
+.reference-section__heading p:last-child,
+.quality-section > div > p:last-child,
+.empty-state p:not(.eyebrow),
+.error-state p:not(.eyebrow),
+.methodology-copy p,
+.reference-card__rule {
+  hanging-punctuation: first last;
+  text-wrap: pretty;
+}
+
+@media (max-width: 680px) {
+  .hero__copy > p,
+  .reference-section__heading p:last-child,
+  .quality-section > div > p:last-child,
+  .empty-state p:not(.eyebrow),
+  .error-state p:not(.eyebrow),
+  .methodology-copy p,
+  .reference-card__rule {
+    text-align: justify;
+    text-justify: inter-word;
+  }
 }

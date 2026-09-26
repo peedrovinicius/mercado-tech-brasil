@@ -191,11 +191,11 @@ export function Dashboard() {
             </div>
             <article className="quality-card">
               <span>Taxa de registros válidos</span>
-              <strong>{quality.data ? formatPercent(quality.data.valid_rate) : ':'}</strong>
+              <strong>{quality.data ? formatPercent(quality.data.valid_rate) : 'N/D'}</strong>
               <div className="quality-card__rows">
-                <span>Linhas lidas</span><b>{quality.data ? formatNumber(quality.data.rows_read) : ':'}</b>
-                <span>Rejeitadas</span><b>{quality.data ? formatNumber(quality.data.rows_rejected) : ':'}</b>
-                <span>Recorte tech</span><b>{quality.data ? formatNumber(quality.data.rows_tech) : ':'}</b>
+                <span>Linhas lidas</span><b>{quality.data ? formatNumber(quality.data.rows_read) : 'N/D'}</b>
+                <span>Rejeitadas</span><b>{quality.data ? formatNumber(quality.data.rows_rejected) : 'N/D'}</b>
+                <span>Recorte tech</span><b>{quality.data ? formatNumber(quality.data.rows_tech) : 'N/D'}</b>
               </div>
             </article>
           </section>
