@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.35.0
+
+- processamento integral dos sete arquivos regionais da RAIS 2025 concluído para diagnóstico metodológico;
+- microdados apresentaram 60.691.770 vínculos com indicador bruto ativo em 31/12;
+- referência oficial permanece em 59.970.945 vínculos e não foi alterada para acomodar o microdado;
+- diagnóstico regional identificou o indicador de vínculo abandonado como filtro necessário do estoque publicado;
+- no Norte, 3.911.021 ativos brutos menos 41.830 abandonados resultam exatamente nos 3.869.191 vínculos oficiais;
+- contrato semântico RAIS evolui para versão 3 e torna vínculo abandonado um conceito obrigatório;
+- contrato de valores evolui para versão 3, com abandono 0 elegível e abandono 1 excluído;
+- Silver passa a separar ativo bruto, abandonado e estoque oficial elegível;
+- recorte tech é aplicado somente após a qualificação do estoque oficial;
+- reconciliação anual passa a usar rows_stock_eligible_source;
+- publicação anual continua bloqueada até reprocessamento integral e fechamento nacional exato;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.34.4
 
 - merge nacional da RAIS 2025 passa a exigir exatamente sete partes regionais completas;

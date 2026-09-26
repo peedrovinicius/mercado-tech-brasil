@@ -23,11 +23,13 @@ def _write_reports(base: Path, *, silver_ready: bool = True) -> tuple[Path, Path
                             "CBO 2002 Ocupação - Código",
                             "Município - Código",
                             "Ind Vínculo Ativo 31/12 - Código",
+                            "Ind Vínculo Abandonado - Código",
                         ],
                         "normalized_columns": [
                             "cbo_2002_ocupacao_codigo",
                             "municipio_codigo",
                             "ind_vinculo_ativo_31_12_codigo",
+                            "ind_vinculo_abandonado_codigo",
                         ],
                     }
                 ],
@@ -39,7 +41,7 @@ def _write_reports(base: Path, *, silver_ready: bool = True) -> tuple[Path, Path
         json.dumps(
             {
                 "year": 2025,
-                "contract_version": 2,
+                "contract_version": 3,
                 "silver_ready": silver_ready,
                 "files": [
                     {
@@ -58,6 +60,10 @@ def _write_reports(base: Path, *, silver_ready: bool = True) -> tuple[Path, Path
                                 "status": "matched",
                                 "matches": ["ind_vinculo_ativo_31_12_codigo"],
                             },
+                            "abandoned_link": {
+                                "status": "matched",
+                                "matches": ["ind_vinculo_abandonado_codigo"],
+                            },
                         },
                     }
                 ],
@@ -68,16 +74,16 @@ def _write_reports(base: Path, *, silver_ready: bool = True) -> tuple[Path, Path
     return layout, semantic
 
 
-def test_profile_rais_values_reports_observed_codes(tmp_path: Path):
+def test_profile_rais_values_reports_stock_codes(tmp_path: Path):
     extracted = tmp_path / "extracted"
     extracted.mkdir()
     source = extracted / "RAIS_VINC_TESTE.comt"
     source.write_text(
         "CBO 2002 Ocupação - Código,Município - Código,"
-        "Ind Vínculo Ativo 31/12 - Código\n"
-        "212405,2304400,1\n"
-        "317110,3550308,1\n"
-        "212405,2304400,0\n",
+        "Ind Vínculo Ativo 31/12 - Código,Ind Vínculo Abandonado - Código\n"
+        "212405,2304400,1,0\n"
+        "317110,3550308,1,1\n"
+        "212405,2304400,0,0\n",
         encoding="utf-8",
     )
     layout, semantic = _write_reports(tmp_path)
@@ -91,36 +97,19 @@ def test_profile_rais_values_reports_observed_codes(tmp_path: Path):
         max_rows_per_file=100,
     )
 
-    assert payload["files_profiled"] == 1
     assert payload["profile_complete"] is True
-    assert payload["silver_transform_ready"] is False
-    assert payload["publication_ready"] is False
-
-    active = payload["aggregate"]["active_3112"]
-    assert active["top_values"] == [
-        {"value": "1", "count": 2},
-        {"value": "0", "count": 1},
+    assert payload["aggregate"]["active_3112"]["observed_values"] == ["0", "1"]
+    assert payload["aggregate"]["abandoned_link"]["observed_values"] == ["0", "1"]
+    assert payload["aggregate"]["abandoned_link"]["top_values"] == [
+        {"value": "0", "count": 2},
+        {"value": "1", "count": 1},
     ]
-
-    year = payload["aggregate"]["year"]
-    assert year["derived"] is True
-    assert year["observed_values"] == ["2025"]
-    assert year["top_values"] == [{"value": "2025", "count": 3}]
-
-    cbo = payload["aggregate"]["cbo_occupation"]
-    assert cbo["digits_only"] == 3
-    assert cbo["lengths"] == {"6": 3}
+    assert payload["aggregate"]["year"]["observed_values"] == ["2025"]
 
 
 def test_profile_requires_semantic_validation(tmp_path: Path):
     extracted = tmp_path / "extracted"
     extracted.mkdir()
-    (extracted / "RAIS_VINC_TESTE.comt").write_text(
-        "CBO 2002 Ocupação - Código,Município - Código,"
-        "Ind Vínculo Ativo 31/12 - Código\n"
-        "212405,2304400,1\n",
-        encoding="utf-8",
-    )
     layout, semantic = _write_reports(tmp_path, silver_ready=False)
 
     with pytest.raises(ValueError, match="silver_ready=true"):

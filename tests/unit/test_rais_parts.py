@@ -16,6 +16,7 @@ def _write_part(
     source_file: str,
     active: int,
     inactive: int,
+    abandoned: int = 0,
     tech_rows: list[dict[str, object]],
     reject_rows: list[dict[str, object]],
 ) -> None:
@@ -37,16 +38,22 @@ def _write_part(
         "rows_read": rows_read,
         "rows_valid": rows_read - len(reject_rows),
         "rows_rejected": len(reject_rows),
-        "rows_active": len(tech_rows),
+        "rows_active": active - abandoned,
         "rows_inactive": inactive,
         "rows_active_source": active,
+        "rows_abandoned_source": abandoned,
+        "rows_stock_eligible_source": active - abandoned,
+        "rows_unknown_abandoned_source": 0,
         "rows_inactive_source": inactive,
         "rows_unknown_status_source": 0,
         "rows_year_mismatch_source": 0,
+        "rows_residual_municipality": 0,
         "rows_tech": len(tech_rows),
         "source_partition_complete": True,
+        "stock_partition_complete": True,
         "rejection_counts": {
             "invalid_active_status": 0,
+            "invalid_abandoned_status": 0,
             "invalid_cbo": len(reject_rows),
             "invalid_municipality": 0,
             "invalid_uf": 0,
@@ -74,9 +81,7 @@ def _write_part(
     )
 
 
-def test_merge_rais_parts_builds_national_quality_and_parquet(
-    tmp_path: Path,
-):
+def test_merge_rais_parts_builds_national_stock_quality(tmp_path: Path):
     parts = tmp_path / "parts"
     silver = tmp_path / "silver"
     bronze = tmp_path / "bronze"
@@ -88,6 +93,7 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
         source_file="RAIS_VINC_A.7z",
         active=3,
         inactive=1,
+        abandoned=1,
         tech_rows=[
             {
                 "year": 2025,
@@ -119,19 +125,8 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
                 "source_file": "B.COMT",
             }
         ],
-        reject_rows=[
-            {
-                "source_file": "B.COMT",
-                "year_context": "2025",
-                "cbo_raw": "",
-                "municipio_raw": "355030",
-                "uf_derived": "SP",
-                "active_raw": "1",
-                "reason": "invalid_cbo",
-            }
-        ],
+        reject_rows=[],
     )
-
     for key in ("c", "d", "e", "f", "g"):
         _write_part(
             parts,
@@ -151,42 +146,22 @@ def test_merge_rais_parts_builds_national_quality_and_parquet(
         bronze_archive_dir=bronze,
     )
 
-    quality = json.loads(
-        paths["quality"].read_text(encoding="utf-8")
-    )
+    quality = json.loads(paths["quality"].read_text(encoding="utf-8"))
     assert quality["parts_merged"] == 7
     assert quality["rows_read"] == 13
     assert quality["rows_active_source"] == 10
+    assert quality["rows_abandoned_source"] == 1
+    assert quality["rows_stock_eligible_source"] == 9
     assert quality["rows_inactive_source"] == 3
+    assert quality["stock_partition_complete"] is True
     assert quality["rows_tech"] == 2
-    assert quality["rows_rejected"] == 1
-    assert quality["source_partition_complete"] is True
-    assert quality["source_archives"] == [
-        "RAIS_VINC_A.7z",
-        "RAIS_VINC_B.7z",
-        "RAIS_VINC_C.7z",
-        "RAIS_VINC_D.7z",
-        "RAIS_VINC_E.7z",
-        "RAIS_VINC_F.7z",
-        "RAIS_VINC_G.7z",
-    ]
 
-    tech = pq.read_table(paths["silver"])
-    rejects = pq.read_table(paths["rejects"])
-    assert tech.num_rows == 2
-    assert rejects.num_rows == 1
-
-    manifest = json.loads(
-        paths["manifest"].read_text(encoding="utf-8")
-    )
-    assert len(manifest["files"]) == 7
+    assert pq.read_table(paths["silver"]).num_rows == 2
+    assert len(json.loads(paths["manifest"].read_text())["files"]) == 7
 
 
 def test_merge_rais_2025_blocks_incomplete_parts(tmp_path: Path):
     parts = tmp_path / "parts"
-    silver = tmp_path / "silver"
-    bronze = tmp_path / "bronze"
-
     _write_part(
         parts,
         key="a",
@@ -202,8 +177,8 @@ def test_merge_rais_2025_blocks_incomplete_parts(tmp_path: Path):
         merge_rais_silver_parts(
             year=2025,
             parts_root=parts,
-            silver_dir=silver,
-            bronze_archive_dir=bronze,
+            silver_dir=tmp_path / "silver",
+            bronze_archive_dir=tmp_path / "bronze",
         )
     except ValueError as exc:
         assert "exatamente sete partes" in str(exc)

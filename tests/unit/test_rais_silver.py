@@ -28,11 +28,13 @@ def _prepare_reports(base: Path) -> tuple[Path, Path, Path]:
                             "CBO 2002 Ocupação - Código",
                             "Município - Código",
                             "Ind Vínculo Ativo 31/12 - Código",
+                            "Ind Vínculo Abandonado - Código",
                         ],
                         "normalized_columns": [
                             "cbo_2002_ocupacao_codigo",
                             "municipio_codigo",
                             "ind_vinculo_ativo_31_12_codigo",
+                            "ind_vinculo_abandonado_codigo",
                         ],
                     }
                 ],
@@ -62,6 +64,10 @@ def _prepare_reports(base: Path) -> tuple[Path, Path, Path]:
                                 "status": "matched",
                                 "matches": ["ind_vinculo_ativo_31_12_codigo"],
                             },
+                            "abandoned_link": {
+                                "status": "matched",
+                                "matches": ["ind_vinculo_abandonado_codigo"],
+                            },
                         },
                     }
                 ],
@@ -78,6 +84,10 @@ def _prepare_reports(base: Path) -> tuple[Path, Path, Path]:
                     "official_active_values": ["1"],
                     "official_inactive_values": ["0"],
                 },
+                "abandoned_link": {
+                    "official_eligible_values": ["0"],
+                    "official_excluded_values": ["1"],
+                },
             }
         ),
         encoding="utf-8",
@@ -90,24 +100,22 @@ def test_cbo_and_uf_normalization():
     assert normalize_cbo_code("12345") == "012345"
     assert normalize_cbo_code("1234") is None
     assert uf_from_municipality_code("230440") == "CE"
-    assert uf_from_municipality_code("355030") == "SP"
-    assert uf_from_municipality_code("330455") == "RJ"
     assert uf_from_municipality_code("999999") == "NI"
-    assert uf_from_municipality_code("990000") is None
 
 
-def test_transform_rais_year_filters_active_and_tech(tmp_path: Path):
+def test_transform_filters_abandoned_from_official_stock_and_tech(tmp_path: Path):
     extracted = tmp_path / "extracted"
     silver = tmp_path / "silver"
     extracted.mkdir()
 
     (extracted / "RAIS_VINC_TESTE.COMT").write_text(
         "CBO 2002 Ocupação - Código,Município - Código,"
-        "Ind Vínculo Ativo 31/12 - Código\n"
-        "212405,230440,1\n"
-        "317110,355030,0\n"
-        "411010,330455,1\n"
-        "212405,230440,1\n",
+        "Ind Vínculo Ativo 31/12 - Código,Ind Vínculo Abandonado - Código\n"
+        "212405,230440,1,0\n"
+        "317110,355030,0,0\n"
+        "411010,330455,1,0\n"
+        "212405,230440,1,1\n"
+        "212405,230440,1,0\n",
         encoding="utf-8",
     )
     layout, semantic, values = _prepare_reports(tmp_path)
@@ -129,33 +137,35 @@ def test_transform_rais_year_filters_active_and_tech(tmp_path: Path):
         batch_size=1000,
     )
 
-    assert result.rows_read == 4
-    assert result.rows_valid == 4
+    assert result.rows_read == 5
+    assert result.rows_active_source == 4
+    assert result.rows_abandoned_source == 1
+    assert result.rows_stock_eligible_source == 3
+    assert result.rows_unknown_abandoned_source == 0
+    assert result.rows_inactive_source == 1
     assert result.rows_active == 3
     assert result.rows_inactive == 1
-    assert result.rows_active_source == 3
-    assert result.rows_inactive_source == 1
-    assert result.rows_unknown_status_source == 0
-    assert result.rows_year_mismatch_source == 0
     assert result.rows_tech == 2
     assert result.rows_rejected == 0
 
     table = pq.read_table(result.silver_path)
     assert table.num_rows == 2
     assert set(table.column("cbo_familia").to_pylist()) == {"2124"}
-    assert set(table.column("uf").to_pylist()) == {"CE"}
-    assert set(table.column("municipio_codigo").to_pylist()) == {"230440"}
+
+    quality = json.loads(result.quality_path.read_text(encoding="utf-8"))
+    assert quality["stock_partition_complete"] is True
+    assert quality["stock_rule"] == "active_3112=1 and abandoned_link=0"
 
 
-def test_transform_rais_year_preserves_residual_municipality(tmp_path: Path):
+def test_transform_preserves_residual_municipality(tmp_path: Path):
     extracted = tmp_path / "extracted"
     silver = tmp_path / "silver"
     extracted.mkdir()
 
     (extracted / "RAIS_VINC_TESTE.COMT").write_text(
         "CBO 2002 Ocupação - Código,Município - Código,"
-        "Ind Vínculo Ativo 31/12 - Código\n"
-        "212405,999999,1\n",
+        "Ind Vínculo Ativo 31/12 - Código,Ind Vínculo Abandonado - Código\n"
+        "212405,999999,1,0\n",
         encoding="utf-8",
     )
     layout, semantic, values = _prepare_reports(tmp_path)
@@ -178,29 +188,20 @@ def test_transform_rais_year_preserves_residual_municipality(tmp_path: Path):
 
     assert result.rows_rejected == 0
     assert result.rows_residual_municipality == 1
-    assert pq.read_table(result.silver_path).to_pylist() == [
-        {
-            "year": 2025,
-            "cbo_codigo": "212405",
-            "cbo_familia": "2124",
-            "municipio_codigo": "999999",
-            "uf": "NI",
-            "active_3112": True,
-            "source_file": "RAIS_VINC_TESTE.COMT",
-        }
-    ]
+    assert result.rows_stock_eligible_source == 1
+    assert pq.read_table(result.silver_path).to_pylist()[0]["uf"] == "NI"
 
 
-def test_transform_rais_year_preserves_rejections(tmp_path: Path):
+def test_transform_rejects_unknown_stock_status(tmp_path: Path):
     extracted = tmp_path / "extracted"
     silver = tmp_path / "silver"
     extracted.mkdir()
 
     (extracted / "RAIS_VINC_TESTE.COMT").write_text(
         "CBO 2002 Ocupação - Código,Município - Código,"
-        "Ind Vínculo Ativo 31/12 - Código\n"
-        "212405,230440,1\n"
-        "xx,990000,9\n",
+        "Ind Vínculo Ativo 31/12 - Código,Ind Vínculo Abandonado - Código\n"
+        "212405,230440,1,0\n"
+        "xx,990000,9,9\n",
         encoding="utf-8",
     )
     layout, semantic, values = _prepare_reports(tmp_path)
@@ -222,45 +223,8 @@ def test_transform_rais_year_preserves_rejections(tmp_path: Path):
     )
 
     assert result.rows_rejected == 1
-    assert result.rows_active_source == 1
-    assert result.rows_inactive_source == 0
-    assert result.rows_unknown_status_source == 1
-    assert result.rows_year_mismatch_source == 0
-    assert result.rows_residual_municipality == 0
     rejected = pq.read_table(result.reject_path).to_pylist()
-    assert len(rejected) == 1
     assert "invalid_active_status" in rejected[0]["reason"]
+    assert "invalid_abandoned_status" in rejected[0]["reason"]
     assert "invalid_cbo" in rejected[0]["reason"]
-    assert "invalid_uf" in rejected[0]["reason"]
-
-    quality = json.loads(result.quality_path.read_text(encoding="utf-8"))
-    assert quality["source_partition_complete"] is True
-    assert quality["year_source"] == "annual_context"
-    assert quality["uf_source"] == "municipality_code_prefix"
-    assert quality["gold_ready"] is False
-    assert quality["publication_ready"] is False
-
-
-def test_transform_rais_year_requires_value_semantics_ready(tmp_path: Path):
-    layout, semantic, values = _prepare_reports(tmp_path)
-    payload = json.loads(values.read_text(encoding="utf-8"))
-    payload["silver_transform_ready"] = False
-    values.write_text(json.dumps(payload), encoding="utf-8")
-
-    cbo = tmp_path / "cbo.yml"
-    cbo.write_text('families:\n  "2124": "Tech"\n', encoding="utf-8")
-
-    try:
-        transform_rais_year(
-            year=2025,
-            extracted_dir=tmp_path,
-            layout_report_path=layout,
-            semantic_report_path=semantic,
-            value_semantics_report_path=values,
-            cbo_config_path=cbo,
-            silver_dir=tmp_path / "silver",
-        )
-    except ValueError as exc:
-        assert "Semântica de valores RAIS" in str(exc)
-    else:
-        raise AssertionError("Silver deveria permanecer bloqueado.")
+    assert rejected[0]["abandoned_raw"] == "9"

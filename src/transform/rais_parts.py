@@ -211,6 +211,13 @@ def merge_rais_silver_parts(
         all(item.get("source_partition_complete") is True for item in qualities)
         and partition_total == totals["rows_read"]
     )
+    stock_partition_complete = (
+        all(item.get("stock_partition_complete") is True for item in qualities)
+        and totals["rows_active_source"]
+        == totals["rows_stock_eligible_source"]
+        + totals["rows_abandoned_source"]
+        + totals["rows_unknown_abandoned_source"]
+    )
 
     silver_dir.mkdir(parents=True, exist_ok=True)
     tech_destination = silver_dir / tech_name
@@ -232,9 +239,10 @@ def merge_rais_silver_parts(
     quality: dict[str, object] = {
         "source": "RAIS / Ministério do Trabalho e Emprego",
         "year": year,
-        "scope": "vínculos ativos em 31/12 com recorte CBO tech v2",
+        "scope": "vínculos ativos e não abandonados em 31/12 com recorte CBO tech v2",
         **totals,
         "source_partition_complete": partition_complete,
+        "stock_partition_complete": stock_partition_complete,
         "valid_rate": (
             round(totals["rows_valid"] / totals["rows_read"], 8)
             if totals["rows_read"]
@@ -252,6 +260,7 @@ def merge_rais_silver_parts(
         "cbo_normalization": (
             "5 digit numeric codes are left padded to 6 digits"
         ),
+        "stock_rule": "active_3112=1 and abandoned_link=0",
         "silver_path": tech_destination.name,
         "reject_path": reject_destination.name,
         "gold_ready": False,

@@ -49,7 +49,8 @@ A RAIS usa contrato próprio e separado do Novo CAGED.
 | CBO ocupação 2002 | sim | recorte ocupacional tech |
 | município | sim | dimensão territorial principal |
 | UF | derivado | prefixo do código municipal |
-| vínculo ativo em 31/12 | sim | definição do estoque anual |
+| vínculo ativo em 31/12 | sim | primeira condição do estoque anual |
+| vínculo abandonado | sim | exclui registros ativos abandonados do estoque oficial |
 | remuneração de dezembro | não | análise salarial futura |
 | remuneração média | não | análise salarial futura |
 
@@ -89,15 +90,19 @@ O relatório `rais_quality_<ano>.json` preserva contagens nacionais anteriores a
 
 | Campo | Regra |
 |---|---|
-| rows_active_source | vínculos do ano com situação oficial ativa |
-| rows_inactive_source | vínculos do ano com situação oficial inativa |
-| rows_unknown_status_source | vínculos do ano com situação não reconhecida |
+| rows_active_source | vínculos com indicador bruto ativo igual a 1 |
+| rows_abandoned_source | vínculos ativos com indicador abandonado igual a 1 |
+| rows_stock_eligible_source | vínculos ativos com indicador abandonado igual a 0 |
+| rows_unknown_abandoned_source | vínculos ativos com código de abandono não reconhecido |
+| rows_inactive_source | vínculos do ano com situação inativa |
+| rows_unknown_status_source | vínculos com situação em 31/12 não reconhecida |
 | rows_year_mismatch_source | registros fora do ano solicitado |
-| source_partition_complete | soma das categorias igual ao total lido |
+| source_partition_complete | partição ativo, inativo e desconhecido fecha o total lido |
+| stock_partition_complete | elegíveis, abandonados e desconhecidos fecham o ativo bruto |
 
-A reconciliação usa `rows_active_source`, não `rows_tech` nem `rows_active` após validações territoriais.
+A reconciliação usa `rows_stock_eligible_source`, não o ativo bruto nem `rows_tech`.
 
-Para 2025, `rows_active_source` precisa ser exatamente 59.970.945 antes de o Gold anual ser liberado.
+Para 2025, `rows_stock_eligible_source` precisa ser exatamente 59.970.945 antes de o Gold anual ser liberado.
 
 
 ### Gold RAIS anual

@@ -10,9 +10,13 @@ class RaisReconciliationResult:
     year: int
     expected_active: int
     observed_active: int
+    raw_active_source: int
+    abandoned_active_source: int
     difference: int
     source_partition_complete: bool
+    stock_partition_complete: bool
     unknown_status_rows: int
+    unknown_abandoned_rows: int
     year_mismatch_rows: int
     tech_rows: int
     reconciled: bool
@@ -50,19 +54,27 @@ def evaluate_rais_reconciliation(
         raise ValueError("Ano do relatório de qualidade RAIS diverge do solicitado.")
 
     expected = int(reference.get("active_links") or 0)
-    observed = int(quality.get("rows_active_source") or 0)
+    observed = int(quality.get("rows_stock_eligible_source") or 0)
+    raw_active = int(quality.get("rows_active_source") or 0)
+    abandoned = int(quality.get("rows_abandoned_source") or 0)
     if expected <= 0:
         raise ValueError("Referência oficial RAIS possui total ativo inválido.")
 
     source_partition_complete = quality.get("source_partition_complete") is True
+    stock_partition_complete = quality.get("stock_partition_complete") is True
     unknown_status = int(quality.get("rows_unknown_status_source") or 0)
+    unknown_abandoned = int(
+        quality.get("rows_unknown_abandoned_source") or 0
+    )
     year_mismatch = int(quality.get("rows_year_mismatch_source") or 0)
     tech_rows = int(quality.get("rows_tech") or 0)
     difference = observed - expected
 
     reconciled = (
         source_partition_complete
+        and stock_partition_complete
         and unknown_status == 0
+        and unknown_abandoned == 0
         and year_mismatch == 0
         and observed == expected
         and 0 <= tech_rows <= observed
@@ -72,9 +84,13 @@ def evaluate_rais_reconciliation(
         year=year,
         expected_active=expected,
         observed_active=observed,
+        raw_active_source=raw_active,
+        abandoned_active_source=abandoned,
         difference=difference,
         source_partition_complete=source_partition_complete,
+        stock_partition_complete=stock_partition_complete,
         unknown_status_rows=unknown_status,
+        unknown_abandoned_rows=unknown_abandoned,
         year_mismatch_rows=year_mismatch,
         tech_rows=tech_rows,
         reconciled=reconciled,

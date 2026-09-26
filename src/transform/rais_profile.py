@@ -145,7 +145,12 @@ def profile_rais_values(
     if not semantic_files:
         raise ValueError("Relatório semântico não possui arquivos validados.")
 
-    physical_concepts = ("cbo_occupation", "municipality", "active_3112")
+    physical_concepts = (
+        "cbo_occupation",
+        "municipality",
+        "active_3112",
+        "abandoned_link",
+    )
     aggregate_counters = {
         concept: Counter()
         for concept in physical_concepts
@@ -274,7 +279,7 @@ def profile_rais_values(
             "O perfil descreve valores observados em amostra controlada. "
             "Ano é derivado do contexto anual e UF será derivada do município. "
             "O perfil não define automaticamente quais códigos representam vínculo "
-            "ativo nem autoriza transformação ou publicação."
+            "ativo ou abandonado, nem autoriza transformação ou publicação."
         ),
     }
 

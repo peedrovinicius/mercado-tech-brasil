@@ -27,6 +27,15 @@ def load_value_contract(path: Path) -> dict[str, Any]:
         raise ValueError(
             "Contrato RAIS precisa definir valores ativos e inativos."
         )
+
+    abandoned = payload.get("abandoned_link")
+    if not isinstance(abandoned, dict):
+        raise ValueError("Contrato RAIS não define abandoned_link.")
+    if not abandoned.get("eligible_values") or not abandoned.get("excluded_values"):
+        raise ValueError(
+            "Contrato RAIS precisa definir valores elegíveis e excluídos "
+            "para vínculo abandonado."
+        )
     return payload
 
 
@@ -58,6 +67,50 @@ def _observed_values(profile: dict[str, Any], concept: str) -> list[str]:
     return [str(value) for value in observed]
 
 
+def _binary_semantics(
+    *,
+    profile: dict[str, Any],
+    concept: str,
+    positive_values: set[str],
+    negative_values: set[str],
+    reject_unknown: bool,
+    reject_blank: bool,
+) -> dict[str, object]:
+    concept_profile = profile.get("aggregate", {}).get(concept, {})
+    blanks = int(concept_profile.get("blank") or 0)
+    raw_values = _observed_values(profile, concept)
+    normalized_values = {
+        normalize_value(value)
+        for value in raw_values
+        if str(value).strip()
+    }
+    allowed_values = positive_values | negative_values
+    unknown_values = sorted(normalized_values - allowed_values)
+
+    positive_observed = sorted(normalized_values & positive_values)
+    negative_observed = sorted(normalized_values & negative_values)
+
+    positive_valid = bool(positive_observed)
+    negative_valid = bool(negative_observed)
+    unknown_valid = not unknown_values if reject_unknown else True
+    blanks_valid = blanks == 0 if reject_blank else True
+    valid = (
+        positive_valid
+        and negative_valid
+        and unknown_valid
+        and blanks_valid
+    )
+
+    return {
+        "observed_values_normalized": sorted(normalized_values),
+        "positive_observed": positive_observed,
+        "negative_observed": negative_observed,
+        "unknown_values": unknown_values,
+        "blank_values": blanks,
+        "valid": valid,
+    }
+
+
 def validate_value_semantics(
     profile_path: Path,
     contract_path: Path,
@@ -75,15 +128,6 @@ def validate_value_semantics(
             f"Ano do perfil RAIS difere do solicitado: {profile.get('year')}."
         )
 
-    active_profile = profile.get("aggregate", {}).get("active_3112", {})
-    blanks = int(active_profile.get("blank") or 0)
-    raw_values = _observed_values(profile, "active_3112")
-    normalized_values = {
-        normalize_value(value)
-        for value in raw_values
-        if str(value).strip()
-    }
-
     active_spec = contract["active_3112"]
     active_values = {
         normalize_value(value)
@@ -93,22 +137,31 @@ def validate_value_semantics(
         normalize_value(value)
         for value in active_spec.get("inactive_values", [])
     }
-    allowed_values = active_values | inactive_values
-    unknown_values = sorted(normalized_values - allowed_values)
-
-    active_observed = sorted(normalized_values & active_values)
-    inactive_observed = sorted(normalized_values & inactive_values)
-
-    active_valid = bool(active_observed)
-    unknown_valid = (
-        not unknown_values
-        if active_spec.get("reject_unknown_values", True)
-        else True
+    active_result = _binary_semantics(
+        profile=profile,
+        concept="active_3112",
+        positive_values=active_values,
+        negative_values=inactive_values,
+        reject_unknown=active_spec.get("reject_unknown_values", True),
+        reject_blank=active_spec.get("reject_blank_values", True),
     )
-    blanks_valid = (
-        blanks == 0
-        if active_spec.get("reject_blank_values", True)
-        else True
+
+    abandoned_spec = contract["abandoned_link"]
+    eligible_values = {
+        normalize_value(value)
+        for value in abandoned_spec.get("eligible_values", [])
+    }
+    excluded_values = {
+        normalize_value(value)
+        for value in abandoned_spec.get("excluded_values", [])
+    }
+    abandoned_result = _binary_semantics(
+        profile=profile,
+        concept="abandoned_link",
+        positive_values=eligible_values,
+        negative_values=excluded_values,
+        reject_unknown=abandoned_spec.get("reject_unknown_values", True),
+        reject_blank=abandoned_spec.get("reject_blank_values", True),
     )
 
     year_profile = profile.get("aggregate", {}).get("year", {})
@@ -118,7 +171,11 @@ def validate_value_semantics(
     }
     year_valid = observed_years == {str(year)}
 
-    valid = active_valid and unknown_valid and blanks_valid and year_valid
+    valid = (
+        bool(active_result["valid"])
+        and bool(abandoned_result["valid"])
+        and year_valid
+    )
 
     payload: dict[str, object] = {
         "source": "RAIS / Ministério do Trabalho e Emprego",
@@ -130,12 +187,24 @@ def validate_value_semantics(
         "active_3112": {
             "official_active_values": sorted(active_values),
             "official_inactive_values": sorted(inactive_values),
-            "observed_values_normalized": sorted(normalized_values),
-            "active_observed": active_observed,
-            "inactive_observed": inactive_observed,
-            "unknown_values": unknown_values,
-            "blank_values": blanks,
-            "valid": active_valid and unknown_valid and blanks_valid,
+            "active_observed": active_result["positive_observed"],
+            "inactive_observed": active_result["negative_observed"],
+            **{
+                key: value
+                for key, value in active_result.items()
+                if key not in {"positive_observed", "negative_observed"}
+            },
+        },
+        "abandoned_link": {
+            "official_eligible_values": sorted(eligible_values),
+            "official_excluded_values": sorted(excluded_values),
+            "eligible_observed": abandoned_result["positive_observed"],
+            "excluded_observed": abandoned_result["negative_observed"],
+            **{
+                key: value
+                for key, value in abandoned_result.items()
+                if key not in {"positive_observed", "negative_observed"}
+            },
         },
         "year_check": {
             "expected": str(year),
@@ -143,9 +212,10 @@ def validate_value_semantics(
             "valid": year_valid,
         },
         "note": (
-            "silver_transform_ready valida a semântica mínima para iniciar "
-            "a transformação. A publicação permanece bloqueada até qualidade, "
-            "reconciliação anual e gate específico."
+            "silver_transform_ready valida a situação em 31/12 e a qualificação "
+            "de vínculo abandonado. Para 2025, o estoque oficial exige vínculo "
+            "ativo e não abandonado. A publicação permanece bloqueada até "
+            "qualidade, reconciliação anual e gate específico."
         ),
     }
 

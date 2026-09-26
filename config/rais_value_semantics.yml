@@ -1,13 +1,14 @@
-version: 2
+version: 3
 dataset: rais_vinculos
 year_reference: 2025
 sources:
   rais_faq: "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/perguntas-frequentes"
   rais_2025: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025"
+  rais_2025_presentation: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/apresentacao-rais-2025.pdf"
   coding_reference: "https://www2.senado.leg.br/bdsf/bitstream/handle/id/574054/NT44.pdf"
 
 active_3112:
-  description: "Situação do vínculo em 31/12 do ano-base"
+  description: "Situação bruta do vínculo em 31/12 do ano-base"
   normalization: "string"
   active_values:
     - "1"
@@ -22,10 +23,28 @@ active_3112:
     inactive_count: 2773
     other_count: 0
 
+abandoned_link:
+  description: "Qualificação do vínculo ativo para o estoque oficial RAIS 2025"
+  normalization: "string"
+  eligible_values:
+    - "0"
+  excluded_values:
+    - "1"
+  reject_unknown_values: true
+  reject_blank_values: true
+  observed_2025_diagnostic:
+    archive: "RAIS_VINC_PUB_NORTE.7z"
+    raw_active: 3911021
+    abandoned_active: 41830
+    stock_eligible: 3869191
+    official_north_stock: 3869191
+    exact_match: true
+
 year:
   must_match_requested_year: true
   source: annual_context
 
 rules:
+  official_stock_requires_active_and_not_abandoned: true
   silver_transform_ready_after_validation: true
   publication_ready_after_validation: false

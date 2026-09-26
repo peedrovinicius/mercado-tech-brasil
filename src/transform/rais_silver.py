@@ -52,6 +52,9 @@ class RaisSilverResult:
     rows_active: int
     rows_inactive: int
     rows_active_source: int
+    rows_abandoned_source: int
+    rows_stock_eligible_source: int
+    rows_unknown_abandoned_source: int
     rows_inactive_source: int
     rows_unknown_status_source: int
     rows_year_mismatch_source: int
@@ -84,6 +87,7 @@ REJECT_SCHEMA = pa.schema(
         ("municipio_raw", pa.string()),
         ("uf_derived", pa.string()),
         ("active_raw", pa.string()),
+        ("abandoned_raw", pa.string()),
         ("reason", pa.string()),
     ]
 )
@@ -131,7 +135,12 @@ def _column_mapping(
 
     result: dict[str, str] = {}
     required = semantic_item.get("required") or {}
-    for concept in ("cbo_occupation", "municipality", "active_3112"):
+    for concept in (
+        "cbo_occupation",
+        "municipality",
+        "active_3112",
+        "abandoned_link",
+    ):
         item = required.get(concept) or {}
         matches = item.get("matches") or []
         if item.get("status") != "matched" or len(matches) != 1:
@@ -233,6 +242,20 @@ def transform_rais_year(
     if not active_values or not inactive_values:
         raise ValueError("Relatório de valores não define categorias ativas e inativas.")
 
+    abandoned_payload = value_semantics.get("abandoned_link", {})
+    abandoned_eligible_values = {
+        normalize_value(value)
+        for value in abandoned_payload.get("official_eligible_values") or []
+    }
+    abandoned_excluded_values = {
+        normalize_value(value)
+        for value in abandoned_payload.get("official_excluded_values") or []
+    }
+    if not abandoned_eligible_values or not abandoned_excluded_values:
+        raise ValueError(
+            "Relatório de valores não define a qualificação de vínculo abandonado."
+        )
+
     tech_families = _load_tech_families(cbo_config_path)
     layout_files = {
         str(item.get("file")): item
@@ -275,6 +298,9 @@ def transform_rais_year(
     rows_active = 0
     rows_inactive = 0
     rows_active_source = 0
+    rows_abandoned_source = 0
+    rows_stock_eligible_source = 0
+    rows_unknown_abandoned_source = 0
     rows_inactive_source = 0
     rows_unknown_status_source = 0
     rows_year_mismatch_source = 0
@@ -284,6 +310,7 @@ def transform_rais_year(
     rows_tech = 0
     rejection_counts: dict[str, int] = {
         "invalid_active_status": 0,
+        "invalid_abandoned_status": 0,
         "invalid_cbo": 0,
         "invalid_municipality": 0,
         "invalid_uf": 0,
@@ -321,8 +348,12 @@ def transform_rais_year(
                         row.get(columns["municipality"]) or ""
                     ).strip()
                     active_raw = str(row.get(columns["active_3112"]) or "").strip()
+                    abandoned_raw = str(
+                        row.get(columns["abandoned_link"]) or ""
+                    ).strip()
 
                     active_normalized = normalize_value(active_raw)
+                    abandoned_normalized = normalize_value(abandoned_raw)
                     cbo_code = normalize_cbo_code(cbo_raw)
                     municipality_code = normalize_municipality_code(
                         municipality_raw
@@ -333,6 +364,12 @@ def transform_rais_year(
 
                     if active_normalized in active_values:
                         rows_active_source += 1
+                        if abandoned_normalized in abandoned_eligible_values:
+                            rows_stock_eligible_source += 1
+                        elif abandoned_normalized in abandoned_excluded_values:
+                            rows_abandoned_source += 1
+                        else:
+                            rows_unknown_abandoned_source += 1
                     elif active_normalized in inactive_values:
                         rows_inactive_source += 1
                     else:
@@ -341,6 +378,10 @@ def transform_rais_year(
                     reasons: list[str] = []
                     if active_normalized not in active_values | inactive_values:
                         reasons.append("invalid_active_status")
+                    if abandoned_normalized not in (
+                        abandoned_eligible_values | abandoned_excluded_values
+                    ):
+                        reasons.append("invalid_abandoned_status")
                     if cbo_code is None:
                         reasons.append("invalid_cbo")
                     if municipality_code is None:
@@ -360,6 +401,7 @@ def transform_rais_year(
                                 "municipio_raw": municipality_raw,
                                 "uf_derived": uf or "",
                                 "active_raw": active_raw,
+                                "abandoned_raw": abandoned_raw,
                                 "reason": ",".join(reasons),
                             }
                         )
@@ -370,6 +412,8 @@ def transform_rais_year(
                     rows_valid += 1
                     if active_normalized in inactive_values:
                         rows_inactive += 1
+                        continue
+                    if abandoned_normalized in abandoned_excluded_values:
                         continue
 
                     rows_active += 1
@@ -414,13 +458,16 @@ def transform_rais_year(
     quality = {
         "source": "RAIS / Ministério do Trabalho e Emprego",
         "year": year,
-        "scope": "vínculos ativos em 31/12 com recorte CBO tech v2",
+        "scope": "vínculos ativos e não abandonados em 31/12 com recorte CBO tech v2",
         "rows_read": rows_read,
         "rows_valid": rows_valid,
         "rows_rejected": rows_rejected,
         "rows_active": rows_active,
         "rows_inactive": rows_inactive,
         "rows_active_source": rows_active_source,
+        "rows_abandoned_source": rows_abandoned_source,
+        "rows_stock_eligible_source": rows_stock_eligible_source,
+        "rows_unknown_abandoned_source": rows_unknown_abandoned_source,
         "rows_inactive_source": rows_inactive_source,
         "rows_unknown_status_source": rows_unknown_status_source,
         "rows_year_mismatch_source": rows_year_mismatch_source,
@@ -432,6 +479,12 @@ def transform_rais_year(
             + rows_unknown_status_source
             + rows_year_mismatch_source
         ),
+        "stock_partition_complete": (
+            rows_active_source
+            == rows_stock_eligible_source
+            + rows_abandoned_source
+            + rows_unknown_abandoned_source
+        ),
         "rows_tech": rows_tech,
         "valid_rate": round(rows_valid / rows_read, 8) if rows_read else 0,
         "rejection_counts": rejection_counts,
@@ -439,6 +492,7 @@ def transform_rais_year(
         "year_source": "annual_context",
         "uf_source": "municipality_code_prefix",
         "cbo_normalization": "5 digit numeric codes are left padded to 6 digits",
+        "stock_rule": "active_3112=1 and abandoned_link=0",
         "silver_path": silver_path.name,
         "reject_path": reject_path.name,
         "gold_ready": False,
@@ -458,6 +512,9 @@ def transform_rais_year(
         rows_active=rows_active,
         rows_inactive=rows_inactive,
         rows_active_source=rows_active_source,
+        rows_abandoned_source=rows_abandoned_source,
+        rows_stock_eligible_source=rows_stock_eligible_source,
+        rows_unknown_abandoned_source=rows_unknown_abandoned_source,
         rows_inactive_source=rows_inactive_source,
         rows_unknown_status_source=rows_unknown_status_source,
         rows_year_mismatch_source=rows_year_mismatch_source,

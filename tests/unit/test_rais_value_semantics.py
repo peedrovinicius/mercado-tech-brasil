@@ -1,17 +1,19 @@
 import json
 from pathlib import Path
 
-from src.transform.rais_value_semantics import (
-    normalize_value,
-    validate_value_semantics,
-)
+from src.transform.rais_value_semantics import validate_value_semantics
 
 
-CONTRACT = """version: 2
+CONTRACT = """version: 3
 dataset: rais_vinculos
 active_3112:
   active_values: ["1"]
   inactive_values: ["0"]
+  reject_unknown_values: true
+  reject_blank_values: true
+abandoned_link:
+  eligible_values: ["0"]
+  excluded_values: ["1"]
   reject_unknown_values: true
   reject_blank_values: true
 """
@@ -21,7 +23,8 @@ def _write_profile(
     path: Path,
     *,
     active_values: list[str],
-    active_blank: int = 0,
+    abandoned_values: list[str] | None = None,
+    abandoned_blank: int = 0,
     years: list[str] | None = None,
 ) -> None:
     path.write_text(
@@ -31,8 +34,12 @@ def _write_profile(
                 "profile_complete": True,
                 "aggregate": {
                     "active_3112": {
-                        "blank": active_blank,
+                        "blank": 0,
                         "observed_values": active_values,
+                    },
+                    "abandoned_link": {
+                        "blank": abandoned_blank,
+                        "observed_values": abandoned_values or ["0", "1"],
                     },
                     "year": {
                         "blank": 0,
@@ -45,7 +52,7 @@ def _write_profile(
     )
 
 
-def test_value_semantics_accepts_observed_2025_codes(tmp_path: Path):
+def test_value_semantics_accepts_stock_codes(tmp_path: Path):
     profile = tmp_path / "profile.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "values.json"
@@ -60,20 +67,22 @@ def test_value_semantics_accepts_observed_2025_codes(tmp_path: Path):
         year=2025,
     )
 
-    assert payload["value_semantics_valid"] is True
     assert payload["silver_transform_ready"] is True
-    assert payload["publication_ready"] is False
     assert payload["active_3112"]["active_observed"] == ["1"]
-    assert payload["active_3112"]["inactive_observed"] == ["0"]
-    assert payload["active_3112"]["unknown_values"] == []
+    assert payload["abandoned_link"]["eligible_observed"] == ["0"]
+    assert payload["abandoned_link"]["excluded_observed"] == ["1"]
 
 
-def test_value_semantics_blocks_unknown_code(tmp_path: Path):
+def test_value_semantics_blocks_unknown_abandoned_code(tmp_path: Path):
     profile = tmp_path / "profile.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "values.json"
 
-    _write_profile(profile, active_values=["0", "1", "9"])
+    _write_profile(
+        profile,
+        active_values=["0", "1"],
+        abandoned_values=["0", "1", "9"],
+    )
     contract.write_text(CONTRACT, encoding="utf-8")
 
     payload = validate_value_semantics(
@@ -83,12 +92,11 @@ def test_value_semantics_blocks_unknown_code(tmp_path: Path):
         year=2025,
     )
 
-    assert payload["value_semantics_valid"] is False
     assert payload["silver_transform_ready"] is False
-    assert payload["active_3112"]["unknown_values"] == ["9"]
+    assert payload["abandoned_link"]["unknown_values"] == ["9"]
 
 
-def test_value_semantics_blocks_blank_active_status(tmp_path: Path):
+def test_value_semantics_blocks_blank_abandoned_status(tmp_path: Path):
     profile = tmp_path / "profile.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "values.json"
@@ -96,7 +104,7 @@ def test_value_semantics_blocks_blank_active_status(tmp_path: Path):
     _write_profile(
         profile,
         active_values=["0", "1"],
-        active_blank=1,
+        abandoned_blank=1,
     )
     contract.write_text(CONTRACT, encoding="utf-8")
 

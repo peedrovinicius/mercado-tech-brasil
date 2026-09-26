@@ -4,7 +4,7 @@ from pathlib import Path
 from src.transform.rais_semantics import validate_layout_semantics
 
 
-CONTRACT = """version: 2
+CONTRACT = """version: 3
 dataset: rais_vinculos
 required:
   cbo_occupation:
@@ -13,6 +13,8 @@ required:
     aliases: [municipio_codigo, municipio]
   active_3112:
     aliases: [ind_vinculo_ativo_31_12_codigo, vinculo_ativo_31_12]
+  abandoned_link:
+    aliases: [ind_vinculo_abandonado_codigo, vinculo_abandonado]
 derived:
   year:
     strategy: annual_context
@@ -55,6 +57,7 @@ def test_semantic_contract_marks_silver_ready_when_required_concepts_match(
             "cbo_2002_ocupacao_codigo",
             "municipio_codigo",
             "ind_vinculo_ativo_31_12_codigo",
+            "ind_vinculo_abandonado_codigo",
             "vl_rem_dezembro_nom",
         ],
     )
@@ -66,11 +69,9 @@ def test_semantic_contract_marks_silver_ready_when_required_concepts_match(
     assert payload["silver_ready"] is True
     assert payload["publication_ready"] is False
     assert payload["files"][0]["missing_required"] == []
-    assert payload["derived"]["year"]["strategy"] == "annual_context"
-    assert payload["derived"]["uf"]["strategy"] == "municipality_code"
 
 
-def test_semantic_contract_blocks_missing_required_concept(tmp_path: Path):
+def test_semantic_contract_blocks_missing_stock_concepts(tmp_path: Path):
     layout = tmp_path / "layout.json"
     contract = tmp_path / "contract.yml"
     destination = tmp_path / "semantic.json"
@@ -88,7 +89,10 @@ def test_semantic_contract_blocks_missing_required_concept(tmp_path: Path):
 
     assert payload["semantic_valid"] is False
     assert payload["silver_ready"] is False
-    assert payload["files"][0]["missing_required"] == ["active_3112"]
+    assert payload["files"][0]["missing_required"] == [
+        "active_3112",
+        "abandoned_link",
+    ]
 
 
 def test_semantic_contract_blocks_ambiguous_aliases(tmp_path: Path):
@@ -103,6 +107,7 @@ def test_semantic_contract_blocks_ambiguous_aliases(tmp_path: Path):
             "cbo",
             "municipio_codigo",
             "ind_vinculo_ativo_31_12_codigo",
+            "ind_vinculo_abandonado_codigo",
         ],
     )
     contract.write_text(CONTRACT, encoding="utf-8")

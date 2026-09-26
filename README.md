@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Pipeline regional integral preparado; layout e valores 2025 validados em amostra oficial; release nacional ainda não publicada |
+| RAIS anual | Sete arquivos processados; filtro oficial de vínculo abandonado identificado; reprocessamento qualificado pendente |
 
 ## Série publicada
 
@@ -195,6 +195,7 @@ O pipeline mantém:
 - downloader RAIS retomável após queda de conexão FTP;
 - fallback HTTPS de transporte auditável quando o FTP estiver instável;
 - contrato RAIS 2025 alinhado ao layout real observado;
+- estoque anual qualificado por vínculo ativo em 31/12 e exclusão de vínculo abandonado;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;

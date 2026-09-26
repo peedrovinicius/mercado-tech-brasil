@@ -134,7 +134,8 @@ A validação com uma amostra oficial real da RAIS 2025 confirmou o layout atual
 
 - `CBO 2002 Ocupação - Código`;
 - `Município - Código`;
-- `Ind Vínculo Ativo 31/12 - Código`.
+- `Ind Vínculo Ativo 31/12 - Código`;
+- `Ind Vínculo Abandonado - Código`.
 
 O ano-base não existe como coluna no arquivo regional de vínculos e é derivado do contexto anual do pipeline. A UF também não existe como coluna física e é derivada do prefixo do código municipal.
 
@@ -256,7 +257,9 @@ O Silver tech contém somente:
 - confirmação de vínculo ativo em 31/12;
 - arquivo de origem.
 
-Somente vínculos ativos em 31/12 entram no estoque. Depois disso, o recorte CBO tech v2 é aplicado pelas famílias 2122, 2123, 2124, 3171 e 3172.
+O estoque oficial de 2025 exige duas condições simultâneas: vínculo ativo em 31/12 igual a `1` e indicador de vínculo abandonado igual a `0`. Depois dessa qualificação, o recorte CBO tech v2 é aplicado pelas famílias 2122, 2123, 2124, 3171 e 3172.
+
+A necessidade do segundo filtro foi confirmada com os microdados reais. Na Região Norte, havia 3.911.021 registros com vínculo ativo bruto. Desses, 41.830 estavam marcados como vínculo abandonado. A exclusão desses registros produz 3.869.191 vínculos, exatamente o estoque oficial divulgado pelo MTE para a região.
 
 O ano é fixado pelo contexto anual validado, e a UF é derivada do prefixo municipal oficial. Registros com situação de vínculo desconhecida, CBO inválida, município inválido ou prefixo de UF desconhecido são preservados no Parquet de rejeições com a razão correspondente.
 
@@ -294,16 +297,24 @@ Executar:
 python -m src.cli rais-reconcile 2025
 ```
 
-A transformação Silver registra uma partição da fonte antes do recorte CBO:
+A transformação Silver registra duas partições antes do recorte CBO.
+
+Partição bruta da fonte:
 
 - vínculos ativos do ano solicitado;
 - vínculos inativos;
 - status desconhecido;
 - registros com ano divergente.
 
+Partição do estoque ativo:
+
+- vínculos ativos elegíveis, com abandono igual a `0`;
+- vínculos ativos abandonados, com abandono igual a `1`;
+- códigos de abandono desconhecidos.
+
 Essas categorias precisam fechar exatamente o total de linhas lidas. O gate exige também zero status desconhecido e zero ano divergente.
 
-O total comparado com o MTE é `rows_active_source`, calculado antes das validações de CBO, município e UF. Assim, registros territoriais rejeitados não reduzem artificialmente o estoque nacional usado na reconciliação.
+O total comparado com o MTE é `rows_stock_eligible_source`, calculado antes das validações de CBO, município e UF. `rows_active_source` permanece como auditoria do indicador bruto de atividade. Assim, o pipeline preserva a diferença entre estoque bruto e estoque oficial qualificado sem perder rastreabilidade.
 
 A diferença precisa ser exatamente zero. Qualquer divergência mantém `gold_ready=false`.
 

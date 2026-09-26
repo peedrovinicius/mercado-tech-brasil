@@ -1,8 +1,9 @@
-version: 2
+version: 3
 dataset: rais_vinculos
 year_reference: 2025
 sources:
   rais_2025: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025"
+  rais_2025_presentation: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/apresentacao-rais-2025.pdf"
   rais_2024_change_notice: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/comunicados/comunicado-microdados-rais-2024"
   cbo: "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/informacoes-gerais"
 
@@ -31,6 +32,13 @@ required:
       - vinculo_ativo_3112
       - emp_em_31_12
       - emprego_em_31_12
+
+  abandoned_link:
+    description: "Indicador de vínculo abandonado no processamento RAIS"
+    aliases:
+      - ind_vinculo_abandonado_codigo
+      - vinculo_abandonado
+      - ind_vinculo_abandonado
 
 derived:
   year:
