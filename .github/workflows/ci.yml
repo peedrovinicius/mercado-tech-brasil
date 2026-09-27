@@ -47,6 +47,9 @@ jobs:
           pip install -e ".[dev]"
           pip install httpx
 
+      - name: Import order diagnostic
+        run: ruff check src/validation/deployment_policy.py --select I --fix --diff || true
+
       - name: Lint
         run: ruff check src tests
 
