@@ -1,6 +1,7 @@
 import json
 import re
 import tomllib
+from itertools import pairwise
 from pathlib import Path
 
 from src.api.publication import published_competencies
@@ -58,7 +59,7 @@ def test_published_monthly_scope_is_contiguous():
     competencies = published_competencies(Path("data/gold"))
 
     assert competencies
-    for previous, current in zip(competencies, competencies[1:], strict=False):
+    for previous, current in pairwise(competencies):
         assert current == _next_month(previous)
 
 
@@ -86,9 +87,12 @@ def test_versioned_monthly_gold_only_contains_published_competencies():
                 continue
 
             competence = path.name.removeprefix(prefix).split(".", maxsplit=1)[0]
-            if len(competence) == 6 and competence.isdigit():
-                if competence not in published:
-                    violations.append(str(path))
+            if (
+                len(competence) == 6
+                and competence.isdigit()
+                and competence not in published
+            ):
+                violations.append(str(path))
             break
 
     assert violations == []
