@@ -45,6 +45,6 @@ def test_openapi_export_workflow_skips_render_for_docs_only_commit():
         ROOT / ".github" / "workflows" / "openapi-contract.yml"
     ).read_text(encoding="utf-8")
 
-    assert "python scripts/export_openapi.py" in workflow
+    assert "PYTHONPATH=. python scripts/export_openapi.py" in workflow
     assert "[skip render]" in workflow
     assert "docs/openapi.json" in workflow
