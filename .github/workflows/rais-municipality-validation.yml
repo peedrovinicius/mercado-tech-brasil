@@ -1,0 +1,50 @@
+name: RAIS 2025 municipality validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download validated RAIS release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rais-2025-v035-full-reprocess
+          path: work/release
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 36285923783
+
+      - name: Validate municipality codes against IBGE DTB 2025
+        run: |
+          PYTHONPATH=. python scripts/rais_validate_municipalities.py             --silver work/release/data/silver/rais_tech_2025.parquet             --output rais-municipality-validation-2025.json             --year 2025
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-municipality-validation-2025
+          retention-days: 3
+          if-no-files-found: error
+          path: rais-municipality-validation-2025.json
