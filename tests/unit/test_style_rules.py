@@ -3,6 +3,8 @@ import re
 import tomllib
 from pathlib import Path
 
+from src.api.publication import published_competencies
+
 TEXT_SUFFIXES = {
     ".css",
     ".html",
@@ -44,18 +46,50 @@ def test_repository_does_not_use_long_dashes():
     assert violations == []
 
 
-def test_published_scope_does_not_reintroduce_excluded_period():
-    violations: list[str] = []
-    forbidden_tokens = (
-        "2026" + "08",
-        "agos" + "to",
-        "Ago" + "/2026",
-    )
+def _next_month(yearmonth: str) -> str:
+    year = int(yearmonth[:4])
+    month = int(yearmonth[4:])
+    if month == 12:
+        return f"{year + 1:04d}01"
+    return f"{year:04d}{month + 1:02d}"
 
-    for path in iter_repository_text_files():
-        text = path.read_text(encoding="utf-8")
-        if any(token.lower() in text.lower() for token in forbidden_tokens):
-            violations.append(str(path))
+
+def test_published_monthly_scope_is_contiguous():
+    competencies = published_competencies(Path("data/gold"))
+
+    assert competencies
+    for previous, current in zip(competencies, competencies[1:], strict=False):
+        assert current == _next_month(previous)
+
+
+def test_versioned_monthly_gold_only_contains_published_competencies():
+    gold = Path("data/gold")
+    published = set(published_competencies(gold))
+    prefixes = (
+        "audit-national-mov-",
+        "by-municipality-",
+        "by-occupation-",
+        "by-uf-",
+        "market-",
+        "overview-",
+        "publication-gate-",
+        "quality-",
+    )
+    violations: list[str] = []
+
+    for path in gold.iterdir():
+        if not path.is_file():
+            continue
+
+        for prefix in prefixes:
+            if not path.name.startswith(prefix):
+                continue
+
+            competence = path.name.removeprefix(prefix).split(".", maxsplit=1)[0]
+            if len(competence) == 6 and competence.isdigit():
+                if competence not in published:
+                    violations.append(str(path))
+            break
 
     assert violations == []
 
