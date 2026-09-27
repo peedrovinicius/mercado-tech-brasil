@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "frontend/**"
+      - "config/rais_publication_approvals.json"
+      - "data/gold/rais-publication-gate-*.json"
       - ".github/workflows/frontend.yml"
   workflow_dispatch:
 
