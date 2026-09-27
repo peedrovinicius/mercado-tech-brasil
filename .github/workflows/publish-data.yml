@@ -133,5 +133,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "data: publish validated $COMPETENCE release [skip ci]"
+          git commit -m "data: publish validated $COMPETENCE release"
           git push
