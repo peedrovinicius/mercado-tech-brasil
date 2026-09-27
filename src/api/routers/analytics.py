@@ -11,6 +11,7 @@ from src.api.publication import (
     latest_published_competence,
     published_competencies,
 )
+from src.api.stock_flow_context import build_stock_flow_context
 from src.core.settings import settings
 from src.db.repository import (
     fetch_by_municipality,
@@ -174,6 +175,20 @@ def by_occupation(limit: int = Query(default=10, ge=1, le=50)) -> dict[str, obje
         **payload,
         "items": payload.get("items", [])[:limit],
     }
+
+
+@router.get("/stock-flow-context")
+def stock_flow_context() -> dict[str, object]:
+    try:
+        return build_stock_flow_context(
+            gold_dir=settings.gold_path,
+            cbo_config_path=settings.cbo_config_path,
+        )
+    except (FileNotFoundError, TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Contexto RAIS x CAGED indisponível: {exc}",
+        ) from exc
 
 
 @router.get("/occupation-family-trend")

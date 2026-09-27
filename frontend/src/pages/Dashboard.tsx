@@ -18,6 +18,7 @@ import { TemporalSummary } from '../components/TemporalSummary'
 import { MunicipalityAnalysis } from '../components/MunicipalityAnalysis'
 import { OccupationFamilyAnalysis } from '../components/OccupationFamilyAnalysis'
 import { RaisAnnualAnalysis } from '../components/RaisAnnualAnalysis'
+import { StockFlowContextAnalysis } from '../components/StockFlowContextAnalysis'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
@@ -129,6 +130,12 @@ export function Dashboard() {
     queryFn: api.raisByMunicipality,
     retry: false,
     enabled: publishedRaisYear !== null,
+  })
+  const stockFlowContext = useQuery({
+    queryKey: ['stock-flow-context', publishedRaisYear],
+    queryFn: api.stockFlowContext,
+    retry: false,
+    enabled: overview.isSuccess && publishedRaisYear !== null,
   })
 
   const isLoading = readiness.isLoading || (readiness.data?.data_loaded && overview.isLoading)
@@ -296,6 +303,10 @@ export function Dashboard() {
 
           {occupationFamilyTrend.data ? (
             <OccupationFamilyAnalysis data={occupationFamilyTrend.data} />
+          ) : null}
+
+          {stockFlowContext.data ? (
+            <StockFlowContextAnalysis data={stockFlowContext.data} />
           ) : null}
 
           <section className="analysis-grid">

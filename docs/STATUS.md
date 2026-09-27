@@ -44,6 +44,7 @@ Em todas as competências processadas:
 - Gold por município;
 - série histórica;
 - série temporal por família CBO com admissões, desligamentos, saldo e participação;
+- contexto estoque RAIS x fluxo CAGED por família CBO, com interpretação descritiva;
 - referências oficiais nacionais por competência;
 - recorte CBO v2;
 - metodologia salarial MTE;
@@ -83,6 +84,7 @@ Em todas as competências processadas:
 - React e TypeScript;
 - gráficos ECharts modulares;
 - análise visual da evolução mensal das cinco famílias CBO tech;
+- comparação visual RAIS x CAGED com participação e escala por estoque anterior;
 - frontend responsivo;
 - deploy público no Render.
 

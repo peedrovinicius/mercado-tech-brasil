@@ -61,6 +61,45 @@ export type OccupationFamilyTrend = {
   families: OccupationFamilyTrendItem[]
 }
 
+export type StockFlowFamilyItem = {
+  cbo_familia: string
+  cbo_familia_nome: string
+  active_stock: number
+  share_of_tech_stock: number
+  admissions: number
+  dismissals: number
+  balance: number
+  share_of_tech_admissions: number
+  admissions_per_100_prior_stock: number
+  dismissals_per_100_prior_stock: number
+  balance_per_100_prior_stock: number
+  composition_gap_pp: number
+}
+
+export type StockFlowContext = {
+  stock_source: string
+  flow_source: string
+  scope: string
+  interpretation: 'descriptive_scale_context'
+  rais_year: number
+  stock_reference_date: string
+  caged_year: number
+  caged_from: string
+  caged_to: string
+  published_months: number
+  totals: {
+    active_stock: number
+    admissions: number
+    dismissals: number
+    balance: number
+    admissions_per_100_prior_stock: number
+    dismissals_per_100_prior_stock: number
+    balance_per_100_prior_stock: number
+  }
+  families: StockFlowFamilyItem[]
+  methodological_warning: string
+}
+
 export type MunicipalityItem = SalaryFields & {
   municipio_codigo_caged: string
   municipio_codigo_ibge?: string | null
@@ -349,6 +388,8 @@ export const api = {
     ),
   occupationFamilyTrend: () =>
     get<OccupationFamilyTrend>('/analytics/occupation-family-trend'),
+  stockFlowContext: () =>
+    get<StockFlowContext>('/analytics/stock-flow-context'),
   byMunicipality: () =>
     get<MunicipalityResponse>('/analytics/by-municipality?limit=15'),
   byMunicipalityNormalized: () =>

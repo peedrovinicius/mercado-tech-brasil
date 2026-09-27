@@ -63,6 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Evolução ocupacional | Série mensal das cinco famílias CBO tech |
+| Estoque x fluxo | RAIS 2025 contextualizada com movimentações CAGED 2026 |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
 | RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
@@ -215,6 +216,7 @@ O pipeline mantém:
 - endpoints e visual anual RAIS condicionados ao gate publishable=true;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
 - evolução mensal das cinco famílias CBO do recorte, sem agregação indevida de medianas salariais;
+- comparação descritiva entre estoque RAIS e fluxos CAGED por família, sem rotular a razão como turnover;
 - intake governado do QBQ preparado para workbook oficial, fingerprint e validação dos CBOs tech;
 - pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 

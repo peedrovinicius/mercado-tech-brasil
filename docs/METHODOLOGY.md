@@ -123,6 +123,26 @@ A integração exige arquivo XLSX oficial, SHA-256 registrado, código CBO de se
 
 O schema definitivo só será versionado depois da inspeção do workbook oficial autenticado. Até lá, nenhum atributo QBQ entra na API ou no dashboard.
 
+## Comparação entre estoque RAIS e fluxos Novo CAGED
+
+A comparação entre RAIS e Novo CAGED usa exatamente o mesmo recorte CBO versionado, mas preserva a diferença conceitual entre as fontes.
+
+A RAIS fornece o estoque de vínculos ativos em 31 de dezembro do ano-base. O Novo CAGED fornece eventos de admissão e desligamento ao longo do ano seguinte.
+
+Para cada família CBO, o produto pode derivar:
+
+`admissoes_por_100_estoque_anterior = admissoes_acumuladas / estoque_rais_31_12 x 100`
+
+`desligamentos_por_100_estoque_anterior = desligamentos_acumulados / estoque_rais_31_12 x 100`
+
+`saldo_por_100_estoque_anterior = saldo_acumulado / estoque_rais_31_12 x 100`
+
+Também é comparada a participação da família no estoque tech da RAIS com sua participação nas admissões tech do Novo CAGED. A diferença é expressa em pontos percentuais e descreve composição relativa entre estoque e fluxo.
+
+Esses indicadores são apenas contexto de escala. Eles não são classificados como turnover, taxa de contratação, probabilidade individual, crescimento do estoque ou número de pessoas únicas. Um vínculo ou trabalhador pode aparecer em mais de um evento do Novo CAGED, e o estoque RAIS pertence a uma data de referência diferente.
+
+A API só monta essa comparação quando existe uma RAIS publicada e competências publicadas do Novo CAGED no ano imediatamente posterior.
+
 ## Série histórica
 
 Cada overview Gold é incorporado em `trend.json`. No backend PostgreSQL, a série é construída diretamente a partir das competências publicadas em `dataset_release`.

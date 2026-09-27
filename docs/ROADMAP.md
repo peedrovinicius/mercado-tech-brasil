@@ -94,7 +94,10 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 - intake auditável de workbook QBQ com SHA-256 e cobertura dos CBOs tech: implementado;
 - confirmar o schema real do Excel QBQ após obtenção do arquivo oficial autenticado;
 - construir Silver e API QBQ somente depois da validação do schema real;
-- avaliar comparações entre estoque anual RAIS e movimentação mensal Novo CAGED somente onde a interpretação metodológica for válida.
+- comparação descritiva entre estoque RAIS e fluxos Novo CAGED no mesmo recorte CBO: implementada;
+- escala de admissões, desligamentos e saldo por 100 vínculos do estoque anterior: implementada;
+- comparação de participação no estoque versus participação nas admissões por família CBO: implementada;
+- interpretação explicitamente bloqueada para turnover, probabilidade individual ou crescimento direto do estoque.
 
 ## Critério de inclusão
 
