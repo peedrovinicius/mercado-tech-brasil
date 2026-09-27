@@ -50,6 +50,9 @@ from src.validation.incremental_release import (
     evaluate_next_competence,
     validate_requested_competence,
 )
+from src.validation.population_enrichment import (
+    enrich_published_municipality_population,
+)
 from src.validation.publication_gate import (
     approve_competence,
     evaluate_publication_gate,
@@ -68,6 +71,42 @@ from src.validation.rais_regional_reconciliation import (
     evaluate_rais_regional_reconciliation,
     write_rais_regional_reconciliation,
 )
+
+
+def command_enrich_published_population(
+    yearmonth: str,
+    *,
+    population_year: int,
+    source_url: str,
+    published_at: str,
+    strict: bool,
+) -> None:
+    populations = fetch_population_estimates(population_year)
+    if len(populations) < 5000:
+        raise SystemExit(
+            "SIDRA retornou uma quantidade inesperadamente baixa de municípios."
+        )
+    save_population_cache(
+        populations,
+        year=population_year,
+        destination=settings.population_cache_path,
+    )
+    report = enrich_published_municipality_population(
+        yearmonth=yearmonth,
+        population_year=population_year,
+        gold_dir=settings.gold_path,
+        population_cache_path=settings.population_cache_path,
+        source_url=source_url,
+        published_at=published_at,
+    )
+    print(
+        "population enrichment: "
+        f"competence={yearmonth} "
+        f"matched={report['matched_population']} "
+        f"missing={report['missing_population']} "
+        f"population_sha256={report['population_cache_sha256']}"
+    )
+    _run_publication_gate(yearmonth, strict=strict)
 
 
 def command_qbq_inspect(
@@ -964,6 +1003,36 @@ def build_parser() -> argparse.ArgumentParser:
     local_pipeline.add_argument("file", help="Caminho do arquivo TXT ou .7z")
     local_pipeline.add_argument("--kind", choices=["MOV", "FOR", "EXC"], default="MOV")
 
+    population_enrich = sub.add_parser(
+        "enrich-published-population",
+        help=(
+            "Enriquece um Gold municipal já publicado com população oficial "
+            "do IBGE e refaz o gate."
+        ),
+    )
+    population_enrich.add_argument("yearmonth", help="Competência AAAAMM")
+    population_enrich.add_argument(
+        "--population-year",
+        type=int,
+        required=True,
+        help="Ano da estimativa populacional oficial.",
+    )
+    population_enrich.add_argument(
+        "--source-url",
+        required=True,
+        help="URL oficial da publicação populacional.",
+    )
+    population_enrich.add_argument(
+        "--published-at",
+        required=True,
+        help="Data de publicação oficial no formato AAAA-MM-DD.",
+    )
+    population_enrich.add_argument(
+        "--strict",
+        action="store_true",
+        help="Retorna código 2 se o gate deixar de ser publicável.",
+    )
+
     qbq_inspect = sub.add_parser(
         "qbq-inspect",
         help="Inspeciona um Excel oficial do QBQ antes de qualquer enriquecimento.",
@@ -1234,6 +1303,16 @@ def main() -> None:
 
     if args.command == "local-pipeline":
         command_local_pipeline(args.yearmonth, args.file, args.kind)
+        return
+
+    if args.command == "enrich-published-population":
+        command_enrich_published_population(
+            args.yearmonth,
+            population_year=args.population_year,
+            source_url=args.source_url,
+            published_at=args.published_at,
+            strict=args.strict,
+        )
         return
 
     if args.command == "qbq-inspect":
