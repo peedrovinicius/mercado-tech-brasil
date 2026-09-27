@@ -61,9 +61,11 @@ A base necessária para publicar e auditar o produto está implementada:
 
 Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 
-- automatizar a preparação da próxima competência do Novo CAGED somente após a publicação oficial;
-- detectar a nova competência disponível sem antecipar período ainda não publicado;
-- baixar e registrar a origem com manifesto e SHA-256;
+- preparação automática da próxima competência condicionada à referência oficial: implementada;
+- detecção contínua da próxima competência sem antecipar período não publicado: implementada;
+- bloqueio de saltos mensais e de data de publicação futura: implementado;
+- auditoria automática disparada quando a referência oficial elegível entra no main: implementada;
+- baixar e registrar a origem com manifesto e SHA-256 na próxima competência elegível;
 - executar Bronze, Silver, Gold, ajustes FOR/EXC e enriquecimentos pelo fluxo existente;
 - manter validação explícita da referência oficial do MTE antes da liberação;
 - gerar o gate da nova competência inicialmente bloqueado;
