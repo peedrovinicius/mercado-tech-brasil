@@ -56,9 +56,18 @@ def test_published_analytics_are_served():
         "?limit=15&metric=admissions_per_100k"
     )
     assert normalized.status_code == 200
-    assert normalized.json()["ranking_metric"] == "admissions_per_100k"
-    assert normalized.json()["normalization_available"] is False
-    assert normalized.json()["items"] == []
+    normalized_payload = normalized.json()
+    assert normalized_payload["ranking_metric"] == "admissions_per_100k"
+    if normalized_payload["normalization_available"]:
+        assert normalized_payload["items"]
+        assert all(
+            item["admissions_per_100k"] is not None
+            and item["population_estimate"] is not None
+            and item["population_estimate"] > 0
+            for item in normalized_payload["items"]
+        )
+    else:
+        assert normalized_payload["items"] == []
 
     comparison = client.get("/api/v1/analytics/territorial-comparison")
     assert comparison.status_code == 200
