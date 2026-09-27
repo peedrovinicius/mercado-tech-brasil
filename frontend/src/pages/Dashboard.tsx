@@ -24,6 +24,11 @@ export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
 
   const readiness = useQuery({ queryKey: ['readiness'], queryFn: api.readiness })
+  const releaseState = useQuery({
+    queryKey: ['release-state'],
+    queryFn: api.releaseState,
+    retry: false,
+  })
   const releases = useQuery({
     queryKey: ['releases'],
     queryFn: api.releases,
@@ -402,6 +407,18 @@ export function Dashboard() {
         <div className="footer__identity">
           <strong>Mercado Tech Brasil</strong>
           <span>Fonte principal: Novo CAGED / Ministério do Trabalho e Emprego</span>
+          {releaseState.data ? (
+            <small className="footer__version">
+              v{releaseState.data.version}
+              {' · '}
+              {releaseState.data.monthly.latest_competence
+                ? formatCompetence(releaseState.data.monthly.latest_competence)
+                : 'sem competência mensal'}
+              {releaseState.data.rais.latest_published_year
+                ? ' · RAIS ' + releaseState.data.rais.latest_published_year
+                : ''}
+            </small>
+          ) : null}
         </div>
         <nav className="footer__links" aria-label="Links técnicos">
           <a href="/docs" target="_blank" rel="noreferrer">API / OpenAPI</a>
