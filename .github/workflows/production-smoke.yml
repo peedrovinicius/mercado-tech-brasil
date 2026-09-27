@@ -1,0 +1,64 @@
+name: Production smoke
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Resolve expected release state
+        id: expected
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import tomllib
+          from pathlib import Path
+
+          pyproject = tomllib.loads(
+              Path("pyproject.toml").read_text(encoding="utf-8")
+          )
+          policy = json.loads(
+              Path("config/monthly_coverage_policy.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+
+          rais_years = []
+          for path in Path("data/gold").glob("rais-publication-gate-*.json"):
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              if payload.get("publishable") is True:
+                  rais_years.append(int(payload["year"]))
+
+          print(f"version={pyproject['project']['version']}")
+          print(f"monthly={policy['max_competence']}")
+          print(f"rais_year={max(rais_years)}")
+          PY
+
+      - name: Validate production
+        run: |
+          python scripts/smoke_production.py             --base-url "https://mercado-tech-brasil.onrender.com"             --expected-version "${{ steps.expected.outputs.version }}"             --expected-monthly "${{ steps.expected.outputs.monthly }}"             --expected-rais-year "${{ steps.expected.outputs.rais_year }}"
