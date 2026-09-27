@@ -34,6 +34,33 @@ export type OccupationItem = SalaryFields & {
   balance: number
 }
 
+export type OccupationFamilyMonthly = {
+  competence: string
+  admissions: number
+  dismissals: number
+  balance: number
+}
+
+export type OccupationFamilyTrendItem = {
+  cbo_familia: string
+  cbo_familia_nome: string
+  admissions: number
+  dismissals: number
+  balance: number
+  share_of_tech_admissions: number
+  monthly: OccupationFamilyMonthly[]
+}
+
+export type OccupationFamilyTrend = {
+  source: string
+  scope: string
+  dimension: 'familia_cbo'
+  published_from: string
+  published_to: string
+  published_months: number
+  families: OccupationFamilyTrendItem[]
+}
+
 export type MunicipalityItem = SalaryFields & {
   municipio_codigo_caged: string
   municipio_codigo_ibge?: string | null
@@ -320,6 +347,8 @@ export const api = {
     get<{ competence: string; source: string; items: OccupationItem[] }>(
       '/analytics/by-occupation?limit=10',
     ),
+  occupationFamilyTrend: () =>
+    get<OccupationFamilyTrend>('/analytics/occupation-family-trend'),
   byMunicipality: () =>
     get<MunicipalityResponse>('/analytics/by-municipality?limit=15'),
   byMunicipalityNormalized: () =>
