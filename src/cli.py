@@ -364,6 +364,7 @@ def command_approve_release(
         reviewer=reviewer,
         notes=notes,
         bronze_dir=settings.bronze_path,
+        reference_path=settings.reference_totals_path,
         approvals_path=settings.publication_approvals_path,
     )
     print(
