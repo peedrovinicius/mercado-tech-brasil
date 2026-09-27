@@ -13,6 +13,37 @@ def test_health():
     payload = response.json()
     assert payload["status"] == "ok"
     assert payload["project"] == "Mercado Tech Brasil"
+    assert payload["version"] == "0.40.0"
+
+
+def test_release_state_exposes_governed_baseline():
+    response = client.get("/api/v1/system/release")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["project"] == "Mercado Tech Brasil"
+    assert payload["version"] == "0.40.0"
+    assert payload["monthly"]["published_count"] == 7
+    assert payload["monthly"]["first_competence"] == "202601"
+    assert payload["monthly"]["latest_competence"] == "202607"
+    assert payload["monthly"]["policy_mode"] == "locked"
+    assert payload["monthly"]["policy_max_competence"] == "202607"
+    assert payload["rais"]["latest_published_year"] == 2025
+
+
+def test_security_headers_are_present():
+    response = client.get("/api/v1/system/health")
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert (
+        response.headers["referrer-policy"]
+        == "strict-origin-when-cross-origin"
+    )
+    assert (
+        response.headers["permissions-policy"]
+        == "camera=(), microphone=(), geolocation=()"
+    )
+    assert response.headers["cross-origin-opener-policy"] == "same-origin"
 
 
 def test_sources_are_exposed():
