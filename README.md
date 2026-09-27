@@ -64,7 +64,7 @@ python scripts/generate_readme_dashboard.py
 | Consolidação temporal | Trimestres completos e parciais |
 | Evolução ocupacional | Série mensal das cinco famílias CBO tech |
 | Estoque x fluxo | RAIS 2025 contextualizada com movimentações CAGED 2026 |
-| Ranking municipal normalizado | Jul/2026 alvo para população IBGE 2026 com gate específico |
+| Ranking municipal normalizado | Ativo em Jul/2026 com população IBGE 2026 e gate aprovado |
 | RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
 ## Série publicada
@@ -92,6 +92,12 @@ O processamento anual completo leu **91.710.262 registros** dos sete arquivos de
 Todos os checks automáticos nacionais e regionais passaram. A dimensão municipal também foi validada contra a Divisão Territorial Brasileira 2025 do IBGE: 3.689 códigos não residuais do estoque tech encontraram correspondência, sem código desconhecido e sem divergência de UF. O único residual é `999999`, com 1 vínculo tech, preservado como `NI`.
 
 A release 2025 passou pelo gate automático e pela aprovação metodológica manual. A API anual fica liberada por `publishable=true`, e o frontend habilita automaticamente a seção RAIS ao detectar 2025 no registro de releases publicadas.
+
+### Normalização municipal, Jul/2026
+
+O Gold municipal de julho de 2026 foi enriquecido com as **Estimativas da População 2026 do IBGE**, com referência em 1º de julho. Os **1.274 municípios tech identificados** encontraram denominador populacional, com **zero ausências**. O enriquecimento preservou exatamente **19.253 admissões, 18.347 desligamentos e saldo +906**.
+
+O gate valida a proveniência da referência, o SHA-256 do cache populacional, a cobertura municipal e a aritmética das taxas de admissões, desligamentos e saldo por 100 mil habitantes. O ranking normalizado do dashboard fica disponível somente quando esses checks passam.
 
 ### Comparação territorial, Jul/2026
 
