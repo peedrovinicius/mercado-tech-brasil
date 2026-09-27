@@ -1,0 +1,3 @@
+run=rais-v035-full-reprocess-1
+purpose=reprocess-all-seven-with-active-and-not-abandoned-rule
+transport=https-audited-mirror

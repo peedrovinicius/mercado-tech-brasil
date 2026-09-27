@@ -1,14 +1,17 @@
-name: RAIS 2025 mirror retry
+name: RAIS 2025 v0.35 full reprocess
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/rais-v035-full.run"
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: rais-mirror-retry-2025
+  group: rais-v035-full-reprocess-2025
   cancel-in-progress: false
 
 jobs:
@@ -33,16 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
 
-      - name: Reuse validated Centro-Oeste, Norte and NI parts
-        uses: actions/download-artifact@v4
-        with:
-          name: rais-2025-parts-mirror-retry
-          path: work
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: peedrovinicius/mercado-tech-brasil
-          run-id: 36275196275
-
-      - name: Process remaining parts through audited HTTPS mirror
+      - name: Process all seven parts through audited HTTPS mirror
         id: process
         continue-on-error: true
         run: |
@@ -53,7 +47,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rais-2025-parts-mirror-retry
+          name: rais-2025-v035-parts
           retention-days: 3
           if-no-files-found: warn
           path: |
@@ -99,7 +93,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rais-2025-full-audit-mirror
+          name: rais-2025-v035-full-reprocess
           retention-days: 3
           if-no-files-found: warn
           path: |
@@ -116,6 +110,6 @@ jobs:
             data/gold/rais-market-2025.parquet
             data/gold/rais-publication-gate-2025.json
 
-      - name: Fail if pending processing failed
+      - name: Fail if full reprocessing failed
         if: steps.process.outcome == 'failure'
         run: exit 2
