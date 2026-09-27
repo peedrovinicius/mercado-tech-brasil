@@ -44,6 +44,8 @@ A base necessária para publicar e auditar o produto está implementada:
 - Gold anual RAIS por overview, UF e família CBO;
 - gate anual RAIS com fingerprint integral e aprovação metodológica;
 - helpers de serving que ignoram anos sem publicação aprovada;
+- endpoints anuais RAIS protegidos por publishable=true;
+- integração visual RAIS preparada no frontend e condicionada ao registry anual;
 - publicação pública no Render.
 
 ## Próximas entregas
@@ -65,8 +67,7 @@ A base necessária para publicar e auditar o produto está implementada:
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
 - concluir a aprovação metodológica manual da release anual;
-- ativar automaticamente o serving dos endpoints RAIS já implementados quando a release atingir publishable=true;
-- integrar a seção anual RAIS ao frontend mantendo-a oculta enquanto não houver release publicada;
+- verificar a exposição automática da API e da seção RAIS após publishable=true;
 - validar sistema de códigos municipais da RAIS 2025 antes de agregação municipal;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.

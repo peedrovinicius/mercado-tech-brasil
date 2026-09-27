@@ -1002,3 +1002,272 @@ a:focus-visible, button:focus-visible {
     gap: 14px;
   }
 }
+
+
+.rais-section {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 72px 5vw;
+  border-top: 1px solid #e0e0e4;
+}
+
+.rais-section__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 36px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+.rais-section__heading h2 {
+  max-width: 880px;
+  margin: 8px 0 14px;
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+
+.rais-section__heading > div > p:last-child {
+  max-width: 800px;
+  margin: 0;
+  color: #66666e;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+.rais-section__meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.rais-section__meta span {
+  font-size: 34px;
+  font-weight: 780;
+  letter-spacing: -.04em;
+}
+
+.rais-section__meta small {
+  color: #7b7b83;
+  font-size: 11px;
+}
+
+.rais-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rais-metric {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  border: 1px solid #e1e1e5;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.rais-metric--primary {
+  background: #171719;
+  border-color: #171719;
+  color: #fff;
+}
+
+.rais-metric > span {
+  color: #74747c;
+  font-size: 12px;
+}
+
+.rais-metric--primary > span,
+.rais-metric--primary > small {
+  color: #aaaab4;
+}
+
+.rais-metric > strong {
+  font-size: clamp(32px, 4vw, 52px);
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.rais-metric > small {
+  color: #86868e;
+  font-size: 11px;
+}
+
+.rais-grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 14px;
+}
+
+.rais-panel {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #e1e1e5;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.rais-panel__heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.rais-panel__heading h3 {
+  margin: 6px 0 0;
+  font-size: 20px;
+}
+
+.rais-panel__heading > span {
+  color: #85858d;
+  font-size: 11px;
+}
+
+.rais-ranking {
+  display: grid;
+  gap: 14px;
+}
+
+.rais-ranking__row {
+  display: grid;
+  grid-template-columns: 120px minmax(80px, 1fr) 72px;
+  gap: 14px;
+  align-items: center;
+}
+
+.rais-ranking__label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.rais-ranking__label span {
+  color: #7d7d85;
+  font-variant-numeric: tabular-nums;
+}
+
+.rais-ranking__track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ececf0;
+}
+
+.rais-ranking__track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2459ff;
+}
+
+.rais-ranking__row > small {
+  color: #7d7d85;
+  text-align: right;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rais-family-list {
+  display: grid;
+}
+
+.rais-family {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #ececf0;
+}
+
+.rais-family:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rais-family > div:first-child span,
+.rais-family > div:first-child strong,
+.rais-family__value strong,
+.rais-family__value small {
+  display: block;
+}
+
+.rais-family > div:first-child span {
+  color: #85858d;
+  font-size: 10px;
+}
+
+.rais-family > div:first-child strong {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.rais-family__value {
+  text-align: right;
+}
+
+.rais-family__value strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rais-family__value small {
+  margin-top: 3px;
+  color: #85858d;
+  font-size: 10px;
+}
+
+.rais-section__note {
+  max-width: 900px;
+  margin: 18px 0 0;
+  color: #74747c;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+@media (max-width: 980px) {
+  .rais-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .rais-section__heading,
+  .rais-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .rais-section__meta {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .rais-section {
+    padding: 54px 20px;
+  }
+
+  .rais-ranking__row {
+    grid-template-columns: 96px minmax(60px, 1fr) 64px;
+    gap: 10px;
+  }
+
+  .rais-panel,
+  .rais-metric {
+    padding: 20px;
+  }
+}

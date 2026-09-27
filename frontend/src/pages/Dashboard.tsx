@@ -16,6 +16,7 @@ import { PipelineVisual } from '../components/PipelineVisual'
 import { TerritorialComparison } from '../components/TerritorialComparison'
 import { TemporalSummary } from '../components/TemporalSummary'
 import { MunicipalityAnalysis } from '../components/MunicipalityAnalysis'
+import { RaisAnnualAnalysis } from '../components/RaisAnnualAnalysis'
 
 export function Dashboard() {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
@@ -24,6 +25,11 @@ export function Dashboard() {
   const releases = useQuery({
     queryKey: ['releases'],
     queryFn: api.releases,
+    retry: false,
+  })
+  const raisReleases = useQuery({
+    queryKey: ['rais-releases'],
+    queryFn: api.raisReleases,
     retry: false,
   })
   const officialReference = useQuery({
@@ -92,6 +98,26 @@ export function Dashboard() {
     enabled: readiness.data?.data_loaded === true,
   })
 
+  const publishedRaisYear = raisReleases.data?.latest_published_year ?? null
+  const raisOverview = useQuery({
+    queryKey: ['rais-overview', publishedRaisYear],
+    queryFn: api.raisOverview,
+    retry: false,
+    enabled: publishedRaisYear !== null,
+  })
+  const raisByUf = useQuery({
+    queryKey: ['rais-by-uf', publishedRaisYear],
+    queryFn: api.raisByUf,
+    retry: false,
+    enabled: publishedRaisYear !== null,
+  })
+  const raisByCboFamily = useQuery({
+    queryKey: ['rais-by-cbo-family', publishedRaisYear],
+    queryFn: api.raisByCboFamily,
+    retry: false,
+    enabled: publishedRaisYear !== null,
+  })
+
   const isLoading = readiness.isLoading || (readiness.data?.data_loaded && overview.isLoading)
   const noData = readiness.isSuccess && readiness.data.data_loaded === false
   const hasTechData = overview.isSuccess
@@ -124,6 +150,7 @@ export function Dashboard() {
         <nav className="topbar__actions" aria-label="Navegação principal">
           <a href="#contexto">Contexto</a>
           <a href="#analise">Análise</a>
+          {publishedRaisYear ? <a href="#rais">RAIS</a> : null}
           <a href="#qualidade">Qualidade</a>
           <button className="button button--secondary" onClick={() => setMethodologyOpen(true)}>
             Metodologia
@@ -315,6 +342,14 @@ export function Dashboard() {
             </article>
           </section>
         </>
+      ) : null}
+
+      {raisOverview.data && raisByUf.data && raisByCboFamily.data ? (
+        <RaisAnnualAnalysis
+          overview={raisOverview.data}
+          byUf={raisByUf.data}
+          byFamily={raisByCboFamily.data}
+        />
       ) : null}
 
       {readiness.isError ? (

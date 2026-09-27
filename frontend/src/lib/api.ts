@@ -209,6 +209,68 @@ export type OfficialReference = {
   ufs: Record<string, ReferenceUfMetric>
 }
 
+export type RaisReleaseItem = {
+  year: number
+  automatic_checks_passed: boolean
+  manual_approval_valid: boolean
+  publishable: boolean
+  release_sha256?: string | null
+  generated_at_utc?: string | null
+}
+
+export type RaisReleases = {
+  latest_published_year: number | null
+  published_years: number[]
+  items: RaisReleaseItem[]
+}
+
+export type RaisOverview = {
+  year: number
+  reference_date: string
+  source: string
+  scope: string
+  active_stock_tech: number
+  active_stock_national_reference: number
+  share_tech_of_national_active: number
+  cbo_scope_version: number
+  cbo_families: string[]
+  uf_count: number
+  market_rows: number
+  status: string
+  publication_ready: boolean
+}
+
+export type RaisUfItem = {
+  uf: string
+  active_stock: number
+  share_of_tech_stock: number
+}
+
+export type RaisUfResponse = {
+  year: number
+  reference_date: string
+  source: string
+  scope: string
+  items: RaisUfItem[]
+  publication_ready: boolean
+}
+
+export type RaisCboFamilyItem = {
+  cbo_familia: string
+  cbo_familia_nome: string
+  active_stock: number
+  share_of_tech_stock: number
+}
+
+export type RaisCboFamilyResponse = {
+  year: number
+  reference_date: string
+  source: string
+  scope: string
+  items: RaisCboFamilyItem[]
+  publication_ready: boolean
+}
+
 type ApiError = Error & { status?: number }
 
 async function get<T>(path: string): Promise<T> {
@@ -253,6 +315,11 @@ export const api = {
   readiness: () => get<Readiness>('/system/readiness'),
   coverage: () => get<Coverage>('/metadata/coverage'),
   releases: () => get<Releases>('/metadata/releases'),
+  raisReleases: () => get<RaisReleases>('/rais/releases'),
+  raisOverview: () => get<RaisOverview>('/rais/overview'),
+  raisByUf: () => get<RaisUfResponse>('/rais/by-uf?limit=10'),
+  raisByCboFamily: () =>
+    get<RaisCboFamilyResponse>('/rais/by-cbo-family?limit=5'),
   officialReferenceJuly2026: () =>
     get<OfficialReference>('/metadata/official-reference/202607'),
   quality: () => get<QualityReport>('/quality/latest'),

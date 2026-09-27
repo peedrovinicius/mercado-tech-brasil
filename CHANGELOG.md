@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.38.0
+
+- frontend ganha integração anual RAIS separada da análise mensal do Novo CAGED;
+- cliente TypeScript recebe contratos para release, overview, UF e família CBO da RAIS;
+- Dashboard consulta primeiro o registry anual e não requisita métricas quando não existe ano publicado;
+- seção visual RAIS permanece totalmente oculta enquanto latest_published_year for nulo;
+- após publicação, a seção mostra estoque tech, participação nacional, estoque formal total, ranking por UF e composição por família CBO;
+- textos distinguem explicitamente estoque anual de movimentação mensal;
+- navegação para RAIS só aparece quando existe release anual publicada;
+- layout anual é responsivo e mantém a governança publishable=true como única chave de exposição;
+- release 2025 continua invisível ao público enquanto a aprovação metodológica manual estiver pendente;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.37.0
 
 - API ganha namespace anual /api/v1/rais separado dos endpoints mensais do Novo CAGED;

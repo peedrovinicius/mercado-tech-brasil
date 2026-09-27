@@ -204,6 +204,7 @@ O pipeline mantém:
 - estoque anual qualificado por vínculo ativo em 31/12 e exclusão de vínculo abandonado;
 - carga PostgreSQL transacional e idempotente;
 - contratos de API versionados;
+- endpoints e visual anual RAIS condicionados ao gate publishable=true;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
 - pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 
@@ -221,8 +222,8 @@ flowchart LR
 | Componente | Estado |
 |---|---|
 | Aplicação pública | Operacional |
-| API / OpenAPI | Operacional |
-| Frontend de produção | Operacional |
+| API / OpenAPI | Operacional, incluindo namespace RAIS protegido pelo gate |
+| Frontend de produção | Operacional, seção RAIS preparada e oculta até publicação |
 | Bronze / Silver / Gold | Implementado |
 | Gate de publicação | Implementado |
 | Serving ativo em produção | Arquivos Gold publicados |
