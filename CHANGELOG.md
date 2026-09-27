@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.37.0
+
+- API ganha namespace anual /api/v1/rais separado dos endpoints mensais do Novo CAGED;
+- overview RAIS só é servido quando o ano possui gate anual com publishable=true;
+- ranking por UF e distribuição por família CBO seguem a mesma trava de publicação;
+- endpoint de releases expõe estado do gate sem liberar métricas bloqueadas;
+- parâmetro opcional de ano permite consultar somente releases anuais publicadas;
+- release 2025 permanece invisível nos endpoints de métricas enquanto a aprovação metodológica estiver pendente;
+- testes cobrem bloqueio real, ano não publicado, registry e serving após gate aprovado;
+- OpenAPI recebe automaticamente os novos contratos anuais;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.36.0
 
 - processamento integral da RAIS 2025 confirmado com 91.710.262 registros e zero rejeições;

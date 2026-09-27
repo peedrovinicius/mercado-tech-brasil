@@ -415,7 +415,18 @@ O gate final é salvo em:
 data/gold/rais-publication-gate-2025.json
 ```
 
-Somente `publishable=true` autoriza uma camada futura de API a expor os agregados anuais. Os helpers de publicação ignoram anos sem gate aprovado, mesmo quando os arquivos Gold existem.
+Somente `publishable=true` autoriza a API a expor os agregados anuais. Os helpers de publicação ignoram anos sem gate aprovado, mesmo quando os arquivos Gold existem.
+
+Os endpoints anuais são:
+
+```text
+GET /api/v1/rais/releases
+GET /api/v1/rais/overview
+GET /api/v1/rais/by-uf
+GET /api/v1/rais/by-cbo-family
+```
+
+`/rais/releases` pode informar o estado do gate. Os três endpoints de métricas recusam qualquer ano sem `publishable=true`, inclusive quando os Gold já estão versionados.
 
 ## Regra de publicação
 

@@ -65,7 +65,8 @@ A base necessária para publicar e auditar o produto está implementada:
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
 - concluir a aprovação metodológica manual da release anual;
-- expor endpoints RAIS somente depois de a release atingir publishable=true;
+- ativar automaticamente o serving dos endpoints RAIS já implementados quando a release atingir publishable=true;
+- integrar a seção anual RAIS ao frontend mantendo-a oculta enquanto não houver release publicada;
 - validar sistema de códigos municipais da RAIS 2025 antes de agregação municipal;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
