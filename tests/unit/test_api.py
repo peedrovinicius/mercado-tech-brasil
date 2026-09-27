@@ -71,6 +71,34 @@ def test_published_analytics_are_served():
     assert by_key["NE"]["balance"] == 155
     assert by_key["CE"]["balance"] == 107
 
+    occupation_trend = client.get(
+        "/api/v1/analytics/occupation-family-trend"
+    )
+    assert occupation_trend.status_code == 200
+    occupation_payload = occupation_trend.json()
+    assert occupation_payload["published_months"] == 7
+    assert len(occupation_payload["families"]) == 5
+    assert {
+        item["cbo_familia"]
+        for item in occupation_payload["families"]
+    } == {"2122", "2123", "2124", "3171", "3172"}
+    assert sum(
+        item["admissions"]
+        for item in occupation_payload["families"]
+    ) == 134209
+    assert sum(
+        item["dismissals"]
+        for item in occupation_payload["families"]
+    ) == 127865
+    assert sum(
+        item["balance"]
+        for item in occupation_payload["families"]
+    ) == 6344
+    assert all(
+        len(item["monthly"]) == 7
+        for item in occupation_payload["families"]
+    )
+
     temporal = client.get("/api/v1/analytics/temporal-summary")
     assert temporal.status_code == 200
     temporal_payload = temporal.json()
