@@ -16,6 +16,9 @@ on:
       - ".github/workflows/frontend.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
