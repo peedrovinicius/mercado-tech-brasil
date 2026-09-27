@@ -20,7 +20,7 @@ FastAPI
 
 ## Arquitetura de produção
 
-A configuração versionada de produção em `render.yaml` espelha o serviço real: runtime Python 3.11, build do backend e do frontend no mesmo serviço, Uvicorn como processo web e health check em `/api/v1/system/health`.
+A configuração versionada de produção em `render.yaml` representa o estado desejado: runtime Python 3.11, build do backend e do frontend no mesmo serviço, Uvicorn como processo web e health check em `/api/v1/system/health`.
 
 O build executa a instalação do pacote Python e, em seguida, compila o frontend React + TypeScript com Vite. O frontend de produção utiliza `/api/v1` como base da API, mantendo tudo no mesmo domínio.
 
@@ -93,4 +93,13 @@ git diff --name-only HEAD^ HEAD > changed-files.txt
 python -m src.validation.deployment_policy --changed-files changed-files.txt
 ~~~
 
-A configuração operacional do serviço no Render deve permanecer equivalente ao Blueprint versionado. Em especial, o Auto-Deploy deve usar **After CI Checks Pass**. Caso o serviço seja alterado diretamente pelo Dashboard, a divergência deve ser tratada como drift de infraestrutura.
+A configuração operacional do serviço no Render deve permanecer equivalente ao Blueprint versionado. Em especial, o Auto-Deploy deve usar **After CI Checks Pass**.
+
+### Drift operacional conhecido
+
+Na última verificação do serviço existente, o Render ainda reportou:
+
+- `autoDeployTrigger=commit`;
+- health check vazio.
+
+Portanto, o Blueprint está correto, mas o serviço existente ainda não está sincronizado com ele. Essa divergência deve ser tratada como drift de infraestrutura até a configuração operacional do serviço ser atualizada.
