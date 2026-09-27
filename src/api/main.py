@@ -35,15 +35,32 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def add_security_headers(request: Request, call_next):
+async def add_response_policy(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+
+    if request.method == "GET":
+        if request.url.path in {
+            "/api/v1/system/health",
+            "/api/v1/system/readiness",
+        }:
+            response.headers["Cache-Control"] = "no-store"
+        elif (
+            request.url.path.startswith("/api/v1/")
+            and response.status_code == 200
+        ):
+            response.headers["Cache-Control"] = (
+                "public, max-age=300, stale-while-revalidate=60"
+            )
+
     if settings.environment == "production":
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
     return response
 
 app.include_router(system.router, prefix="/api/v1")
