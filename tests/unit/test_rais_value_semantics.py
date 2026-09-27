@@ -3,7 +3,6 @@ from pathlib import Path
 
 from src.transform.rais_value_semantics import validate_value_semantics
 
-
 CONTRACT = """version: 3
 dataset: rais_vinculos
 active_3112:
