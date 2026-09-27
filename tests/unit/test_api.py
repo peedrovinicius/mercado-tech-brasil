@@ -46,6 +46,60 @@ def test_security_headers_are_present():
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
 
 
+def test_cache_policy_distinguishes_live_state_from_published_data():
+    health = client.get("/api/v1/system/health")
+    readiness = client.get("/api/v1/system/readiness")
+    overview = client.get("/api/v1/indicators/overview")
+
+    assert health.headers["cache-control"] == "no-store"
+    assert readiness.headers["cache-control"] == "no-store"
+    assert (
+        overview.headers["cache-control"]
+        == "public, max-age=300, stale-while-revalidate=60"
+    )
+
+
+def test_release_provenance_exposes_hashed_published_artifacts():
+    response = client.get("/api/v1/provenance/release")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["version"] == "0.40.0"
+    assert payload["monthly"]["competence"] == "202607"
+    assert payload["rais"]["year"] == 2025
+
+    monthly = payload["monthly"]["artifacts"]
+    rais = payload["rais"]["artifacts"]
+    assert monthly
+    assert rais
+    assert any(
+        item["path"].endswith("publication-gate-202607.json")
+        for item in monthly
+    )
+    assert any(
+        item["path"].endswith("rais-publication-gate-2025.json")
+        for item in rais
+    )
+    assert all(len(item["sha256"]) == 64 for item in monthly + rais)
+    assert all(item["size_bytes"] > 0 for item in monthly + rais)
+    assert all("data/bronze/" not in item["path"] for item in monthly + rais)
+
+
+def test_csv_export_serves_latest_published_dataset():
+    response = client.get("/api/v1/export/latest/by-uf.csv")
+    assert response.status_code == 200
+    assert response.headers["x-data-competence"] == "202607"
+    assert (
+        response.headers["content-disposition"]
+        == 'attachment; filename="mercado-tech-brasil-by-uf-202607.csv"'
+    )
+    body = response.content.decode("utf-8-sig")
+    header, *rows = body.splitlines()
+    assert "uf" in header.split(",")
+    assert "admissions" in header.split(",")
+    assert len(rows) == 27
+
+
 def test_sources_are_exposed():
     response = client.get("/api/v1/metadata/sources")
     assert response.status_code == 200
