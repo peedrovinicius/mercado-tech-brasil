@@ -48,7 +48,7 @@ def evaluate_rais_reconciliation(
     references = _read_json(reference_path)
     reference = references.get(str(year))
     if not isinstance(reference, dict):
-        raise ValueError(f"Referência oficial RAIS ausente para {year}.")
+        raise TypeError(f"Referência oficial RAIS ausente para {year}.")
 
     if int(quality.get("year") or 0) != year:
         raise ValueError("Ano do relatório de qualidade RAIS diverge do solicitado.")

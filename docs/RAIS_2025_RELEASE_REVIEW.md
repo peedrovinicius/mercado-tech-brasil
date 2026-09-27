@@ -7,7 +7,7 @@ A release anual foi processada integralmente e passou por todos os checks autom�
 - Ano-base: 2025
 - Fonte metodológica: RAIS, Ministério do Trabalho e Emprego
 - Dataset: vínculos
-- Fingerprint da release: `46e4f877ac79112a31bcddf0f9f28b8620360217994210f21ad9caf4c8d1be7a`
+- Fingerprint da release: `4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a`
 - Checks automáticos: aprovados
 - Aprovação metodológica manual: pendente
 - `publishable`: falso
@@ -75,6 +75,23 @@ Todos os sete grupos de origem fecham exatamente com a referência oficial.
 | Centro-Oeste | 5.944.488 | 5.944.488 | 0 |
 | Não identificado | 3.065 | 3.065 | 0 |
 
+## Validação municipal
+
+A dimensão municipal da RAIS 2025 foi validada contra a Divisão Territorial Brasileira 2025 do IBGE antes de integrar o fingerprint da release.
+
+- Linhas Silver tech: 786.296
+- Códigos municipais distintos observados: 3.690
+- Códigos não residuais correspondentes à DTB 2025: 3.689
+- Códigos sem correspondência: 0
+- Prefixos ambíguos: 0
+- Divergências de UF: 0
+- Códigos com comprimento inválido: 0
+- Códigos não numéricos: 0
+- Residual preservado: `999999`, com 1 vínculo tech, classificado como `NI`
+- `municipality_ready`: verdadeiro
+
+O agregado municipal fecha exatamente em 786.296 vínculos tech e faz parte do fingerprint atual da release.
+
 ## Gold tech
 
 - Estoque tech ativo: 786.296
@@ -82,6 +99,8 @@ Todos os sete grupos de origem fecham exatamente com a referência oficial.
 - Participação tech: 1,311128%
 - Famílias CBO: 2122, 2123, 2124, 3171 e 3172
 - UFs no agregado: 28, incluindo a categoria residual NI
+- Municípios/códigos territoriais no agregado: 3.690, incluindo o residual NI
+- Soma do agregado municipal: 786.296
 
 Distribuição por família CBO:
 
@@ -100,18 +119,22 @@ Os seguintes controles estão aprovados:
 - [x] proveniência completa com sete arquivos de origem;
 - [x] reconciliação nacional presente;
 - [x] reconciliação regional presente;
+- [x] validação municipal presente;
 - [x] overview Gold presente;
 - [x] agregado por UF presente;
 - [x] agregado por família CBO presente;
+- [x] agregado por município presente;
 - [x] Parquet Gold presente;
 - [x] reconciliação nacional com diferença zero;
 - [x] reconciliação regional com diferença zero em todos os grupos;
+- [x] dimensão municipal validada contra a DTB 2025;
 - [x] ano do overview correto;
 - [x] integridade do estoque tech e nacional;
 - [x] soma por UF fecha em 786.296;
 - [x] soma por família CBO fecha em 786.296;
+- [x] soma por município fecha em 786.296;
 - [x] Parquet Gold fecha em 786.296;
-- [x] fingerprint da release calculado;
+- [x] fingerprint atual da release calculado: `4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a`;
 - [ ] aprovação metodológica manual.
 
 ## O que a aprovação manual confirma
@@ -123,8 +146,9 @@ A aprovação manual deve ser registrada somente depois de uma pessoa revisar co
 3. o fechamento nacional;
 4. o fechamento dos sete grupos regionais;
 5. o recorte CBO v2;
-6. os agregados Gold;
-7. o fingerprint da release.
+6. a validação municipal contra a DTB 2025 e o tratamento do residual `999999`;
+7. os agregados Gold por UF, família CBO e município;
+8. o fingerprint atual da release: `4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a`.
 
 A aprovação não altera os dados. Ela apenas registra que a release atual, identificada pelo fingerprint acima, foi revisada e pode ser exposta pelos endpoints e pelo frontend já protegidos pelo gate.
 
@@ -133,7 +157,7 @@ Comando previsto após a revisão humana:
 ```bash
 python -m src.cli rais-approve-release 2025 \
   --reviewer "responsavel" \
-  --notes "Origem, estoque, reconciliação nacional e regional e Gold revisados." \
+  --notes "Origem, estoque, reconciliação nacional e regional, dimensão municipal e Gold revisados." \
   --acknowledge-methodology-reviewed
 ```
 

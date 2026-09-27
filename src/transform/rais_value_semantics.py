@@ -22,7 +22,7 @@ def load_value_contract(path: Path) -> dict[str, Any]:
 
     active = payload.get("active_3112")
     if not isinstance(active, dict):
-        raise ValueError("Contrato RAIS não define active_3112.")
+        raise TypeError("Contrato RAIS não define active_3112.")
     if not active.get("active_values") or not active.get("inactive_values"):
         raise ValueError(
             "Contrato RAIS precisa definir valores ativos e inativos."
@@ -30,7 +30,7 @@ def load_value_contract(path: Path) -> dict[str, Any]:
 
     abandoned = payload.get("abandoned_link")
     if not isinstance(abandoned, dict):
-        raise ValueError("Contrato RAIS não define abandoned_link.")
+        raise TypeError("Contrato RAIS não define abandoned_link.")
     if not abandoned.get("eligible_values") or not abandoned.get("excluded_values"):
         raise ValueError(
             "Contrato RAIS precisa definir valores elegíveis e excluídos "
@@ -50,11 +50,11 @@ def normalize_value(value: object) -> str:
 def _observed_values(profile: dict[str, Any], concept: str) -> list[str]:
     aggregate = profile.get("aggregate")
     if not isinstance(aggregate, dict):
-        raise ValueError("Perfil RAIS não possui bloco aggregate.")
+        raise TypeError("Perfil RAIS não possui bloco aggregate.")
 
     item = aggregate.get(concept)
     if not isinstance(item, dict):
-        raise ValueError(f"Perfil RAIS não possui conceito {concept}.")
+        raise TypeError(f"Perfil RAIS não possui conceito {concept}.")
 
     observed = item.get("observed_values")
     if observed is None:

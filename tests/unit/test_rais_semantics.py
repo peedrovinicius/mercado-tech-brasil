@@ -3,7 +3,6 @@ from pathlib import Path
 
 from src.transform.rais_semantics import validate_layout_semantics
 
-
 CONTRACT = """version: 3
 dataset: rais_vinculos
 required:

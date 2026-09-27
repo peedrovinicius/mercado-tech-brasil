@@ -39,7 +39,7 @@ def test_gold_reconciles_for_exc_and_builds_municipality_and_trend(tmp_path: Pat
             "effective_competence": ["202607"],
             "adjustment_kind": ["FOR"],
         }
-    ).write_parquet(silver_dir / "caged_tech_for_202608.parquet")
+    ).write_parquet(silver_dir / "caged_tech_for_202607.parquet")
 
     pl.DataFrame(
         {

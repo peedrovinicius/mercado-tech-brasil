@@ -90,13 +90,13 @@ def build_rais_release_sha256(
         return None
 
     digest = hashlib.sha256()
-    digest.update(f"rais-release:{year}\n".encode("utf-8"))
+    digest.update(f"rais-release:{year}\n".encode())
 
     for sha256 in source_hashes:
-        digest.update(f"source:{sha256}\n".encode("utf-8"))
+        digest.update(f"source:{sha256}\n".encode())
 
     for path in artifacts:
-        digest.update(f"artifact:{path.name}:{_sha256_file(path)}\n".encode("utf-8"))
+        digest.update(f"artifact:{path.name}:{_sha256_file(path)}\n".encode())
 
     return digest.hexdigest()
 

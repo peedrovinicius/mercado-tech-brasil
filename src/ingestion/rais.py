@@ -133,10 +133,7 @@ def select_smallest_remote_file(
             ),
         )
 
-    return sorted(
-        candidates,
-        key=lambda item: item.filename.upper(),
-    )[0]
+    return min(candidates, key=lambda item: item.filename.upper())
 
 
 def download_file(

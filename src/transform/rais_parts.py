@@ -10,7 +10,6 @@ import pyarrow.parquet as pq
 
 from src.transform.rais_silver import REJECT_SCHEMA, SILVER_SCHEMA
 
-
 SUM_FIELDS = (
     "rows_read",
     "rows_valid",
