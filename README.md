@@ -198,9 +198,12 @@ O pipeline mantém:
 - salário real com número índice do IPCA pelo SIDRA/IBGE;
 - ajustes FOR e EXC incorporados como deltas auditáveis;
 - referência externa para reconciliação;
-- gate mensal vinculado ao hash do arquivo de origem;
+- gate mensal vinculado ao hash do MOV e ao fingerprint da referência oficial;
 - preparação incremental bloqueada até existir referência oficial contínua e efetiva;
 - auditoria mensal impedida de antecipar ou saltar competências;
+- revisão oficial de competência publicada detectada e enviada para reauditoria;
+- alterações históricas por FOR/EXC protegidas por baseline e hashes antes/depois;
+- cache IPCA incremental para preservar reconstruções de competências anteriores;
 - gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
 - downloader RAIS retomável após queda de conexão FTP;
 - fallback HTTPS de transporte auditável quando o FTP estiver instável;
