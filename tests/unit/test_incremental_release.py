@@ -282,3 +282,119 @@ def test_reference_revision_requires_explicit_reaudit(tmp_path: Path):
     )
 
     assert result.reason == "published_reference_revision"
+
+
+def test_coverage_policy_blocks_next_competence_even_with_reference(
+    tmp_path: Path,
+):
+    reference_path = tmp_path / "reference.json"
+    policy_path = tmp_path / "coverage.json"
+    gold = tmp_path / "gold"
+    _published_gate(gold, "202412")
+    _write_json(
+        reference_path,
+        {
+            "202412": _reference("2025-01-10"),
+            "202501": _reference("2025-02-10"),
+        },
+    )
+    _write_json(
+        policy_path,
+        {
+            "version": 1,
+            "mode": "locked",
+            "max_competence": "202412",
+        },
+    )
+
+    result = evaluate_next_competence(
+        reference_path=reference_path,
+        gold_path=gold,
+        coverage_policy_path=policy_path,
+        today=date(2025, 2, 11),
+    )
+
+    assert result.ready is False
+    assert result.reason == "coverage_policy_locked"
+    assert result.next_expected == "202501"
+    assert result.candidate is None
+
+
+def test_coverage_policy_keeps_published_reaudit_available(tmp_path: Path):
+    reference_path = tmp_path / "reference.json"
+    policy_path = tmp_path / "coverage.json"
+    gold = tmp_path / "gold"
+    _published_gate(gold, "202412")
+    _write_json(reference_path, {"202412": _reference("2025-01-10")})
+    _write_json(
+        policy_path,
+        {
+            "version": 1,
+            "mode": "locked",
+            "max_competence": "202412",
+        },
+    )
+
+    result = validate_requested_competence(
+        "202412",
+        reference_path=reference_path,
+        gold_path=gold,
+        coverage_policy_path=policy_path,
+        allow_published=True,
+        today=date(2025, 2, 11),
+    )
+
+    assert result.ready is True
+    assert result.reason == "published_reaudit"
+
+
+def test_reference_revision_is_allowed_under_coverage_lock(tmp_path: Path):
+    reference_path = tmp_path / "reference.json"
+    approvals_path = tmp_path / "approvals.json"
+    policy_path = tmp_path / "coverage.json"
+    gold = tmp_path / "gold"
+    _published_gate(gold, "202412")
+
+    original = _reference("2025-01-10")
+    _write_json(
+        reference_path,
+        {
+            "202412": original,
+            "202501": _reference("2025-02-10"),
+        },
+    )
+    _write_json(
+        approvals_path,
+        {
+            "202412": {
+                "approved": True,
+                "source_sha256": "abc123",
+                "reference_sha256": reference_fingerprint(original),
+            }
+        },
+    )
+    _write_json(
+        policy_path,
+        {
+            "version": 1,
+            "mode": "locked",
+            "max_competence": "202412",
+        },
+    )
+
+    revised = json.loads(reference_path.read_text(encoding="utf-8"))
+    revised["202412"]["admissoes"] += 1
+    revised["202412"]["saldo"] += 1
+    _write_json(reference_path, revised)
+
+    result = evaluate_next_competence(
+        reference_path=reference_path,
+        gold_path=gold,
+        approvals_path=approvals_path,
+        coverage_policy_path=policy_path,
+        today=date(2025, 2, 11),
+    )
+
+    assert result.ready is True
+    assert result.reason == "published_reference_revision"
+    assert result.candidate == "202412"

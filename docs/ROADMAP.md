@@ -65,6 +65,8 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 - detecção contínua da próxima competência sem antecipar período não publicado: implementada;
 - bloqueio de saltos mensais e de data de publicação futura: implementado;
 - auditoria automática disparada quando a referência oficial elegível entra no main: implementada;
+- teto mensal de cobertura versionado e aplicado antes de download, auditoria e publicação: implementado;
+- série mensal explicitamente travada até Jul/2026 enquanto a política não for revisada: implementado;
 - baixar e registrar a origem com manifesto e SHA-256 na próxima competência elegível;
 - executar Bronze, Silver, Gold, ajustes FOR/EXC e enriquecimentos pelo fluxo existente;
 - manter validação explícita da referência oficial do MTE antes da liberação;

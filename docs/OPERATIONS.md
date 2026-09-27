@@ -12,7 +12,7 @@ Isso evita antecipar períodos ainda não publicados e evita reprocessar microda
 
 Workflow: `Prepare next CAGED competence`
 
-O workflow é acionado quando `config/reference_totals.json` muda no `main` e também pode ser executado manualmente.
+O workflow é acionado quando `config/reference_totals.json` ou `config/monthly_coverage_policy.json` muda no `main` e também pode ser executado manualmente.
 
 Antes de qualquer download ele:
 
@@ -23,10 +23,11 @@ Antes de qualquer download ele:
 5. valida fonte, URL, data de publicação e aritmética nacional;
 6. impede referências com `published_at` no futuro;
 7. bloqueia saltos de competência;
-8. verifica se alguma referência de competência já publicada mudou em relação ao fingerprint aprovado;
-9. prioriza a reauditoria dessa competência quando existe uma revisão oficial;
-10. lê a base IPCA já versionada;
-11. aciona `Audit data competence` somente quando o candidato é elegível.
+8. aplica o teto explícito de cobertura definido em `config/monthly_coverage_policy.json`;
+9. verifica se alguma referência de competência já publicada mudou em relação ao fingerprint aprovado;
+10. prioriza a reauditoria dessa competência quando existe uma revisão oficial;
+11. lê a base IPCA já versionada;
+12. aciona `Audit data competence` somente quando o candidato é elegível.
 
 Quando nenhuma nova referência oficial está registrada, o workflow termina sem baixar microdados.
 
@@ -84,7 +85,7 @@ Entradas:
 - `competence`;
 - `audit_run_id`: ID da execução de auditoria que gerou o artefato.
 
-O workflow baixa o artefato derivado, aplica apenas revisões históricas que passaram pela auditoria, confere se o baseline publicado continua igual ao observado durante a auditoria, refaz o gate em modo estrito e só então versiona Gold, auditoria e manifests.
+Antes de baixar qualquer artefato auditado, o workflow revalida a competência contra a política de cobertura vigente no `main`. Depois baixa o artefato derivado, aplica apenas revisões históricas que passaram pela auditoria, confere se o baseline publicado continua igual ao observado durante a auditoria, refaz o gate em modo estrito e só então versiona Gold, auditoria e manifests.
 
 Antes do processamento, a auditoria registra hashes dos artefatos já publicados. Se FOR ou EXC alterarem uma competência anterior, é gerado um manifesto de impacto com hashes antes/depois e métricas do overview. Alterações históricas sem uma competência efetiva correspondente em FOR/EXC são bloqueadas. O pacote de revisão só é aplicado se o histórico de produção ainda corresponder ao baseline auditado.
 
@@ -97,6 +98,7 @@ Os microdados brutos não entram no Git.
 ## Regras operacionais
 
 - não iniciar auditoria incremental sem referência oficial versionada e efetiva;
+- não auditar ou publicar competência acima do teto de cobertura versionado;
 - não saltar competências na série mensal;
 - não publicar competência sem referência oficial;
 - não publicar quando qualquer check bloqueante falhar;

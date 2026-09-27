@@ -64,7 +64,8 @@ Em todas as competências processadas:
 - validação de proveniência, cobertura e aritmética da população municipal;
 - gate de publicação por competência;
 - resolvedor da próxima competência oficial elegível;
-- bloqueio de auditoria para competência antecipada ou com lacuna temporal;
+- bloqueio de auditoria para competência antecipada, com lacuna temporal ou acima do teto de cobertura;
+- política mensal versionada com cobertura máxima em Jul/2026;
 - disparo automático da auditoria quando uma nova referência oficial é versionada;
 - aprovação metodológica vinculada ao SHA-256 do MOV e ao fingerprint da referência;
 - invalidação da aprovação quando a origem ou a referência oficial muda;

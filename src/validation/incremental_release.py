@@ -44,6 +44,28 @@ def _next_month(yearmonth: str) -> str:
     return f"{year:04d}{month + 1:02d}"
 
 
+def _coverage_limit(policy_path: Path | None) -> str | None:
+    if policy_path is None or not policy_path.exists():
+        return None
+
+    policy = _read_json(policy_path)
+    mode = str(policy.get("mode") or "").strip().lower()
+    if mode == "open":
+        return None
+    if mode != "locked":
+        raise ValueError("Política de cobertura mensal possui mode inválido.")
+
+    max_competence = str(policy.get("max_competence") or "")
+    if len(max_competence) != 6 or not max_competence.isdigit():
+        raise ValueError("Política de cobertura mensal sem max_competence válido.")
+
+    month = int(max_competence[4:])
+    if not 1 <= month <= 12:
+        raise ValueError("Política de cobertura mensal possui mês inválido.")
+
+    return max_competence
+
+
 def _reference_effective_date(reference: dict[str, Any]) -> date:
     raw = reference.get("published_at")
     if not isinstance(raw, str):
@@ -90,10 +112,12 @@ def evaluate_next_competence(
     reference_path: Path,
     gold_path: Path,
     approvals_path: Path | None = None,
+    coverage_policy_path: Path | None = None,
     today: date | None = None,
 ) -> IncrementalPreparationStatus:
     references = _read_json(reference_path)
     effective_today = today or datetime.now(UTC).date()
+    max_competence = _coverage_limit(coverage_policy_path)
 
     validated: dict[str, dict[str, Any]] = {}
     for competence, reference in references.items():
@@ -148,6 +172,15 @@ def evaluate_next_competence(
             )
 
         candidate = min(eligible)
+        if max_competence is not None and candidate > max_competence:
+            return IncrementalPreparationStatus(
+                ready=False,
+                reason="coverage_policy_locked",
+                latest_published=None,
+                next_expected=candidate,
+                candidate=None,
+                reference_published_at=None,
+            )
         reference = validated[candidate]
         return IncrementalPreparationStatus(
             ready=True,
@@ -159,6 +192,16 @@ def evaluate_next_competence(
         )
 
     next_expected = _next_month(latest)
+    if max_competence is not None and next_expected > max_competence:
+        return IncrementalPreparationStatus(
+            ready=False,
+            reason="coverage_policy_locked",
+            latest_published=latest,
+            next_expected=next_expected,
+            candidate=None,
+            reference_published_at=None,
+        )
+
     reference = validated.get(next_expected)
 
     if reference is None:
@@ -204,6 +247,7 @@ def validate_requested_competence(
     reference_path: Path,
     gold_path: Path,
     approvals_path: Path | None = None,
+    coverage_policy_path: Path | None = None,
     allow_published: bool = False,
     today: date | None = None,
 ) -> IncrementalPreparationStatus:
@@ -211,6 +255,7 @@ def validate_requested_competence(
         reference_path=reference_path,
         gold_path=gold_path,
         approvals_path=approvals_path,
+        coverage_policy_path=coverage_policy_path,
         today=today,
     )
 

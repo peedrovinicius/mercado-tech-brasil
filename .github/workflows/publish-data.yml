@@ -43,15 +43,6 @@ jobs:
             exit 1
           fi
 
-      - name: Download audited artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: caged-${{ inputs.competence }}-audit
-          path: data
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ inputs.audit_run_id }}
-
       - name: Python
         uses: actions/setup-python@v7
         with:
@@ -62,6 +53,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
+
+      - name: Revalidate publication scope
+        run: |
+          if [[ -f "data/gold/publication-gate-$COMPETENCE.json" ]]; then
+            python -m src.cli validate-incremental-competence \
+              "$COMPETENCE" --allow-published
+          else
+            python -m src.cli validate-incremental-competence "$COMPETENCE"
+          fi
+
+      - name: Download audited artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: caged-${{ inputs.competence }}-audit
+          path: data
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.audit_run_id }}
 
       - name: Apply audited historical revisions
         run: |

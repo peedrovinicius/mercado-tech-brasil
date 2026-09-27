@@ -21,6 +21,9 @@ class Settings:
     sources_path: Path = ROOT / "config" / "sources.json"
     cbo_config_path: Path = ROOT / "config" / "cbo_tech.yml"
     reference_totals_path: Path = ROOT / "config" / "reference_totals.json"
+    monthly_coverage_policy_path: Path = (
+        ROOT / "config" / "monthly_coverage_policy.json"
+    )
     rais_reference_totals_path: Path = ROOT / "config" / "rais_reference_totals.json"
     rais_regional_reference_path: Path = (
         ROOT / "config" / "rais_reference_regions_2025.json"
