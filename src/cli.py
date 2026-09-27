@@ -64,6 +64,7 @@ def command_next_competence(*, json_output: bool) -> None:
     result = evaluate_next_competence(
         reference_path=settings.reference_totals_path,
         gold_path=settings.gold_path,
+        approvals_path=settings.publication_approvals_path,
     )
 
     if json_output:
@@ -92,6 +93,7 @@ def command_validate_incremental_competence(
             yearmonth,
             reference_path=settings.reference_totals_path,
             gold_path=settings.gold_path,
+            approvals_path=settings.publication_approvals_path,
             allow_published=allow_published,
         )
     except (TypeError, ValueError) as exc:
