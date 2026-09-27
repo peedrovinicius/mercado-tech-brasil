@@ -374,7 +374,7 @@ def evaluate_publication_gate(
                     == _sha256(municipality_path)
                     and int(report.get("matched_population") or 0)
                     == identified_count
-                    and int(report.get("missing_population") or -1) == 0
+                    and int(report.get("missing_population", -1)) == 0
                 )
             checks.append(
                 GateCheck(
