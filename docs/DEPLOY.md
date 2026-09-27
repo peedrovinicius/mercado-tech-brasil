@@ -90,7 +90,7 @@ A validação pode ser executada localmente com:
 
 ~~~bash
 git diff --name-only HEAD^ HEAD > changed-files.txt
-python scripts/validate_deployment.py --changed-files changed-files.txt
+python -m src.validation.deployment_policy --changed-files changed-files.txt
 ~~~
 
 A configuração operacional do serviço no Render deve permanecer equivalente ao Blueprint versionado. Em especial, o Auto-Deploy deve usar **After CI Checks Pass**. Caso o serviço seja alterado diretamente pelo Dashboard, a divergência deve ser tratada como drift de infraestrutura.
