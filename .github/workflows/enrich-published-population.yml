@@ -144,6 +144,6 @@ jobs:
             exit 0
           fi
 
-          git commit -m "data: enrich published municipalities with IBGE population [skip ci]"
+          git commit -m "data: enrich published municipalities with IBGE population"
           git pull --rebase origin main
           git push
