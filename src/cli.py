@@ -99,14 +99,24 @@ def command_enrich_published_population(
         source_url=source_url,
         published_at=published_at,
     )
+    changed = report.get("_changed") is True
     print(
         "population enrichment: "
         f"competence={yearmonth} "
         f"matched={report['matched_population']} "
         f"missing={report['missing_population']} "
-        f"population_sha256={report['population_cache_sha256']}"
+        f"population_sha256={report['population_cache_sha256']} "
+        f"changed={str(changed).lower()}"
     )
-    _run_publication_gate(yearmonth, strict=strict)
+    if changed:
+        _run_publication_gate(yearmonth, strict=strict)
+    elif strict:
+        gate_path = settings.gold_path / f"publication-gate-{yearmonth}.json"
+        gate = json.loads(gate_path.read_text(encoding="utf-8"))
+        if gate.get("publishable") is not True:
+            raise SystemExit(
+                f"Gate existente deixou de ser publicável: {yearmonth}"
+            )
 
 
 def command_qbq_inspect(
