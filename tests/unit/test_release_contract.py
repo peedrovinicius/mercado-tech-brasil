@@ -6,7 +6,6 @@ import yaml
 
 from src.core.settings import settings
 
-
 ROOT = Path(__file__).resolve().parents[2]
 
 
