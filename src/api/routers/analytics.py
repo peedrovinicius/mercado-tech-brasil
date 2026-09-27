@@ -7,11 +7,11 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.api.occupation_analysis import build_occupation_family_trend
-from src.api.stock_flow_context import build_stock_flow_context
 from src.api.publication import (
     latest_published_competence,
     published_competencies,
 )
+from src.api.stock_flow_context import build_stock_flow_context
 from src.core.settings import settings
 from src.db.repository import (
     fetch_by_municipality,
