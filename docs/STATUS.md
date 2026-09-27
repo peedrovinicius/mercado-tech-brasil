@@ -23,8 +23,9 @@ Em todas as competências processadas:
 - MOV, FOR e EXC apresentaram taxa válida de 100%;
 - os agregados por UF, ocupação e município fecham com o overview;
 - o recorte ocupacional permaneceu restrito às cinco famílias CBO versionadas;
-- cada aprovação está vinculada ao SHA-256 do MOV correspondente;
+- cada aprovação está vinculada ao SHA-256 do MOV e ao fingerprint da referência oficial correspondente;
 - FOR e EXC são aplicados às competências de origem;
+- alterações retroativas do Gold são auditadas por hash antes de serem publicadas;
 - remuneração real usa julho de 2026 como base do IPCA.
 
 ## Dados
@@ -58,8 +59,13 @@ Em todas as competências processadas:
 - resolvedor da próxima competência oficial elegível;
 - bloqueio de auditoria para competência antecipada ou com lacuna temporal;
 - disparo automático da auditoria quando uma nova referência oficial é versionada;
-- aprovação metodológica vinculada ao SHA-256;
-- invalidação da aprovação quando a origem muda;
+- aprovação metodológica vinculada ao SHA-256 do MOV e ao fingerprint da referência;
+- invalidação da aprovação quando a origem ou a referência oficial muda;
+- detecção de revisão oficial em competência já publicada;
+- snapshot e regressão dos artefatos históricos;
+- pacote de revisão histórica protegido por hashes antes/depois;
+- rejeição de alterações históricas não justificadas por FOR/EXC;
+- cache IPCA incremental para preservar competências anteriores;
 - registro de releases publicado pela API;
 - regra editorial automatizada para pontuação.
 
