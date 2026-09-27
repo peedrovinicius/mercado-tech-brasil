@@ -39,7 +39,7 @@ jobs:
           pip install -e .
 
       - name: Export OpenAPI
-        run: python scripts/export_openapi.py
+        run: PYTHONPATH=. python scripts/export_openapi.py
 
       - name: Persist contract
         run: |
