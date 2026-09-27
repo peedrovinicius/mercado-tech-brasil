@@ -61,7 +61,7 @@ def evaluate_rais_regional_reconciliation(
     references = _read_json(reference_path)
     reference = references.get(str(year))
     if not isinstance(reference, dict):
-        raise ValueError(f"Referência regional RAIS ausente para {year}.")
+        raise TypeError(f"Referência regional RAIS ausente para {year}.")
 
     expected_groups = reference.get("groups")
     if not isinstance(expected_groups, dict) or not expected_groups:
