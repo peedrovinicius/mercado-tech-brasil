@@ -20,14 +20,11 @@ FastAPI
 
 ## Arquitetura de produção
 
-O Render usa `render.yaml` com runtime Docker e health check em `/api/v1/system/health`.
+A configuração versionada de produção em `render.yaml` espelha o serviço real: runtime Python 3.11, build do backend e do frontend no mesmo serviço, Uvicorn como processo web e health check em `/api/v1/system/health`.
 
-A imagem `docker/app/Dockerfile` possui dois estágios:
+O build executa a instalação do pacote Python e, em seguida, compila o frontend React + TypeScript com Vite. O frontend de produção utiliza `/api/v1` como base da API, mantendo tudo no mesmo domínio.
 
-1. Node 22 compila o frontend React + TypeScript com Vite;
-2. Python 3.11 instala o backend e serve API e frontend pelo Uvicorn.
-
-O frontend de produção utiliza `/api/v1` como base da API, mantendo tudo no mesmo domínio.
+O Blueprint usa `autoDeployTrigger: checksPass`. Alterações de produção somente devem ser promovidas depois dos checks do GitHub. O `buildFilter` restringe builds automáticos a código de runtime, frontend, artefatos Gold, `pyproject.toml` e ao próprio `render.yaml`, evitando rebuild por alterações apenas documentais.
 
 ## Backend de dados atual
 
@@ -72,3 +69,28 @@ Durante o desenvolvimento, o Vite encaminha `/api/*` para `http://localhost:8000
 ## Verificações de publicação
 
 Antes de tratar uma competência como publicada, o projeto exige os artefatos Gold correspondentes e um gate válido. O endpoint de readiness informa o backend ativo e se há dados publicados disponíveis para serving.
+
+
+## Política de promoção para produção
+
+O workflow `Deployment policy` valida alterações relevantes antes da promoção.
+
+Para qualquer artefato mensal alterado em `data/gold`, a competência correspondente precisa possuir:
+
+- `automatic_checks_passed=true`;
+- `manual_approval_valid=true`;
+- `publishable=true`;
+- todos os checks bloqueantes aprovados.
+
+A mesma regra é aplicada às releases anuais da RAIS.
+
+Commits de publicação de Gold não usam `[skip ci]`, pois a política depende da execução dos checks antes do deploy.
+
+A validação pode ser executada localmente com:
+
+~~~bash
+git diff --name-only HEAD^ HEAD > changed-files.txt
+python -m src.validation.deployment_policy --changed-files changed-files.txt
+~~~
+
+A configuração operacional do serviço no Render deve permanecer equivalente ao Blueprint versionado. Em especial, o Auto-Deploy deve usar **After CI Checks Pass**. Caso o serviço seja alterado diretamente pelo Dashboard, a divergência deve ser tratada como drift de infraestrutura.

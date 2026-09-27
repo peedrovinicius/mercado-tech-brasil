@@ -74,7 +74,9 @@ Em todas as competências processadas:
 - rejeição de alterações históricas não justificadas por FOR/EXC;
 - cache IPCA incremental para preservar competências anteriores;
 - registro de releases publicado pela API;
-- regra editorial automatizada para pontuação.
+- regra editorial automatizada para pontuação;
+- política de deploy que bloqueia artefatos mensais ou RAIS sem gate publicável;
+- Blueprint versionado com build filter e promoção após checks de CI.
 
 ## Serving e aplicação
 
