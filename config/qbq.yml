@@ -1,0 +1,25 @@
+version: 1
+name: quadro_brasileiro_de_qualificacoes
+owner: Ministério do Trabalho e Emprego
+official_service_url: https://www.gov.br/pt-br/servicos/consultar-quadro-brasileiro-de-qualificacoes
+official_system_url: https://qbq.trabalho.gov.br/
+bulk_download_url: https://qbq.trabalho.gov.br/loginDados
+bulk_format: xlsx
+bulk_access: authenticated_download
+automatic_download: false
+join:
+  target: cbo_codigo
+  width: 6
+allowed_dimensions:
+  - nivel_qualificacao
+  - perfil_ocupacional
+  - conhecimentos
+  - habilidades
+  - atitudes
+publication_policy:
+  - O QBQ entra somente como dimensão descritiva da ocupação.
+  - Atributos QBQ não representam habilidades observadas de cada trabalhador.
+  - Nenhum dado QBQ é inferido a partir do CAGED ou da RAIS.
+  - O arquivo oficial precisa ter SHA-256 registrado antes de qualquer enriquecimento.
+  - O join exige código CBO de seis dígitos e cobertura explícita dos códigos tech publicados.
+  - A interface HTML do portal não é raspada como fonte de produção.
