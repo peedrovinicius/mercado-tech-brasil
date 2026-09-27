@@ -36,6 +36,10 @@ from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
 from src.transform.rais_silver import transform_rais_year
 from src.transform.rais_value_semantics import validate_value_semantics
+from src.validation.incremental_release import (
+    evaluate_next_competence,
+    validate_requested_competence,
+)
 from src.validation.publication_gate import (
     approve_competence,
     evaluate_publication_gate,
@@ -54,6 +58,50 @@ from src.validation.rais_regional_reconciliation import (
     evaluate_rais_regional_reconciliation,
     write_rais_regional_reconciliation,
 )
+
+
+def command_next_competence(*, json_output: bool) -> None:
+    result = evaluate_next_competence(
+        reference_path=settings.reference_totals_path,
+        gold_path=settings.gold_path,
+    )
+
+    if json_output:
+        import json
+
+        print(json.dumps(result.as_dict(), ensure_ascii=False))
+        return
+
+    print(
+        "incremental: "
+        f"ready={result.ready} "
+        f"reason={result.reason} "
+        f"latest={result.latest_published or 'none'} "
+        f"next={result.next_expected or 'none'} "
+        f"candidate={result.candidate or 'none'}"
+    )
+
+
+def command_validate_incremental_competence(
+    yearmonth: str,
+    *,
+    allow_published: bool,
+) -> None:
+    try:
+        result = validate_requested_competence(
+            yearmonth,
+            reference_path=settings.reference_totals_path,
+            gold_path=settings.gold_path,
+            allow_published=allow_published,
+        )
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(str(exc)) from exc
+
+    print(
+        f"incremental audit allowed: competence={yearmonth} "
+        f"reason={result.reason} "
+        f"reference_published_at={result.reference_published_at}"
+    )
 
 
 def command_download(yearmonth: str) -> None:
@@ -821,6 +869,27 @@ def build_parser() -> argparse.ArgumentParser:
     local_pipeline.add_argument("file", help="Caminho do arquivo TXT ou .7z")
     local_pipeline.add_argument("--kind", choices=["MOV", "FOR", "EXC"], default="MOV")
 
+    next_competence = sub.add_parser(
+        "next-competence",
+        help="Resolve a próxima competência elegível pelas referências oficiais.",
+    )
+    next_competence.add_argument(
+        "--json",
+        action="store_true",
+        help="Emite somente o estado incremental em JSON.",
+    )
+
+    validate_incremental = sub.add_parser(
+        "validate-incremental-competence",
+        help="Bloqueia auditoria fora da próxima competência oficial elegível.",
+    )
+    validate_incremental.add_argument("yearmonth", help="Competência AAAAMM")
+    validate_incremental.add_argument(
+        "--allow-published",
+        action="store_true",
+        help="Permite reauditar explicitamente uma competência já publicada.",
+    )
+
     validate = sub.add_parser(
         "validate-release",
         help="Executa o gate de publicação de uma competência.",
@@ -1029,6 +1098,17 @@ def main() -> None:
 
     if args.command == "local-pipeline":
         command_local_pipeline(args.yearmonth, args.file, args.kind)
+        return
+
+    if args.command == "next-competence":
+        command_next_competence(json_output=args.json)
+        return
+
+    if args.command == "validate-incremental-competence":
+        command_validate_incremental_competence(
+            args.yearmonth,
+            allow_published=args.allow_published,
+        )
         return
 
     if args.command == "validate-release":

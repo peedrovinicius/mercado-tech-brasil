@@ -199,6 +199,8 @@ O pipeline mantém:
 - ajustes FOR e EXC incorporados como deltas auditáveis;
 - referência externa para reconciliação;
 - gate mensal vinculado ao hash do arquivo de origem;
+- preparação incremental bloqueada até existir referência oficial contínua e efetiva;
+- auditoria mensal impedida de antecipar ou saltar competências;
 - gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
 - downloader RAIS retomável após queda de conexão FTP;
 - fallback HTTPS de transporte auditável quando o FTP estiver instável;
@@ -272,6 +274,15 @@ cd frontend && npm run build
 ~~~
 
 ## Pipeline
+
+Resolução segura da próxima competência mensal:
+
+~~~bash
+python -m src.cli next-competence
+python -m src.cli next-competence --json
+~~~
+
+A auditoria incremental só é liberada quando a competência é imediatamente posterior à última publicação e já possui referência oficial versionada.
 
 Sincronização das referências oficiais:
 

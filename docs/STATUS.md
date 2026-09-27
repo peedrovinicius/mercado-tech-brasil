@@ -55,6 +55,9 @@ Em todas as competências processadas:
 - reconciliação nacional por competência;
 - qualidade da dimensão municipal;
 - gate de publicação por competência;
+- resolvedor da próxima competência oficial elegível;
+- bloqueio de auditoria para competência antecipada ou com lacuna temporal;
+- disparo automático da auditoria quando uma nova referência oficial é versionada;
 - aprovação metodológica vinculada ao SHA-256;
 - invalidação da aprovação quando a origem muda;
 - registro de releases publicado pela API;
