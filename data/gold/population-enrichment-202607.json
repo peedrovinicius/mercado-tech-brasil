@@ -7,7 +7,7 @@
   "population_source_url": "https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html",
   "population_published_at": "2026-08-28",
   "population_cache_sha256": "9d0ff6edcd84b767a024716717946b6ae101e6feaf30d9b300a58511c8ec122b",
-  "municipality_artifact_before_sha256": "b8c81d636a98b72a722f6146cd4d530ad43fa0da60f19e3c121c17be99e4c016",
+  "municipality_artifact_before_sha256": "7113469c0639d2fc4d45660f5c5638d6773df72e90dd05ef8a3004209a790367",
   "municipality_artifact_sha256": "7113469c0639d2fc4d45660f5c5638d6773df72e90dd05ef8a3004209a790367",
   "identified_municipalities": 1274,
   "residual_municipalities": 0,
