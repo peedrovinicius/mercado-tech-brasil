@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -112,9 +113,9 @@ def test_rais_endpoints_serve_only_after_published_gate(
     )
 
     monkeypatch.setattr(
-        rais_router.settings,
-        "gold_path",
-        tmp_path,
+        rais_router,
+        "settings",
+        replace(rais_router.settings, gold_path=tmp_path),
     )
 
     overview = client.get("/api/v1/rais/overview")
