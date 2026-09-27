@@ -111,7 +111,11 @@ A população é associada pelo código IBGE de sete dígitos já incorporado à
 
 Municípios sem código IBGE válido, população ausente ou categoria residual permanecem com essas taxas nulas. O pipeline não substitui denominadores ausentes por estimativas próprias.
 
-A referência populacional é sincronizada antes da geração Gold e registra fonte, tabela, variável, ano e data de referência no cache de processamento.
+A referência populacional é sincronizada antes da geração Gold nas novas competências. Para competências já publicadas sem denominador, o projeto também permite enriquecimento pós-publicação sem reprocessar microdados, desde que a competência já esteja publicável.
+
+Nesse fluxo, o artefato municipal preserva os totais de admissões, desligamentos e saldo, recebe a população oficial e as taxas normalizadas, e ganha metadados de fonte, data de referência, data de publicação e SHA-256 do cache populacional.
+
+O gate só aceita o enriquecimento quando todos os municípios identificados possuem população válida, as taxas por 100 mil fecham aritmeticamente e um relatório de enriquecimento com SHA-256 coincide com o Gold municipal atualizado. O residual `999999` permanece sem denominador.
 
 ## Quadro Brasileiro de Qualificações
 

@@ -50,6 +50,8 @@ Em todas as competências processadas:
 - metodologia salarial MTE;
 - salário real por IPCA;
 - referência municipal IBGE;
+- enriquecimento populacional pós-publicação com Estimativas da População 2026;
+- taxas municipais por 100 mil condicionadas a cobertura completa e gate;
 - categoria residual municipal Não identificado;
 - governança de intake QBQ com arquivo oficial XLSX, SHA-256 e validação de cobertura CBO.
 
@@ -58,6 +60,7 @@ Em todas as competências processadas:
 - checks automáticos;
 - reconciliação nacional por competência;
 - qualidade da dimensão municipal;
+- validação de proveniência, cobertura e aritmética da população municipal;
 - gate de publicação por competência;
 - resolvedor da próxima competência oficial elegível;
 - bloqueio de auditoria para competência antecipada ou com lacuna temporal;

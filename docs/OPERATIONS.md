@@ -108,3 +108,27 @@ Os microdados brutos não entram no Git.
 - manter a competência base do IPCA explícita;
 - evitar reprocessamento quando um artefato auditado ainda estiver disponível;
 - manter CI e build do frontend separados da operação de microdados.
+
+
+## Enriquecimento populacional pós-publicação
+
+Workflow: `Enrich published population`
+
+Esse fluxo existe para competências já publicadas cujo Gold municipal foi gerado antes da disponibilidade da estimativa populacional oficial do mesmo ano.
+
+Os alvos ficam em `config/population_release_targets.json`. Para cada alvo habilitado, o workflow:
+
+1. valida a competência e a data oficial de referência;
+2. consulta a tabela 6579, variável 9324, do SIDRA/IBGE;
+3. grava o cache populacional versionado;
+4. enriquece somente o Gold municipal já publicado;
+5. preserva exatamente admissões, desligamentos e saldo;
+6. exige população para todos os municípios identificados;
+7. mantém o residual `999999` sem denominador;
+8. calcula admissões, desligamentos e saldo por 100 mil habitantes;
+9. gera relatório com SHA-256 antes/depois;
+10. refaz o gate em modo estrito;
+11. executa testes específicos e atualiza o visual do README;
+12. versiona apenas os artefatos derivados.
+
+O fluxo não baixa nem reprocessa MOV, FOR ou EXC.

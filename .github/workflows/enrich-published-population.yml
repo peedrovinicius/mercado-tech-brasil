@@ -1,0 +1,139 @@
+name: Enrich published population
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "config/population_release_targets.json"
+      - ".github/workflows/enrich-published-population.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enrich-published-population
+  cancel-in-progress: false
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install httpx
+
+      - name: Validate population targets
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+
+          path = Path("config/population_release_targets.json")
+          targets = json.loads(path.read_text(encoding="utf-8"))
+          if not isinstance(targets, dict) or not targets:
+              raise SystemExit("Nenhum alvo populacional configurado.")
+
+          enabled = 0
+          for competence, target in targets.items():
+              if target.get("enabled") is not True:
+                  continue
+              enabled += 1
+              if len(competence) != 6 or not competence.isdigit():
+                  raise SystemExit(f"Competência inválida: {competence}")
+
+              year = int(target["population_year"])
+              if target.get("reference_date") != f"{year}-07-01":
+                  raise SystemExit(
+                      f"Data de referência populacional inválida: {competence}"
+                  )
+
+              published_at = date.fromisoformat(target["published_at"])
+              if published_at > date.today():
+                  raise SystemExit(
+                      f"Publicação populacional futura: {competence}"
+                  )
+
+              source_url = str(target.get("source_url") or "")
+              if not source_url.startswith("https://www.ibge.gov.br/"):
+                  raise SystemExit(
+                      f"Fonte populacional não oficial: {competence}"
+                  )
+
+          if not enabled:
+              raise SystemExit("Nenhum alvo populacional habilitado.")
+          print(f"targets validated: {enabled}")
+          PY
+
+      - name: Enrich published municipal Gold
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          targets = json.loads(
+              Path("config/population_release_targets.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          for competence, target in sorted(targets.items()):
+              if target.get("enabled") is not True:
+                  continue
+
+              subprocess.run(
+                  [
+                      "python",
+                      "-m",
+                      "src.cli",
+                      "enrich-published-population",
+                      competence,
+                      "--population-year",
+                      str(target["population_year"]),
+                      "--source-url",
+                      target["source_url"],
+                      "--published-at",
+                      target["published_at"],
+                      "--strict",
+                  ],
+                  check=True,
+              )
+          PY
+
+      - name: Validate enrichment contracts
+        run: |
+          pytest -q             tests/unit/test_population.py             tests/unit/test_population_enrichment.py             tests/unit/test_publication_gate.py             tests/unit/test_api.py
+
+      - name: Refresh README dashboard
+        run: python scripts/generate_readme_dashboard.py
+
+      - name: Persist population enrichment
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/reference/population.json assets/readme-dashboard.svg
+          git add -f             data/gold/by-municipality-*.json             data/gold/population-enrichment-*.json             data/gold/publication-gate-*.json
+
+          if git diff --cached --quiet; then
+            echo "Enriquecimento populacional já está versionado."
+            exit 0
+          fi
+
+          git commit -m "data: enrich published municipalities with IBGE population [skip ci]"
+          git pull --rebase origin main
+          git push

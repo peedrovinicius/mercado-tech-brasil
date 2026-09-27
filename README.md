@@ -64,7 +64,7 @@ python scripts/generate_readme_dashboard.py
 | Consolidação temporal | Trimestres completos e parciais |
 | Evolução ocupacional | Série mensal das cinco famílias CBO tech |
 | Estoque x fluxo | RAIS 2025 contextualizada com movimentações CAGED 2026 |
-| Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
+| Ranking municipal normalizado | Jul/2026 alvo para população IBGE 2026 com gate específico |
 | RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
 ## Série publicada
@@ -218,7 +218,8 @@ O pipeline mantém:
 - evolução mensal das cinco famílias CBO do recorte, sem agregação indevida de medianas salariais;
 - comparação descritiva entre estoque RAIS e fluxos CAGED por família, sem rotular a razão como turnover;
 - intake governado do QBQ preparado para workbook oficial, fingerprint e validação dos CBOs tech;
-- pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
+- enriquecimento populacional pós-publicação governado por SHA-256 e cobertura completa;
+- taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 
 ## Estado do produto
 
@@ -297,6 +298,11 @@ Sincronização das referências oficiais:
 ~~~bash
 python -m src.cli sync-municipalities
 python -m src.cli sync-population 2026
+python -m src.cli enrich-published-population 202607 \
+  --population-year 2026 \
+  --source-url "https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html" \
+  --published-at 2026-08-28 \
+  --strict
 python -m src.cli sync-ipca 202607 --base 202607
 
 # Camada anual RAIS, separada do Novo CAGED
