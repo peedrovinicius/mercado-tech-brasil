@@ -2,6 +2,9 @@ name: RAIS 2025 municipality validation
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/rais-municipality-validation.run"
 
 permissions:
   actions: read
