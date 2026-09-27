@@ -1,0 +1,45 @@
+{
+  "2025": {
+    "source": "Ministério do Trabalho e Emprego: RAIS 2025, apresentação oficial, estoque por UF e região",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/apresentacao-rais-2025.pdf",
+    "source_page": 19,
+    "national_active_links": 59970945,
+    "groups": {
+      "RAIS_VINC_PUB_NORTE.7z": {
+        "label": "Norte",
+        "expected_stock": 3869191,
+        "basis": "total oficial da Região Norte"
+      },
+      "RAIS_VINC_PUB_NORDESTE.7z": {
+        "label": "Nordeste",
+        "expected_stock": 11686314,
+        "basis": "total oficial da Região Nordeste"
+      },
+      "RAIS_VINC_PUB_MG_ES_RJ.7z": {
+        "label": "MG + ES + RJ",
+        "expected_stock": 12255362,
+        "basis": "soma oficial de Minas Gerais, Espírito Santo e Rio de Janeiro"
+      },
+      "RAIS_VINC_PUB_SP.7z": {
+        "label": "São Paulo",
+        "expected_stock": 16158390,
+        "basis": "total oficial de São Paulo"
+      },
+      "RAIS_VINC_PUB_SUL.7z": {
+        "label": "Sul",
+        "expected_stock": 10054135,
+        "basis": "total oficial da Região Sul"
+      },
+      "RAIS_VINC_PUB_CENTRO_OESTE.7z": {
+        "label": "Centro-Oeste",
+        "expected_stock": 5944488,
+        "basis": "total oficial da Região Centro-Oeste"
+      },
+      "RAIS_VINC_PUB_NI.7z": {
+        "label": "Não identificado",
+        "expected_stock": 3065,
+        "basis": "resíduo entre o total Brasil e a soma das 27 UFs publicadas"
+      }
+    }
+  }
+}

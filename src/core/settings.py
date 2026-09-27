@@ -12,7 +12,7 @@ class Settings:
     root: Path = ROOT
     environment: str = os.getenv("APP_ENV", "development")
     project_name: str = "Mercado Tech Brasil"
-    version: str = "0.35.0"
+    version: str = "0.36.0"
     data_backend: str = os.getenv("DATA_BACKEND", "files").lower()
     database_url: str = os.getenv(
         "DATABASE_URL",
@@ -22,6 +22,9 @@ class Settings:
     cbo_config_path: Path = ROOT / "config" / "cbo_tech.yml"
     reference_totals_path: Path = ROOT / "config" / "reference_totals.json"
     rais_reference_totals_path: Path = ROOT / "config" / "rais_reference_totals.json"
+    rais_regional_reference_path: Path = (
+        ROOT / "config" / "rais_reference_regions_2025.json"
+    )
     official_reference_202607_path: Path = (
         ROOT / "config" / "official_reference_202607.json"
     )

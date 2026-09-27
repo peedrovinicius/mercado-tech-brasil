@@ -47,6 +47,10 @@ from src.validation.rais_publication_gate import (
     evaluate_rais_publication_gate,
     write_rais_publication_gate,
 )
+from src.validation.rais_regional_reconciliation import (
+    evaluate_rais_regional_reconciliation,
+    write_rais_regional_reconciliation,
+)
 from src.validation.rais_reconciliation import (
     evaluate_rais_reconciliation,
     write_rais_reconciliation,
@@ -528,16 +532,38 @@ def command_rais_transform(
 
 
 def command_rais_merge_parts(year: int, *, parts_root: str) -> None:
+    resolved_parts = Path(parts_root).resolve()
     paths = merge_rais_silver_parts(
         year=year,
-        parts_root=Path(parts_root).resolve(),
+        parts_root=resolved_parts,
         silver_dir=settings.silver_path,
         bronze_archive_dir=settings.bronze_path / "rais" / str(year) / "archives",
     )
+
+    regional = evaluate_rais_regional_reconciliation(
+        year=year,
+        parts_root=resolved_parts,
+        reference_path=settings.rais_regional_reference_path,
+    )
+    regional_path = (
+        settings.silver_path
+        / f"rais_regional_reconciliation_{year}.json"
+    )
+    write_rais_regional_reconciliation(regional, regional_path)
+
     print(f"rais merged silver: {paths['silver']}")
     print(f"rais merged rejects: {paths['rejects']}")
     print(f"rais merged quality: {paths['quality']}")
     print(f"rais merged manifest: {paths['manifest']}")
+    print(
+        f"rais regional reconciliation: "
+        f"{'PASS' if regional.regional_reconciled else 'FAIL'} "
+        f"diferença={regional.difference:+,}"
+    )
+    print(f"rais regional report: {regional_path}")
+
+    if not regional.regional_reconciled:
+        raise SystemExit(2)
 
 
 def command_rais_reconcile(year: int) -> None:

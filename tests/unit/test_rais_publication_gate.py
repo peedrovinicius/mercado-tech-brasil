@@ -44,6 +44,17 @@ def _prepare_release(base: Path) -> tuple[Path, Path, Path, Path]:
         },
     )
     _write_json(
+        silver / "rais_regional_reconciliation_2025.json",
+        {
+            "year": 2025,
+            "expected_national_stock": 1000,
+            "observed_national_stock": 1000,
+            "difference": 0,
+            "group_count": 7,
+            "regional_reconciled": True,
+        },
+    )
+    _write_json(
         gold / "rais-overview-2025.json",
         {
             "year": 2025,
@@ -217,3 +228,24 @@ def test_write_rais_gate_report(tmp_path: Path):
     assert payload["year"] == 2025
     assert payload["publishable"] is False
     assert payload["checks"]
+
+
+
+def test_rais_gate_blocks_failed_regional_reconciliation(tmp_path: Path):
+    bronze, silver, gold, approvals = _prepare_release(tmp_path)
+    regional = silver / "rais_regional_reconciliation_2025.json"
+    payload = json.loads(regional.read_text(encoding="utf-8"))
+    payload["regional_reconciled"] = False
+    payload["difference"] = 1
+    _write_json(regional, payload)
+
+    result = evaluate_rais_publication_gate(
+        year=2025,
+        bronze_dir=bronze,
+        silver_dir=silver,
+        gold_dir=gold,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert result.publishable is False

@@ -318,7 +318,15 @@ O total comparado com o MTE é `rows_stock_eligible_source`, calculado antes das
 
 A diferença precisa ser exatamente zero. Qualquer divergência mantém `gold_ready=false`.
 
-Quando a reconciliação passa, `gold_ready=true`, mas `publication_ready` continua falso.
+Além do fechamento Brasil, a release 2025 é conferida contra a tabela oficial por grupos territoriais compatíveis com os sete arquivos de origem: Norte, Nordeste, MG+ES+RJ, São Paulo, Sul, Centro-Oeste e o residual não identificado. A tabela oficial do MTE informa os totais das regiões e UFs e exclui a classificação não identificada das linhas territoriais; o residual NI é obtido pela diferença exata entre Brasil e a soma das 27 UFs.
+
+O relatório adicional é:
+
+```text
+data/silver/rais_regional_reconciliation_2025.json
+```
+
+Quando as reconciliações nacional e regional passam, `gold_ready=true`, mas `publication_ready` continua falso.
 
 O relatório é salvo em:
 

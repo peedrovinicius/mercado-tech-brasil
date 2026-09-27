@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.36.0
+
+- processamento integral da RAIS 2025 confirmado com 91.710.262 registros e zero rejeições;
+- estoque bruto ativo de 60.691.770 vínculos é separado de 720.825 vínculos ativos abandonados;
+- estoque oficial qualificado fecha exatamente em 59.970.945 vínculos;
+- nova referência territorial versiona Norte, Nordeste, MG+ES+RJ, São Paulo, Sul, Centro-Oeste e residual não identificado;
+- reconciliação regional exige diferença zero em todos os sete grupos de origem;
+- residual não identificado é derivado da diferença entre Brasil e a soma das 27 UFs da tabela oficial;
+- gate anual passa a exigir a reconciliação regional e inclui o relatório no fingerprint da release;
+- derivados reais permanecem bloqueados até aprovação metodológica manual;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.35.0
 
 - processamento integral dos sete arquivos regionais da RAIS 2025 concluído para diagnóstico metodológico;

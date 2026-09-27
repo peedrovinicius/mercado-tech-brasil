@@ -62,6 +62,7 @@ def _source_hashes(bronze_dir: Path, year: int) -> list[str]:
 def _release_artifacts(gold_dir: Path, silver_dir: Path, year: int) -> list[Path]:
     return [
         silver_dir / f"rais_reconciliation_{year}.json",
+        silver_dir / f"rais_regional_reconciliation_{year}.json",
         gold_dir / f"rais-overview-{year}.json",
         gold_dir / f"rais-by-uf-{year}.json",
         gold_dir / f"rais-by-cbo-family-{year}.json",
@@ -137,6 +138,7 @@ def evaluate_rais_publication_gate(
     )
 
     reconciliation_path = silver_dir / f"rais_reconciliation_{year}.json"
+    regional_path = silver_dir / f"rais_regional_reconciliation_{year}.json"
     overview_path = gold_dir / f"rais-overview-{year}.json"
     by_uf_path = gold_dir / f"rais-by-uf-{year}.json"
     by_family_path = gold_dir / f"rais-by-cbo-family-{year}.json"
@@ -144,6 +146,7 @@ def evaluate_rais_publication_gate(
 
     required = {
         "reconciliation": reconciliation_path,
+        "regional_reconciliation": regional_path,
         "overview": overview_path,
         "by_uf": by_uf_path,
         "by_cbo_family": by_family_path,
@@ -179,6 +182,26 @@ def evaluate_rais_publication_gate(
                     "Estoque nacional RAIS reconciliado exatamente com a referência oficial."
                     if reconciliation_ok
                     else "Reconciliação nacional RAIS não está aprovada ou possui diferença."
+                ),
+            )
+        )
+
+    if regional_path.exists():
+        regional = _read_json(regional_path)
+        regional_ok = (
+            int(regional.get("year") or 0) == year
+            and regional.get("regional_reconciled") is True
+            and int(regional.get("difference") or 0) == 0
+            and int(regional.get("group_count") or 0) == (7 if year == 2025 else int(regional.get("group_count") or 0))
+        )
+        checks.append(
+            RaisGateCheck(
+                id="exact_regional_reconciliation",
+                passed=regional_ok,
+                message=(
+                    "Todos os grupos regionais RAIS fecham exatamente com a referência oficial."
+                    if regional_ok
+                    else "Reconciliação regional RAIS está ausente, incompleta ou divergente."
                 ),
             )
         )
