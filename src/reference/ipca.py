@@ -98,7 +98,25 @@ def save_ipca_cache(
     destination: Path,
 ) -> None:
     normalized_base = _validate_competence(base_competence)
-    if normalized_base not in indices:
+    merged: dict[str, Decimal] = {}
+
+    if destination.exists():
+        existing = load_ipca_cache(destination)
+        raw_indices = existing.get("indices")
+        if not isinstance(raw_indices, dict):
+            raise TypeError("Cache IPCA existente sem mapa de índices.")
+        for competence, value in raw_indices.items():
+            normalized = _validate_competence(str(competence))
+            merged[normalized] = Decimal(str(value))
+
+    for competence, value in indices.items():
+        normalized = _validate_competence(str(competence))
+        parsed = Decimal(str(value))
+        if parsed <= 0:
+            raise ValueError("Índices IPCA devem ser positivos.")
+        merged[normalized] = parsed
+
+    if normalized_base not in merged:
         raise ValueError("A competência base precisa existir no cache IPCA.")
 
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -111,7 +129,7 @@ def save_ipca_cache(
                 "base_competence": normalized_base,
                 "indices": {
                     competence: str(value)
-                    for competence, value in sorted(indices.items())
+                    for competence, value in sorted(merged.items())
                 },
             },
             ensure_ascii=False,
