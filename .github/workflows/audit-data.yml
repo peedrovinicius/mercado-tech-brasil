@@ -12,6 +12,11 @@ on:
         required: true
         default: "202607"
         type: string
+      allow_reaudit:
+        description: "Permitir reauditoria explícita de competência já publicada"
+        required: true
+        default: false
+        type: boolean
 
 concurrency:
   group: audit-data-${{ inputs.competence }}
@@ -24,6 +29,7 @@ jobs:
     env:
       COMPETENCE: ${{ inputs.competence }}
       IPCA_BASE: ${{ inputs.ipca_base }}
+      ALLOW_REAUDIT: ${{ inputs.allow_reaudit }}
 
     steps:
       - name: Checkout
@@ -50,6 +56,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
+
+      - name: Validate incremental eligibility
+        run: |
+          if [[ "$ALLOW_REAUDIT" == "true" ]]; then
+            python -m src.cli validate-incremental-competence "$COMPETENCE" --allow-published
+          else
+            python -m src.cli validate-incremental-competence "$COMPETENCE"
+          fi
 
       - name: Sync official references
         run: |
