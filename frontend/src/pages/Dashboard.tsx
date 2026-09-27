@@ -16,6 +16,7 @@ import { PipelineVisual } from '../components/PipelineVisual'
 import { TerritorialComparison } from '../components/TerritorialComparison'
 import { TemporalSummary } from '../components/TemporalSummary'
 import { MunicipalityAnalysis } from '../components/MunicipalityAnalysis'
+import { OccupationFamilyAnalysis } from '../components/OccupationFamilyAnalysis'
 import { RaisAnnualAnalysis } from '../components/RaisAnnualAnalysis'
 
 export function Dashboard() {
@@ -82,6 +83,12 @@ export function Dashboard() {
   const temporalSummary = useQuery({
     queryKey: ['temporal-summary'],
     queryFn: api.temporalSummary,
+    retry: false,
+    enabled: overview.isSuccess,
+  })
+  const occupationFamilyTrend = useQuery({
+    queryKey: ['occupation-family-trend'],
+    queryFn: api.occupationFamilyTrend,
     retry: false,
     enabled: overview.isSuccess,
   })
@@ -285,6 +292,10 @@ export function Dashboard() {
 
           {temporalSummary.data ? (
             <TemporalSummary data={temporalSummary.data} />
+          ) : null}
+
+          {occupationFamilyTrend.data ? (
+            <OccupationFamilyAnalysis data={occupationFamilyTrend.data} />
           ) : null}
 
           <section className="analysis-grid">

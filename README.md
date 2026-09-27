@@ -62,6 +62,7 @@ python scripts/generate_readme_dashboard.py
 | Serving de produção | Arquivos Gold publicados |
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
+| Evolução ocupacional | Série mensal das cinco famílias CBO tech |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
 | RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
@@ -213,6 +214,7 @@ O pipeline mantém:
 - contratos de API versionados;
 - endpoints e visual anual RAIS condicionados ao gate publishable=true;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
+- evolução mensal das cinco famílias CBO do recorte, sem agregação indevida de medianas salariais;
 - pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 
 ## Estado do produto

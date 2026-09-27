@@ -1275,3 +1275,179 @@ a:focus-visible, button:focus-visible {
     padding: 20px;
   }
 }
+
+
+.occupation-family-section {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 6px 5vw 56px;
+}
+
+.occupation-family-section__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 36px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.occupation-family-section__heading h2 {
+  max-width: 900px;
+  margin: 7px 0 10px;
+  font-size: clamp(28px, 3.5vw, 44px);
+  letter-spacing: -.04em;
+}
+
+.occupation-family-section__heading p:last-child {
+  max-width: 800px;
+  margin: 0;
+  color: #66666e;
+  line-height: 1.68;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+.occupation-family-section__heading > span {
+  color: #77777f;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.occupation-family-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, .8fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.occupation-family-chart-panel {
+  min-height: 470px;
+}
+
+.occupation-family-chart-panel .panel__heading {
+  margin-bottom: 10px;
+}
+
+.occupation-family-chart-panel .panel__heading h3 {
+  margin: 6px 0 0;
+  font-size: 20px;
+}
+
+.occupation-family-list {
+  display: grid;
+  gap: 10px;
+}
+
+.occupation-family-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #e1e1e5;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.occupation-family-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.occupation-family-card__head span {
+  color: #77777f;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .08em;
+}
+
+.occupation-family-card__head strong {
+  font-size: 18px;
+  letter-spacing: -.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.occupation-family-card h3 {
+  margin: 7px 0 3px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.occupation-family-card > small {
+  color: #85858d;
+  font-size: 10px;
+}
+
+.occupation-family-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.occupation-family-card dl > div {
+  min-width: 0;
+  padding-top: 10px;
+  border-top: 1px solid #ececf0;
+}
+
+.occupation-family-card dt {
+  color: #85858d;
+  font-size: 9px;
+}
+
+.occupation-family-card dd {
+  margin: 5px 0 0;
+  font-size: 13px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.occupation-family-card dd.is-positive {
+  color: #17643b;
+}
+
+.occupation-family-card dd.is-negative {
+  color: #8a3c3c;
+}
+
+.occupation-family-section__note {
+  max-width: 900px;
+  margin: 14px 0 0;
+  color: #77777f;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1080px) {
+  .occupation-family-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .occupation-family-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .occupation-family-section__heading {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .occupation-family-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .occupation-family-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .occupation-family-chart-panel {
+    min-height: 0;
+  }
+}

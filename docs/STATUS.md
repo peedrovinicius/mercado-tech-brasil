@@ -43,6 +43,7 @@ Em todas as competências processadas:
 - Gold por ocupação;
 - Gold por município;
 - série histórica;
+- série temporal por família CBO com admissões, desligamentos, saldo e participação;
 - referências oficiais nacionais por competência;
 - recorte CBO v2;
 - metodologia salarial MTE;
@@ -80,6 +81,7 @@ Em todas as competências processadas:
 - OpenAPI;
 - React e TypeScript;
 - gráficos ECharts modulares;
+- análise visual da evolução mensal das cinco famílias CBO tech;
 - frontend responsivo;
 - deploy público no Render.
 

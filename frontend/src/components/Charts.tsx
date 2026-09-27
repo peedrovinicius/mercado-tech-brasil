@@ -21,6 +21,7 @@ echarts.use([
 
 import type {
   MunicipalityItem,
+  OccupationFamilyTrendItem,
   OccupationItem,
   TrendItem,
   UfItem,
@@ -318,6 +319,80 @@ export function TrendChart({ items }: { items: TrendItem[] }) {
     />
   )
 }
+
+export function OccupationFamilyTrendChart({
+  families,
+}: {
+  families: OccupationFamilyTrendItem[]
+}) {
+  const competencies = families[0]?.monthly.map((item) => item.competence) ?? []
+  const option = {
+    animationDuration: 500,
+    aria: { show: true },
+    grid: { left: 52, right: 18, top: 54, bottom: 40, containLabel: true },
+    tooltip: {
+      ...numberTooltip,
+      axisPointer: { type: 'line' },
+    },
+    legend: {
+      top: 0,
+      data: families.map((family) => family.cbo_familia),
+      itemWidth: 14,
+      itemHeight: 8,
+      textStyle: { color: '#67676f', fontSize: 11 },
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: competencies.map(formatCompetence),
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: axisLineColor } },
+      axisLabel: { color: categoryLabelColor },
+    },
+    yAxis: {
+      ...valueAxis,
+      name: 'Saldo',
+      nameTextStyle: { color: axisLabelColor, fontSize: 10 },
+    },
+    series: families.map((family) => ({
+      name: family.cbo_familia,
+      type: 'line',
+      smooth: true,
+      showSymbol: competencies.length < 18,
+      symbolSize: 6,
+      data: family.monthly.map((item) => item.balance),
+      lineStyle: { width: 2 },
+      emphasis: { focus: 'series' },
+    })),
+    media: [
+      {
+        query: { maxWidth: 520 },
+        option: {
+          grid: { left: 6, right: 8, top: 72, bottom: 28, containLabel: true },
+          legend: {
+            top: 0,
+            left: 0,
+            right: 0,
+            itemGap: 9,
+            textStyle: { fontSize: 10 },
+          },
+          xAxis: { axisLabel: { fontSize: 10 } },
+          yAxis: { axisLabel: { fontSize: 10 } },
+        },
+      },
+    ],
+  }
+
+  return (
+    <ReactEChartsCore
+      echarts={echarts}
+      option={option}
+      style={{ height: 360 }}
+      opts={{ renderer: 'canvas' }}
+    />
+  )
+}
+
 
 type RegionItem = {
   region: string
