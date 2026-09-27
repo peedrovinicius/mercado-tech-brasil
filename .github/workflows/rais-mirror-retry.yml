@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload collected regional derivatives
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-2025-v035-parts
           retention-days: 3
@@ -88,7 +88,7 @@ jobs:
 
       - name: Upload national result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-2025-v035-full-reprocess
           retention-days: 3
