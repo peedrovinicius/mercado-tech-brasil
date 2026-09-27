@@ -8,12 +8,8 @@ on:
         required: true
         default: "2026"
         type: string
-  push:
-    paths:
-      - ".github/population-2026.run"
-
 concurrency:
-  group: population-audit-${{ github.event.inputs.year || '2026' }}
+  group: population-audit-${{ inputs.year }}
   cancel-in-progress: true
 
 jobs:
@@ -21,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     env:
-      POPULATION_YEAR: ${{ github.event.inputs.year || '2026' }}
+      POPULATION_YEAR: ${{ inputs.year }}
 
     steps:
       - name: Checkout
