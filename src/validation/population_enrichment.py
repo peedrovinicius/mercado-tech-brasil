@@ -188,7 +188,8 @@ def enrich_published_municipality_population(
         )
 
     population_sha256 = _sha256(population_cache_path)
-    payload.update(
+    desired_payload = dict(payload)
+    desired_payload.update(
         {
             "population_source": str(
                 population.get("source") or "IBGE SIDRA"
@@ -205,19 +206,66 @@ def enrich_published_municipality_population(
             "items": enriched,
         }
     )
-    _write_json(municipality_path, payload)
+
+    municipality_changed = desired_payload != payload
+    if municipality_changed:
+        _write_json(municipality_path, desired_payload)
     enriched_sha256 = _sha256(municipality_path)
+
+    report_path = gold_dir / f"population-enrichment-{yearmonth}.json"
+    existing_report = (
+        _read_json(report_path)
+        if report_path.exists()
+        else None
+    )
+    report_matches = bool(
+        existing_report
+        and existing_report.get("version") == 1
+        and existing_report.get("competence") == yearmonth
+        and existing_report.get("population_year") == population_year
+        and existing_report.get("population_reference_date")
+        == desired_payload["population_reference_date"]
+        and existing_report.get("population_source")
+        == desired_payload["population_source"]
+        and existing_report.get("population_source_url") == source_url
+        and existing_report.get("population_published_at") == published_at
+        and existing_report.get("population_cache_sha256")
+        == population_sha256
+        and existing_report.get("municipality_artifact_sha256")
+        == enriched_sha256
+        and existing_report.get("identified_municipalities") == identified
+        and existing_report.get("residual_municipalities") == residual
+        and existing_report.get("matched_population") == identified
+        and existing_report.get("missing_population") == 0
+        and existing_report.get("coverage_complete") is True
+        and existing_report.get("totals_before") == totals_before
+        and existing_report.get("totals_after") == totals_after
+    )
+
+    if not municipality_changed and report_matches:
+        result = dict(existing_report)
+        result["_changed"] = False
+        return result
+
+    baseline_sha256 = original_sha256
+    if not municipality_changed and existing_report:
+        baseline_sha256 = str(
+            existing_report.get("municipality_artifact_before_sha256")
+            or original_sha256
+        )
 
     report = {
         "version": 1,
         "competence": yearmonth,
         "population_year": population_year,
-        "population_reference_date": payload["population_reference_date"],
-        "population_source": payload["population_source"],
+        "population_reference_date": desired_payload[
+            "population_reference_date"
+        ],
+        "population_source": desired_payload["population_source"],
         "population_source_url": source_url,
         "population_published_at": published_at,
         "population_cache_sha256": population_sha256,
-        "municipality_artifact_before_sha256": original_sha256,
+        "municipality_artifact_before_sha256": baseline_sha256,
         "municipality_artifact_sha256": enriched_sha256,
         "identified_municipalities": identified,
         "residual_municipalities": residual,
@@ -227,6 +275,8 @@ def enrich_published_municipality_population(
         "totals_before": totals_before,
         "totals_after": totals_after,
     }
-    report_path = gold_dir / f"population-enrichment-{yearmonth}.json"
     _write_json(report_path, report)
-    return report
+
+    result = dict(report)
+    result["_changed"] = True
+    return result
