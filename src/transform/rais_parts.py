@@ -105,6 +105,18 @@ def _merge_download_manifests(
                 f"Entrada de manifesto RAIS inválida em {path}."
             )
 
+        entry = dict(entry)
+        if "competence" not in entry and "comptence" in entry:
+            entry["competence"] = entry.pop("comptence")
+
+        competence = str(entry.get("competence") or "")
+        if competence and competence != str(year):
+            raise ValueError(
+                f"Competência RAIS divergente em {path}: {competence}."
+            )
+        if not competence:
+            entry["competence"] = str(year)
+
         source_path = str(entry.get("path") or "")
         sha256 = str(entry.get("sha256") or "")
         if not source_path or len(sha256) != 64:

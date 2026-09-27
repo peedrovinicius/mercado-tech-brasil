@@ -352,6 +352,7 @@ docker/      imagens de execução
 | [Data lineage](docs/DATA_LINEAGE.md) | origem e transformação dos dados |
 | [Pipeline](docs/PIPELINE_REAL.md) | execução do processamento |
 | [RAIS anual](docs/RAIS.md) | ingestão anual e separação conceitual de estoque |
+| [Revisão RAIS 2025](docs/RAIS_2025_RELEASE_REVIEW.md) | checklist técnico antes da aprovação metodológica |
 | [Operação de dados](docs/OPERATIONS.md) | auditoria e publicação mensal |
 | [Deploy](docs/DEPLOY.md) | produção e execução |
 | [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |

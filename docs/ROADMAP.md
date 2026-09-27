@@ -46,6 +46,7 @@ A base necessária para publicar e auditar o produto está implementada:
 - helpers de serving que ignoram anos sem publicação aprovada;
 - endpoints anuais RAIS protegidos por publishable=true;
 - integração visual RAIS preparada no frontend e condicionada ao registry anual;
+- relatório técnico de revisão da release RAIS 2025 consolidado;
 - publicação pública no Render.
 
 ## Próximas entregas

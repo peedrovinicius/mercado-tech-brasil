@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.38.1
+
+- revisão de proveniência da release RAIS 2025 documentada em arquivo próprio;
+- manifesto nacional corrige a chave de competência da parte Sul sem alterar SHA-256 ou métricas;
+- merge nacional normaliza o typo legado comptence para competence;
+- merge passa a validar a competência anual presente em cada entrada de proveniência;
+- teste de regressão garante sete entradas com competence=2025 e ausência da chave legada;
+- relatório de revisão reúne proveniência, qualidade, reconciliação nacional, reconciliação regional, Gold e fingerprint;
+- aprovação metodológica humana continua como único bloqueio para publishable=true;
+- fingerprint da release permanece inalterado porque a identidade das origens e artefatos não mudou.
+
 ## 0.38.0
 
 - frontend ganha integração anual RAIS separada da análise mensal do Novo CAGED;

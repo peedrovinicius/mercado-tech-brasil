@@ -184,3 +184,49 @@ def test_merge_rais_2025_blocks_incomplete_parts(tmp_path: Path):
         assert "exatamente sete partes" in str(exc)
     else:
         raise AssertionError("Merge RAIS 2025 deveria bloquear partes incompletas.")
+
+
+
+def test_merge_normalizes_legacy_manifest_competence_typo(tmp_path: Path):
+    parts = tmp_path / "parts"
+    silver = tmp_path / "silver"
+    bronze = tmp_path / "bronze"
+
+    for index, key in enumerate(("a", "b", "c", "d", "e", "f", "g")):
+        _write_part(
+            parts,
+            key=key,
+            year=2025,
+            source_file=f"RAIS_VINC_{key.upper()}.7z",
+            active=1,
+            inactive=0,
+            tech_rows=[],
+            reject_rows=[],
+        )
+        manifest_path = parts / key / "download-manifest-part.json"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if index == 6:
+            payload["files"][0]["comptence"] = "2025"
+        manifest_path.write_text(
+            json.dumps(payload),
+            encoding="utf-8",
+        )
+
+    paths = merge_rais_silver_parts(
+        year=2025,
+        parts_root=parts,
+        silver_dir=silver,
+        bronze_archive_dir=bronze,
+    )
+
+    manifest = json.loads(
+        paths["manifest"].read_text(encoding="utf-8")
+    )
+    assert all(
+        item["competence"] == "2025"
+        for item in manifest["files"]
+    )
+    assert all(
+        "comptence" not in item
+        for item in manifest["files"]
+    )
