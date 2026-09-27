@@ -2,9 +2,6 @@ name: RAIS 2025 municipality release
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/rais-municipality-release.run"
 
 permissions:
   actions: read
