@@ -48,13 +48,13 @@ from src.validation.rais_publication_gate import (
     evaluate_rais_publication_gate,
     write_rais_publication_gate,
 )
-from src.validation.rais_regional_reconciliation import (
-    evaluate_rais_regional_reconciliation,
-    write_rais_regional_reconciliation,
-)
 from src.validation.rais_reconciliation import (
     evaluate_rais_reconciliation,
     write_rais_reconciliation,
+)
+from src.validation.rais_regional_reconciliation import (
+    evaluate_rais_regional_reconciliation,
+    write_rais_regional_reconciliation,
 )
 
 
