@@ -542,6 +542,7 @@ a:focus-visible, button:focus-visible {
 }
 .footer__identity { display: grid; gap: 5px; }
 .footer__identity strong { color: #222226; font-size: 13px; }
+.footer__version { color: #8a8a92; font-size: 10px; font-variant-numeric: tabular-nums; }
 .footer__links { display: flex; align-items: center; gap: 20px; }
 .footer__links a,
 .footer__links button {
