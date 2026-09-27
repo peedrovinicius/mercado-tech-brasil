@@ -3,8 +3,8 @@
   "automatic_checks_passed": true,
   "manual_approval_valid": false,
   "publishable": false,
-  "release_sha256": "46e4f877ac79112a31bcddf0f9f28b8620360217994210f21ad9caf4c8d1be7a",
-  "generated_at_utc": "2026-09-27T08:42:54.264184+00:00",
+  "release_sha256": "4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a",
+  "generated_at_utc": "2026-09-27T09:31:06.452422+00:00",
   "checks": [
     {
       "id": "source_provenance",
@@ -22,6 +22,12 @@
       "id": "artifact_regional_reconciliation",
       "passed": true,
       "message": "Artefato encontrado: rais_regional_reconciliation_2025.json",
+      "blocking": true
+    },
+    {
+      "id": "artifact_municipality_validation",
+      "passed": true,
+      "message": "Artefato encontrado: rais_municipality_validation_2025.json",
       "blocking": true
     },
     {
@@ -43,6 +49,12 @@
       "blocking": true
     },
     {
+      "id": "artifact_by_municipality",
+      "passed": true,
+      "message": "Artefato encontrado: rais-by-municipality-2025.json",
+      "blocking": true
+    },
+    {
       "id": "artifact_market",
       "passed": true,
       "message": "Artefato encontrado: rais-market-2025.parquet",
@@ -58,6 +70,12 @@
       "id": "exact_regional_reconciliation",
       "passed": true,
       "message": "Todos os grupos regionais RAIS fecham exatamente com a referência oficial.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_dimension",
+      "passed": true,
+      "message": "Dimensão municipal RAIS validada contra a DTB oficial do IBGE.",
       "blocking": true
     },
     {
@@ -91,6 +109,12 @@
       "blocking": true
     },
     {
+      "id": "municipality_total",
+      "passed": true,
+      "message": "Agregado municipal fecha o estoque tech: 786,296.",
+      "blocking": true
+    },
+    {
       "id": "market_total",
       "passed": true,
       "message": "Parquet Gold fecha o estoque tech: 786,296.",
@@ -99,7 +123,7 @@
     {
       "id": "release_fingerprint",
       "passed": true,
-      "message": "Fingerprint da release: 46e4f877ac79112a31bcddf0f9f28b8620360217994210f21ad9caf4c8d1be7a.",
+      "message": "Fingerprint da release: 4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a.",
       "blocking": true
     },
     {

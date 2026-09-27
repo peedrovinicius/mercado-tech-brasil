@@ -1,0 +1,16 @@
+{
+  "year": 2025,
+  "silver_rows": 786296,
+  "unique_codes": 3690,
+  "residual_rows": 1,
+  "residual_code_present": true,
+  "ibge_codes": 5571,
+  "matched_codes": 3689,
+  "unmatched_codes": [],
+  "ambiguous_prefixes": [],
+  "uf_mismatch_rows": 0,
+  "invalid_length_codes": [],
+  "invalid_numeric_codes": [],
+  "municipality_ready": true,
+  "source_url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2025/DTB_2025.zip"
+}
