@@ -1,0 +1,109 @@
+{
+  "source": "RAIS / Ministério do Trabalho e Emprego",
+  "year": 2025,
+  "dataset": "vinculos",
+  "concept": "estoque anual de vínculos formais em 31/12",
+  "transport": "https_huggingface_mirror",
+  "transports": [
+    "https_huggingface_mirror"
+  ],
+  "files": [
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_CENTRO_OESTE.7z",
+      "size_bytes": 354015896,
+      "sha256": "0e4459ee90c0219d9b40b9d6129e494034b8d6cd4dbe86eeb1f49e54f964d724",
+      "ingested_at_utc": "2026-09-27T01:35:47.861566+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_CENTRO_OESTE.7z",
+      "path": "RAIS_VINC_PUB_CENTRO_OESTE.7z",
+      "manifest": "RAIS_VINC_PUB_CENTRO_OESTE.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_CENTRO_OESTE.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_MG_ES_RJ.7z",
+      "size_bytes": 766814132,
+      "sha256": "d9c4e359fa16c6a1f929f49c8aec0201a9fbfb801964dc2e27032914924f1f15",
+      "ingested_at_utc": "2026-09-27T01:44:08.793177+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_MG_ES_RJ.7z",
+      "path": "RAIS_VINC_PUB_MG_ES_RJ.7z",
+      "manifest": "RAIS_VINC_PUB_MG_ES_RJ.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_MG_ES_RJ.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_NI.7z",
+      "size_bytes": 209311,
+      "sha256": "dfd32817429cb732963b538d987c1537b12e119e81f667c3f7ffeb279ec0c201",
+      "ingested_at_utc": "2026-09-27T01:34:31.918167+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_NI.7z",
+      "path": "RAIS_VINC_PUB_NI.7z",
+      "manifest": "RAIS_VINC_PUB_NI.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_NI.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_NORDESTE.7z",
+      "size_bytes": 639823548,
+      "sha256": "4366dda32c86e5fdb16f62b09028c7c693852f9b44118cd5536d79613eced089",
+      "ingested_at_utc": "2026-09-27T01:37:37.718396+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_NORDESTE.7z",
+      "path": "RAIS_VINC_PUB_NORDESTE.7z",
+      "manifest": "RAIS_VINC_PUB_NORDESTE.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_NORDESTE.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_NORTE.7z",
+      "size_bytes": 211992734,
+      "sha256": "c7deb880bf43db4e0250c1cba20a84a61dcedc6d1888a0687a18b01483ce2e29",
+      "ingested_at_utc": "2026-09-27T01:34:36.310546+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_NORTE.7z",
+      "path": "RAIS_VINC_PUB_NORTE.7z",
+      "manifest": "RAIS_VINC_PUB_NORTE.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_NORTE.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "competence": "2025",
+      "original_name": "RAIS_VINC_PUB_SP.7z",
+      "size_bytes": 1107305918,
+      "sha256": "d19f924d71578c782408678888ee59d89b05688e3b31babc1f174d06270d29df",
+      "ingested_at_utc": "2026-09-27T01:48:01.703102+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_SP.7z",
+      "path": "RAIS_VINC_PUB_SP.7z",
+      "manifest": "RAIS_VINC_PUB_SP.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_SP.7z?download=true"
+    },
+    {
+      "source": "rais_mte",
+      "comptence": "2025",
+      "original_name": "RAIS_VINC_PUB_SUL.7z",
+      "size_bytes": 704888712,
+      "sha256": "c537caaaa8318b04e6f4cbbc7e59b130988668b7ea58ce67a0ab2caebf2f5bd0",
+      "ingested_at_utc": "2026-09-27T01:40:52.434640+00:00",
+      "transport": "https_huggingface_mirror",
+      "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/2025/RAIS_VINC_PUB_SUL.7z",
+      "manifest": "RAIS_VINC_PUB_SUL.7z.manifest.json",
+      "dataset": "vinculos",
+      "transport_url": "https://huggingface.co/datasets/selenelindsay/rais-caged-bronze/resolve/ad02ee3f6aa2263dd539c7b552785c362b222130/RAIS/2025/RAIS_VINC_PUB_SUL.7z?download=true"
+    }
+  ]
+}

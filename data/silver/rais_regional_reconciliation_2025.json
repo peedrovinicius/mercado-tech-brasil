@@ -1,0 +1,83 @@
+{
+  "year": 2025,
+  "expected_national_stock": 59970945,
+  "observed_national_stock": 59970945,
+  "difference": 0,
+  "group_count": 7,
+  "regional_reconciled": true,
+  "source": "Ministério do Trabalho e Emprego: RAIS 2025, apresentação oficial, estoque por UF e região",
+  "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/apresentacao-rais-2025.pdf",
+  "source_page": 19,
+  "groups": [
+    {
+      "archive": "RAIS_VINC_PUB_CENTRO_OESTE.7z",
+      "label": "Centro-Oeste",
+      "expected_stock": 5944488,
+      "observed_stock": 5944488,
+      "raw_active": 6028172,
+      "abandoned_active": 83684,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_MG_ES_RJ.7z",
+      "label": "MG + ES + RJ",
+      "expected_stock": 12255362,
+      "observed_stock": 12255362,
+      "raw_active": 12399319,
+      "abandoned_active": 143957,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_NI.7z",
+      "label": "Não identificado",
+      "expected_stock": 3065,
+      "observed_stock": 3065,
+      "raw_active": 3066,
+      "abandoned_active": 1,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_NORDESTE.7z",
+      "label": "Nordeste",
+      "expected_stock": 11686314,
+      "observed_stock": 11686314,
+      "raw_active": 11822766,
+      "abandoned_active": 136452,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_NORTE.7z",
+      "label": "Norte",
+      "expected_stock": 3869191,
+      "observed_stock": 3869191,
+      "raw_active": 3911021,
+      "abandoned_active": 41830,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_SP.7z",
+      "label": "São Paulo",
+      "expected_stock": 16158390,
+      "observed_stock": 16158390,
+      "raw_active": 16365074,
+      "abandoned_active": 206684,
+      "difference": 0,
+      "matched": true
+    },
+    {
+      "archive": "RAIS_VINC_PUB_SUL.7z",
+      "label": "Sul",
+      "expected_stock": 10054135,
+      "observed_stock": 10054135,
+      "raw_active": 10162352,
+      "abandoned_active": 108217,
+      "difference": 0,
+      "matched": true
+    }
+  ]
+}

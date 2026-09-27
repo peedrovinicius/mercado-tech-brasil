@@ -1,0 +1,19 @@
+{
+  "year": 2025,
+  "expected_active": 59970945,
+  "observed_active": 59970945,
+  "raw_active_source": 60691770,
+  "abandoned_active_source": 720825,
+  "difference": 0,
+  "source_partition_complete": true,
+  "stock_partition_complete": true,
+  "unknown_status_rows": 0,
+  "unknown_abandoned_rows": 0,
+  "year_mismatch_rows": 0,
+  "tech_rows": 786296,
+  "reconciled": true,
+  "gold_ready": true,
+  "publication_ready": false,
+  "source": "Ministério do Trabalho e Emprego: RAIS 2025, Sumário Executivo",
+  "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/sumario-executivo_rais-2025.pdf"
+}
