@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from src.api.publication import published_competencies
+from src.validation.official_reference import reference_fingerprint
 
 
 @dataclass(frozen=True)
@@ -88,6 +89,7 @@ def evaluate_next_competence(
     *,
     reference_path: Path,
     gold_path: Path,
+    approvals_path: Path | None = None,
     today: date | None = None,
 ) -> IncrementalPreparationStatus:
     references = _read_json(reference_path)
@@ -101,6 +103,33 @@ def evaluate_next_competence(
 
     published = published_competencies(gold_path)
     latest = published[-1] if published else None
+
+    if approvals_path is not None and approvals_path.exists():
+        approvals = _read_json(approvals_path)
+        revised: list[str] = []
+        for competence in published:
+            reference = validated.get(competence)
+            approval = approvals.get(competence)
+            if not isinstance(reference, dict) or not isinstance(approval, dict):
+                continue
+            approved_reference_sha = str(
+                approval.get("reference_sha256") or ""
+            )
+            current_reference_sha = reference_fingerprint(reference)
+            if approved_reference_sha != current_reference_sha:
+                revised.append(competence)
+
+        if revised:
+            candidate = min(revised)
+            reference = validated[candidate]
+            return IncrementalPreparationStatus(
+                ready=True,
+                reason="published_reference_revision",
+                latest_published=latest,
+                next_expected=_next_month(latest) if latest else None,
+                candidate=candidate,
+                reference_published_at=str(reference["published_at"]),
+            )
 
     if latest is None:
         eligible = [
@@ -174,19 +203,26 @@ def validate_requested_competence(
     *,
     reference_path: Path,
     gold_path: Path,
+    approvals_path: Path | None = None,
     allow_published: bool = False,
     today: date | None = None,
 ) -> IncrementalPreparationStatus:
     status = evaluate_next_competence(
         reference_path=reference_path,
         gold_path=gold_path,
+        approvals_path=approvals_path,
         today=today,
     )
 
-    if status.ready and status.candidate == yearmonth:
+    published = set(published_competencies(gold_path))
+    if (
+        status.ready
+        and status.candidate == yearmonth
+        and (yearmonth not in published or allow_published)
+    ):
         return status
 
-    if allow_published and yearmonth in published_competencies(gold_path):
+    if allow_published and yearmonth in published:
         references = _read_json(reference_path)
         reference = _validate_reference(yearmonth, references.get(yearmonth))
         published_at = _reference_effective_date(reference)
