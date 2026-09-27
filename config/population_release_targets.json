@@ -1,0 +1,10 @@
+{
+  "202607": {
+    "enabled": true,
+    "population_year": 2026,
+    "reference_date": "2026-07-01",
+    "published_at": "2026-08-28",
+    "source": "IBGE - Estimativas da População 2026",
+    "source_url": "https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html"
+  }
+}
