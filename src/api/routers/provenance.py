@@ -10,7 +10,6 @@ from src.api.publication import (
     latest_published_competence,
     latest_published_rais_year,
 )
-
 from src.core.settings import settings
 
 router = APIRouter(prefix="/provenance", tags=["provenance"])
