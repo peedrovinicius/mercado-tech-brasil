@@ -207,6 +207,7 @@ def command_next_competence(*, json_output: bool) -> None:
         reference_path=settings.reference_totals_path,
         gold_path=settings.gold_path,
         approvals_path=settings.publication_approvals_path,
+        coverage_policy_path=settings.monthly_coverage_policy_path,
     )
 
     if json_output:
@@ -510,6 +511,7 @@ def command_approve_release(
         bronze_dir=settings.bronze_path,
         reference_path=settings.reference_totals_path,
         approvals_path=settings.publication_approvals_path,
+        coverage_policy_path=settings.monthly_coverage_policy_path,
     )
     print(
         f"aprovação registrada: reviewer={approval['reviewer']} "
