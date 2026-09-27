@@ -173,6 +173,36 @@ def test_rais_endpoints_serve_only_after_published_gate(
     assert by_municipality.json()["items"][0]["active_stock"] == 8
 
 
+def test_rais_2025_repository_release_is_published():
+    releases = client.get("/api/v1/rais/releases")
+
+    assert releases.status_code == 200
+    registry = releases.json()
+    assert 2025 in registry["published_years"]
+
+    by_year = {int(item["year"]): item for item in registry["items"]}
+    assert by_year[2025]["automatic_checks_passed"] is True
+    assert by_year[2025]["manual_approval_valid"] is True
+    assert by_year[2025]["publishable"] is True
+
+    overview = client.get("/api/v1/rais/overview?year=2025")
+    assert overview.status_code == 200
+    assert overview.json()["active_stock_tech"] == 786_296
+    assert overview.json()["active_stock_national_reference"] == 59_970_945
+
+    by_uf = client.get("/api/v1/rais/by-uf?year=2025")
+    assert by_uf.status_code == 200
+    assert sum(item["active_stock"] for item in by_uf.json()["items"]) == 786_296
+
+    by_family = client.get("/api/v1/rais/by-cbo-family?year=2025")
+    assert by_family.status_code == 200
+    assert sum(item["active_stock"] for item in by_family.json()["items"]) == 786_296
+
+    by_municipality = client.get("/api/v1/rais/by-municipality?year=2025&limit=1")
+    assert by_municipality.status_code == 200
+    assert by_municipality.json()["items"][0]["active_stock"] > 0
+
+
 def test_rais_year_parameter_is_validated():
     response = client.get("/api/v1/rais/overview?year=1800")
     assert response.status_code == 422

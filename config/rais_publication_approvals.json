@@ -1,1 +1,9 @@
-{}
+{
+  "2025": {
+    "approved": true,
+    "reviewer": "peedrovinicius",
+    "notes": "Origem, estoque ativo e não abandonado, reconciliação nacional e regional, recorte CBO v2, dimensão municipal DTB 2025, agregados Gold e fingerprint atual revisados.",
+    "release_sha256": "4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a",
+    "approved_at_utc": "2026-09-27T11:00:09+00:00"
+  }
+}

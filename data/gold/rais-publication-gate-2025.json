@@ -1,10 +1,10 @@
 {
   "year": 2025,
   "automatic_checks_passed": true,
-  "manual_approval_valid": false,
-  "publishable": false,
+  "manual_approval_valid": true,
+  "publishable": true,
   "release_sha256": "4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a",
-  "generated_at_utc": "2026-09-27T09:31:06.452422+00:00",
+  "generated_at_utc": "2026-09-27T11:00:09+00:00",
   "checks": [
     {
       "id": "source_provenance",
@@ -128,8 +128,8 @@
     },
     {
       "id": "manual_methodology_approval",
-      "passed": false,
-      "message": "Revisão metodológica RAIS pendente ou vinculada a outra release.",
+      "passed": true,
+      "message": "Revisão metodológica RAIS aprovada e vinculada ao fingerprint atual.",
       "blocking": true
     }
   ]

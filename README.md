@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | 2025 auditada, dimensão municipal validada e API anual implementada; métricas aguardam revisão metodológica |
+| RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
 ## Série publicada
 
@@ -83,13 +83,13 @@ Cada MOV mensal foi reconciliado com a referência nacional publicada pelo MTE. 
 
 Os microdados brutos permanecem fora do Git. O repositório versiona agregados publicados e, no caso de releases ainda bloqueadas, somente derivados auditados, relatórios de qualidade e manifests necessários para reproduzir a proveniência.
 
-### RAIS 2025, release auditada ainda não publicada
+### RAIS 2025, release anual publicada
 
 O processamento anual completo leu **91.710.262 registros** dos sete arquivos de vínculos. Após excluir **720.825 vínculos ativos abandonados**, o estoque qualificado fechou exatamente em **59.970.945 vínculos**, igual à referência oficial. O recorte tech contém **786.296 vínculos ativos**, equivalentes a **1,31%** do estoque formal nacional.
 
 Todos os checks automáticos nacionais e regionais passaram. A dimensão municipal também foi validada contra a Divisão Territorial Brasileira 2025 do IBGE: 3.689 códigos não residuais do estoque tech encontraram correspondência, sem código desconhecido e sem divergência de UF. O único residual é `999999`, com 1 vínculo tech, preservado como `NI`.
 
-A release permanece fora da API e do dashboard enquanto a aprovação metodológica manual estiver pendente.
+A release 2025 passou pelo gate automático e pela aprovação metodológica manual. A API anual fica liberada por `publishable=true`, e o frontend habilita automaticamente a seção RAIS ao detectar 2025 no registro de releases publicadas.
 
 ### Comparação territorial, Jul/2026
 
@@ -224,8 +224,8 @@ flowchart LR
 | Componente | Estado |
 |---|---|
 | Aplicação pública | Operacional |
-| API / OpenAPI | Operacional, incluindo namespace RAIS protegido pelo gate |
-| Frontend de produção | Operacional, seção RAIS preparada e oculta até publicação |
+| API / OpenAPI | Operacional, incluindo RAIS 2025 publicada pelo gate anual |
+| Frontend de produção | Operacional, seção RAIS habilitada automaticamente para releases publicadas |
 | Bronze / Silver / Gold | Implementado |
 | Gate de publicação | Implementado |
 | Serving ativo em produção | Arquivos Gold publicados |

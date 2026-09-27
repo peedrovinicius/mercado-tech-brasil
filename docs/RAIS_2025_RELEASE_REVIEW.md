@@ -2,15 +2,16 @@
 
 ## Estado
 
-A release anual foi processada integralmente e passou por todos os checks automáticos. A publicação continua bloqueada porque a aprovação metodológica manual ainda não foi registrada.
+A release anual foi processada integralmente, passou por todos os checks automáticos e teve a aprovação metodológica manual registrada para o fingerprint atual.
 
 - Ano-base: 2025
 - Fonte metodológica: RAIS, Ministério do Trabalho e Emprego
 - Dataset: vínculos
 - Fingerprint da release: `4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a`
 - Checks automáticos: aprovados
-- Aprovação metodológica manual: pendente
-- `publishable`: falso
+- Aprovação metodológica manual: aprovada por `peedrovinicius`
+- Aprovação registrada em: `2026-09-27T11:00:09+00:00`
+- `publishable`: verdadeiro
 
 ## Proveniência
 
@@ -135,7 +136,7 @@ Os seguintes controles estão aprovados:
 - [x] soma por município fecha em 786.296;
 - [x] Parquet Gold fecha em 786.296;
 - [x] fingerprint atual da release calculado: `4da07584f1fe5843133f8725a43b48c45f081e88c55c85cc36adc7573ad9ee1a`;
-- [ ] aprovação metodológica manual.
+- [x] aprovação metodológica manual vinculada ao fingerprint atual.
 
 ## O que a aprovação manual confirma
 
@@ -152,12 +153,12 @@ A aprovação manual deve ser registrada somente depois de uma pessoa revisar co
 
 A aprovação não altera os dados. Ela apenas registra que a release atual, identificada pelo fingerprint acima, foi revisada e pode ser exposta pelos endpoints e pelo frontend já protegidos pelo gate.
 
-Comando previsto após a revisão humana:
+Registro utilizado para a aprovação humana:
 
 ```bash
 python -m src.cli rais-approve-release 2025 \
-  --reviewer "responsavel" \
-  --notes "Origem, estoque, reconciliação nacional e regional, dimensão municipal e Gold revisados." \
+  --reviewer "peedrovinicius" \
+  --notes "Origem, estoque ativo e não abandonado, reconciliação nacional e regional, recorte CBO v2, dimensão municipal DTB 2025, agregados Gold e fingerprint atual revisados." \
   --acknowledge-methodology-reviewed
 ```
 
