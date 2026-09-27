@@ -131,4 +131,6 @@ Os alvos ficam em `config/population_release_targets.json`. Para cada alvo habil
 11. executa testes específicos e atualiza o visual do README;
 12. versiona apenas os artefatos derivados.
 
+Se a mesma referência populacional já estiver aplicada ao mesmo Gold municipal, a reexecução é idempotente: o artefato municipal, o relatório e o gate permanecem byte a byte inalterados, e nenhum commit de dados é criado. Alterações apenas em testes ou no próprio workflow não disparam enriquecimento real.
+
 O fluxo não baixa nem reprocessa MOV, FOR ou EXC.
