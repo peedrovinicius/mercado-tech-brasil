@@ -153,3 +153,70 @@ def test_enrichment_blocks_missing_population(tmp_path: Path):
         assert "Cobertura populacional incompleta" in str(exc)
     else:
         raise AssertionError("Expected missing population to block enrichment")
+
+
+def test_enrichment_is_idempotent_for_same_population_reference(
+    tmp_path: Path,
+):
+    gold = tmp_path / "gold"
+    population = tmp_path / "population.json"
+    _population_fixture(population)
+
+    _write_json(
+        gold / "publication-gate-202607.json",
+        {
+            "competence": "202607",
+            "publishable": True,
+        },
+    )
+    _write_json(
+        gold / "by-municipality-202607.json",
+        {
+            "competence": "202607",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 270,
+                    "dismissals": 135,
+                    "balance": 135,
+                }
+            ],
+        },
+    )
+
+    first = enrich_published_municipality_population(
+        yearmonth="202607",
+        population_year=2026,
+        gold_dir=gold,
+        population_cache_path=population,
+        source_url="https://www.ibge.gov.br/estimativas",
+        published_at="2026-08-28",
+    )
+    municipality_path = gold / "by-municipality-202607.json"
+    report_path = gold / "population-enrichment-202607.json"
+    municipality_after_first = municipality_path.read_bytes()
+    report_after_first = report_path.read_bytes()
+
+    second = enrich_published_municipality_population(
+        yearmonth="202607",
+        population_year=2026,
+        gold_dir=gold,
+        population_cache_path=population,
+        source_url="https://www.ibge.gov.br/estimativas",
+        published_at="2026-08-28",
+    )
+
+    assert first["_changed"] is True
+    assert second["_changed"] is False
+    assert municipality_path.read_bytes() == municipality_after_first
+    assert report_path.read_bytes() == report_after_first
+    assert "_changed" not in json.loads(
+        report_path.read_text(encoding="utf-8")
+    )
+    assert (
+        second["municipality_artifact_before_sha256"]
+        == first["municipality_artifact_before_sha256"]
+    )
