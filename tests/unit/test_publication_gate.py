@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -282,5 +283,113 @@ def test_gate_blocks_invalid_municipality_dimension(tmp_path: Path):
     assert result.automatic_checks_passed is False
     assert any(
         check.id == "municipality_dimension_quality" and not check.passed
+        for check in result.checks
+    )
+
+
+def test_gate_validates_population_enrichment_when_present(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    municipality_path = gold / "by-municipality-202607.json"
+    _write_json(
+        municipality_path,
+        {
+            "competence": "202607",
+            "population_source": "IBGE SIDRA",
+            "population_reference_year": 2026,
+            "population_reference_date": "2026-07-01",
+            "population_source_url": "https://www.ibge.gov.br/estimativas",
+            "population_published_at": "2026-08-28",
+            "population_cache_sha256": "a" * 64,
+            "population_enrichment_status": "complete",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 10,
+                    "dismissals": 5,
+                    "balance": 5,
+                    "population_estimate": 2500000,
+                    "population_reference_year": 2026,
+                    "admissions_per_100k": 0.4,
+                    "dismissals_per_100k": 0.2,
+                    "balance_per_100k": 0.2,
+                }
+            ],
+        },
+    )
+    digest = hashlib.sha256(municipality_path.read_bytes()).hexdigest()
+    _write_json(
+        gold / "population-enrichment-202607.json",
+        {
+            "coverage_complete": True,
+            "population_year": 2026,
+            "population_cache_sha256": "a" * 64,
+            "municipality_artifact_sha256": digest,
+            "matched_population": 1,
+            "missing_population": 0,
+        },
+    )
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    checks = {check.id: check for check in result.checks}
+    assert checks["municipality_population_metadata"].passed is True
+    assert checks["municipality_population_coverage"].passed is True
+    assert checks["municipality_population_report"].passed is True
+    assert result.automatic_checks_passed is True
+
+
+def test_gate_blocks_incomplete_population_enrichment(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    _write_json(
+        gold / "by-municipality-202607.json",
+        {
+            "competence": "202607",
+            "population_source": "IBGE SIDRA",
+            "population_reference_year": 2026,
+            "population_reference_date": "2026-07-01",
+            "population_source_url": "https://www.ibge.gov.br/estimativas",
+            "population_published_at": "2026-08-28",
+            "population_cache_sha256": "a" * 64,
+            "population_enrichment_status": "complete",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 10,
+                    "dismissals": 5,
+                    "balance": 5,
+                    "population_estimate": None,
+                    "population_reference_year": 2026,
+                    "admissions_per_100k": None,
+                    "dismissals_per_100k": None,
+                    "balance_per_100k": None,
+                }
+            ],
+        },
+    )
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert any(
+        check.id == "municipality_population_coverage"
+        and not check.passed
         for check in result.checks
     )
