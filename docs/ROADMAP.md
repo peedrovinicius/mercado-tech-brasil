@@ -90,7 +90,10 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 - série temporal por família CBO com agregação das cinco famílias versionadas: implementada;
 - endpoint e visualização de evolução ocupacional por família: implementados;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança: primeira expansão ocupacional implementada;
-- avaliar QBQ para atributos ocupacionais;
+- avaliação metodológica do QBQ como dimensão ocupacional: concluída;
+- intake auditável de workbook QBQ com SHA-256 e cobertura dos CBOs tech: implementado;
+- confirmar o schema real do Excel QBQ após obtenção do arquivo oficial autenticado;
+- construir Silver e API QBQ somente depois da validação do schema real;
 - avaliar comparações entre estoque anual RAIS e movimentação mensal Novo CAGED somente onde a interpretação metodológica for válida.
 
 ## Critério de inclusão
