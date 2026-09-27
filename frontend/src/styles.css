@@ -1114,6 +1114,10 @@ a:focus-visible, button:focus-visible {
   background: #fff;
 }
 
+.rais-panel--municipality {
+  grid-column: 1 / -1;
+}
+
 .rais-panel__heading {
   display: flex;
   justify-content: space-between;

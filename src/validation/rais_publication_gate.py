@@ -63,9 +63,11 @@ def _release_artifacts(gold_dir: Path, silver_dir: Path, year: int) -> list[Path
     return [
         silver_dir / f"rais_reconciliation_{year}.json",
         silver_dir / f"rais_regional_reconciliation_{year}.json",
+        silver_dir / f"rais_municipality_validation_{year}.json",
         gold_dir / f"rais-overview-{year}.json",
         gold_dir / f"rais-by-uf-{year}.json",
         gold_dir / f"rais-by-cbo-family-{year}.json",
+        gold_dir / f"rais-by-municipality-{year}.json",
         gold_dir / f"rais-market-{year}.parquet",
     ]
 
@@ -139,17 +141,23 @@ def evaluate_rais_publication_gate(
 
     reconciliation_path = silver_dir / f"rais_reconciliation_{year}.json"
     regional_path = silver_dir / f"rais_regional_reconciliation_{year}.json"
+    municipality_validation_path = (
+        silver_dir / f"rais_municipality_validation_{year}.json"
+    )
     overview_path = gold_dir / f"rais-overview-{year}.json"
     by_uf_path = gold_dir / f"rais-by-uf-{year}.json"
     by_family_path = gold_dir / f"rais-by-cbo-family-{year}.json"
+    by_municipality_path = gold_dir / f"rais-by-municipality-{year}.json"
     market_path = gold_dir / f"rais-market-{year}.parquet"
 
     required = {
         "reconciliation": reconciliation_path,
         "regional_reconciliation": regional_path,
+        "municipality_validation": municipality_validation_path,
         "overview": overview_path,
         "by_uf": by_uf_path,
         "by_cbo_family": by_family_path,
+        "by_municipality": by_municipality_path,
         "market": market_path,
     }
     for check_id, path in required.items():
@@ -202,6 +210,32 @@ def evaluate_rais_publication_gate(
                     "Todos os grupos regionais RAIS fecham exatamente com a referência oficial."
                     if regional_ok
                     else "Reconciliação regional RAIS está ausente, incompleta ou divergente."
+                ),
+            )
+        )
+
+    if municipality_validation_path.exists():
+        municipality_validation = _read_json(
+            municipality_validation_path
+        )
+        municipality_ok = (
+            int(municipality_validation.get("year") or 0) == year
+            and municipality_validation.get("municipality_ready") is True
+            and len(
+                municipality_validation.get("unmatched_codes") or []
+            ) == 0
+            and int(
+                municipality_validation.get("uf_mismatch_rows") or 0
+            ) == 0
+        )
+        checks.append(
+            RaisGateCheck(
+                id="municipality_dimension",
+                passed=municipality_ok,
+                message=(
+                    "Dimensão municipal RAIS validada contra a DTB oficial do IBGE."
+                    if municipality_ok
+                    else "Dimensão municipal RAIS possui pendências de validação."
                 ),
             )
         )
@@ -296,6 +330,27 @@ def evaluate_rais_publication_gate(
                     f"Agregado por família CBO fecha o estoque tech: {total:,}."
                     if total == expected
                     else f"Famílias CBO={total:,}; overview={expected:,}."
+                ),
+            )
+        )
+
+    if by_municipality_path.exists() and overview:
+        payload = _read_json(by_municipality_path)
+        items = payload.get("items")
+        total = (
+            sum(int(item.get("active_stock") or 0) for item in items)
+            if isinstance(items, list)
+            else -1
+        )
+        expected = int(overview.get("active_stock_tech") or 0)
+        checks.append(
+            RaisGateCheck(
+                id="municipality_total",
+                passed=total == expected,
+                message=(
+                    f"Agregado municipal fecha o estoque tech: {total:,}."
+                    if total == expected
+                    else f"Municípios={total:,}; overview={expected:,}."
                 ),
             )
         )

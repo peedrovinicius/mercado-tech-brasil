@@ -7,6 +7,7 @@ from src.core.settings import settings
 from src.db.loader import ReleaseNotApprovedError, load_approved_release
 from src.gold.aggregate import build_gold
 from src.gold.rais import build_rais_gold
+from src.gold.rais_municipalities import build_rais_municipality_gold
 from src.ingestion.archive import extract_7z
 from src.ingestion.https_caged import (
     download_month_resilient,
@@ -626,6 +627,28 @@ def command_rais_gold(year: int) -> None:
     print("rais publication: BLOCKED until annual publication gate")
 
 
+def command_rais_gold_municipality(year: int) -> None:
+    silver_path = settings.silver_path / f"rais_tech_{year}.parquet"
+    validation_path = (
+        settings.silver_path / f"rais_municipality_validation_{year}.json"
+    )
+    if not silver_path.exists():
+        raise SystemExit(f"Silver RAIS ausente: {silver_path}")
+    if not validation_path.exists():
+        raise SystemExit(
+            f"Validação municipal RAIS ausente: {validation_path}"
+        )
+
+    destination = build_rais_municipality_gold(
+        year=year,
+        silver_path=silver_path,
+        validation_path=validation_path,
+        gold_dir=settings.gold_path,
+    )
+    print(f"rais gold município: {destination}")
+    print("rais publication: BLOCKED until annual publication gate")
+
+
 def _run_rais_publication_gate(
     year: int,
     *,
@@ -918,6 +941,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rais_gold.add_argument("year", type=int, help="Ano-base da RAIS.")
 
+    rais_gold_municipality = sub.add_parser(
+        "rais-gold-municipality",
+        help="Gera Gold municipal RAIS após validação contra a DTB do IBGE.",
+    )
+    rais_gold_municipality.add_argument(
+        "year",
+        type=int,
+        help="Ano-base da RAIS.",
+    )
+
     rais_validate_release = sub.add_parser(
         "rais-validate-release",
         help="Executa o gate anual de publicação da RAIS.",
@@ -1065,6 +1098,10 @@ def main() -> None:
 
     if args.command == "rais-gold":
         command_rais_gold(args.year)
+        return
+
+    if args.command == "rais-gold-municipality":
+        command_rais_gold_municipality(args.year)
         return
 
     if args.command == "rais-validate-release":

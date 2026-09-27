@@ -55,6 +55,15 @@ def _prepare_release(base: Path) -> tuple[Path, Path, Path, Path]:
         },
     )
     _write_json(
+        silver / "rais_municipality_validation_2025.json",
+        {
+            "year": 2025,
+            "municipality_ready": True,
+            "unmatched_codes": [],
+            "uf_mismatch_rows": 0,
+        },
+    )
+    _write_json(
         gold / "rais-overview-2025.json",
         {
             "year": 2025,
@@ -81,6 +90,17 @@ def _prepare_release(base: Path) -> tuple[Path, Path, Path, Path]:
             "items": [
                 {"cbo_familia": "2124", "active_stock": 3},
                 {"cbo_familia": "3171", "active_stock": 1},
+            ],
+            "publication_ready": False,
+        },
+    )
+    _write_json(
+        gold / "rais-by-municipality-2025.json",
+        {
+            "year": 2025,
+            "items": [
+                {"municipio_codigo_rais": "230440", "active_stock": 2},
+                {"municipio_codigo_rais": "355030", "active_stock": 2},
             ],
             "publication_ready": False,
         },
@@ -238,6 +258,46 @@ def test_rais_gate_blocks_failed_regional_reconciliation(tmp_path: Path):
     payload["regional_reconciled"] = False
     payload["difference"] = 1
     _write_json(regional, payload)
+
+    result = evaluate_rais_publication_gate(
+        year=2025,
+        bronze_dir=bronze,
+        silver_dir=silver,
+        gold_dir=gold,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert result.publishable is False
+
+
+
+def test_rais_gate_blocks_unvalidated_municipality_dimension(tmp_path: Path):
+    bronze, silver, gold, approvals = _prepare_release(tmp_path)
+    validation = silver / "rais_municipality_validation_2025.json"
+    payload = json.loads(validation.read_text(encoding="utf-8"))
+    payload["municipality_ready"] = False
+    payload["unmatched_codes"] = ["990001"]
+    _write_json(validation, payload)
+
+    result = evaluate_rais_publication_gate(
+        year=2025,
+        bronze_dir=bronze,
+        silver_dir=silver,
+        gold_dir=gold,
+        approvals_path=approvals,
+    )
+
+    assert result.automatic_checks_passed is False
+    assert result.publishable is False
+
+
+def test_rais_gate_blocks_municipality_total_mismatch(tmp_path: Path):
+    bronze, silver, gold, approvals = _prepare_release(tmp_path)
+    path = gold / "rais-by-municipality-2025.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["items"][0]["active_stock"] = 3
+    _write_json(path, payload)
 
     result = evaluate_rais_publication_gate(
         year=2025,

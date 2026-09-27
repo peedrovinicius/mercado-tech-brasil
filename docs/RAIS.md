@@ -450,3 +450,33 @@ O fallback HTTPS tenta primeiro a revisão pinada registrada em `config/rais_tra
 A troca de revisão não reutiliza bytes parciais. O arquivo baixado precisa continuar com tamanho exatamente igual ao tamanho descoberto no FTP oficial. A URL efetivamente usada fica registrada no manifesto de proveniência.
 
 Retries posteriores detectam `part-summary.json` já existentes e pulam automaticamente partes regionais concluídas.
+
+
+## Dimensão municipal anual
+
+A dimensão municipal da RAIS 2025 foi validada contra a Divisão Territorial Brasileira 2025 do IBGE antes da criação do Gold municipal.
+
+O Silver tech possui 786.296 vínculos e 3.690 códigos municipais distintos. A validação encontrou:
+
+- 3.689 códigos não residuais com correspondência na DTB 2025;
+- zero códigos municipais sem correspondência;
+- zero divergências entre a UF do Silver e a UF derivada do código IBGE;
+- um único código residual `999999`, com 1 vínculo tech, preservado como `NI`.
+
+A regra territorial mantém o código RAIS de seis dígitos e o relaciona aos seis primeiros dígitos do código municipal IBGE de sete dígitos.
+
+Depois da validação, o Gold municipal pode ser gerado com:
+
+```bash
+python -m src.cli rais-gold-municipality 2025
+```
+
+O artefato resultante é:
+
+```text
+data/gold/rais-by-municipality-2025.json
+```
+
+Ele contém código RAIS, código IBGE, nome do município, UF, estoque tech ativo e participação no estoque tech nacional. O total municipal precisa fechar exatamente o estoque tech do overview anual.
+
+O relatório `rais_municipality_validation_2025.json` e o Gold municipal passam a fazer parte do fingerprint e do gate anual da release.

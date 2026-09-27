@@ -1,0 +1,68 @@
+name: RAIS 2025 municipality release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run targeted backend tests
+        run: |
+          pytest -q             tests/unit/test_rais_municipalities.py             tests/unit/test_rais_municipality_gold.py             tests/unit/test_rais_publication_gate.py             tests/unit/test_rais_api.py
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Download validated RAIS release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rais-2025-v035-full-reprocess
+          path: work/release
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 36285923783
+
+      - name: Build municipal release artifacts
+        run: |
+          PYTHONPATH=. python scripts/rais_build_municipality_release.py             --silver work/release/data/silver/rais_tech_2025.parquet             --year 2025
+
+      - name: Upload municipal release
+        uses: actions/upload-artifact@v4
+        with:
+          name: rais-2025-municipality-release
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            rais-municipality-release-summary.json
+            data/silver/rais_municipality_validation_2025.json
+            data/gold/rais-by-municipality-2025.json
+            data/gold/rais-publication-gate-2025.json

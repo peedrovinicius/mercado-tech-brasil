@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.39.0
+
+- dimensão municipal RAIS 2025 validada contra a Divisão Territorial Brasileira oficial do IBGE;
+- 3.689 códigos municipais não residuais do Silver tech possuem correspondência na DTB 2025;
+- validação encontrou zero códigos desconhecidos e zero divergências de UF;
+- residual 999999 permanece preservado como Não identificado, UF NI, sem código IBGE inventado;
+- novo Gold anual por município agrega estoque tech e participação nacional;
+- gate anual passa a exigir o relatório de validação municipal e o fechamento do Gold municipal;
+- relatório municipal e Gold por município entram no fingerprint da release;
+- API ganha endpoint protegido /api/v1/rais/by-municipality;
+- frontend anual ganha ranking dos maiores estoques tech por município;
+- CLI ganha rais-gold-municipality;
+- aprovação metodológica manual continua pendente e nenhuma métrica RAIS é exposta antes de publishable=true;
+- cobertura mensal publicada do Novo CAGED permanece de janeiro a julho de 2026.
+
 ## 0.38.1
 
 - revisão de proveniência da release RAIS 2025 documentada em arquivo próprio;

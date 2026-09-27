@@ -271,6 +271,28 @@ export type RaisCboFamilyResponse = {
   publication_ready: boolean
 }
 
+export type RaisMunicipalityItem = {
+  municipio_codigo_rais: string
+  municipio_codigo_ibge: string | null
+  municipio_nome: string
+  uf: string
+  active_stock: number
+  share_of_tech_stock: number
+}
+
+export type RaisMunicipalityResponse = {
+  year: number
+  reference_date: string
+  source: string
+  municipality_reference: string
+  scope: string
+  code_system: string
+  municipality_count: number
+  active_stock_tech: number
+  items: RaisMunicipalityItem[]
+  publication_ready: boolean
+}
+
 type ApiError = Error & { status?: number }
 
 async function get<T>(path: string): Promise<T> {
@@ -320,6 +342,8 @@ export const api = {
   raisByUf: () => get<RaisUfResponse>('/rais/by-uf?limit=10'),
   raisByCboFamily: () =>
     get<RaisCboFamilyResponse>('/rais/by-cbo-family?limit=5'),
+  raisByMunicipality: () =>
+    get<RaisMunicipalityResponse>('/rais/by-municipality?limit=10'),
   officialReferenceJuly2026: () =>
     get<OfficialReference>('/metadata/official-reference/202607'),
   quality: () => get<QualityReport>('/quality/latest'),

@@ -77,6 +77,30 @@ def test_rais_endpoints_serve_only_after_published_gate(
         },
     )
     _write(
+        tmp_path / "rais-by-municipality-2025.json",
+        {
+            "year": 2025,
+            "items": [
+                {
+                    "municipio_codigo_rais": "355030",
+                    "municipio_codigo_ibge": "3550308",
+                    "municipio_nome": "São Paulo",
+                    "uf": "SP",
+                    "active_stock": 8,
+                    "share_of_tech_stock": 0.8,
+                },
+                {
+                    "municipio_codigo_rais": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "active_stock": 2,
+                    "share_of_tech_stock": 0.2,
+                },
+            ],
+        },
+    )
+    _write(
         tmp_path / "rais-publication-gate-2025.json",
         {
             "year": 2025,
@@ -108,6 +132,11 @@ def test_rais_endpoints_serve_only_after_published_gate(
     assert by_family.json()["items"] == [
         {"cbo_familia": "2124", "active_stock": 7}
     ]
+
+    by_municipality = client.get("/api/v1/rais/by-municipality?limit=1")
+    assert by_municipality.status_code == 200
+    assert by_municipality.json()["items"][0]["municipio_nome"] == "São Paulo"
+    assert by_municipality.json()["items"][0]["active_stock"] == 8
 
 
 def test_rais_year_parameter_is_validated():

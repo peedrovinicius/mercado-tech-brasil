@@ -1,5 +1,6 @@
 import type {
   RaisCboFamilyResponse,
+  RaisMunicipalityResponse,
   RaisOverview,
   RaisUfResponse,
 } from '../lib/api'
@@ -9,11 +10,18 @@ type Props = {
   overview: RaisOverview
   byUf: RaisUfResponse
   byFamily: RaisCboFamilyResponse
+  byMunicipality: RaisMunicipalityResponse
 }
 
-export function RaisAnnualAnalysis({ overview, byUf, byFamily }: Props) {
+export function RaisAnnualAnalysis({
+  overview,
+  byUf,
+  byFamily,
+  byMunicipality,
+}: Props) {
   const topUf = byUf.items.slice(0, 10)
   const topFamilies = byFamily.items.slice(0, 5)
+  const topMunicipalities = byMunicipality.items.slice(0, 10)
 
   return (
     <section className="rais-section" id="rais">
@@ -94,6 +102,29 @@ export function RaisAnnualAnalysis({ overview, byUf, byFamily }: Props) {
                 <div>
                   <span>{item.cbo_familia}</span>
                   <strong>{item.cbo_familia_nome}</strong>
+                </div>
+                <div className="rais-family__value">
+                  <strong>{formatNumber(item.active_stock)}</strong>
+                  <small>{formatPercent(item.share_of_tech_stock)}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="rais-panel rais-panel--municipality">
+          <div className="rais-panel__heading">
+            <div>
+              <p className="eyebrow">Concentração municipal</p>
+              <h3>Maiores estoques tech por município</h3>
+            </div>
+            <span>Top 10</span>
+          </div>
+          <div className="rais-family-list">
+            {topMunicipalities.map((item) => (
+              <div className="rais-family" key={item.municipio_codigo_rais}>
+                <div>
+                  <span>{item.uf}</span>
+                  <strong>{item.municipio_nome}</strong>
                 </div>
                 <div className="rais-family__value">
                   <strong>{formatNumber(item.active_stock)}</strong>

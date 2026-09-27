@@ -117,6 +117,12 @@ export function Dashboard() {
     retry: false,
     enabled: publishedRaisYear !== null,
   })
+  const raisByMunicipality = useQuery({
+    queryKey: ['rais-by-municipality', publishedRaisYear],
+    queryFn: api.raisByMunicipality,
+    retry: false,
+    enabled: publishedRaisYear !== null,
+  })
 
   const isLoading = readiness.isLoading || (readiness.data?.data_loaded && overview.isLoading)
   const noData = readiness.isSuccess && readiness.data.data_loaded === false
@@ -344,11 +350,15 @@ export function Dashboard() {
         </>
       ) : null}
 
-      {raisOverview.data && raisByUf.data && raisByCboFamily.data ? (
+      {raisOverview.data
+        && raisByUf.data
+        && raisByCboFamily.data
+        && raisByMunicipality.data ? (
         <RaisAnnualAnalysis
           overview={raisOverview.data}
           byUf={raisByUf.data}
           byFamily={raisByCboFamily.data}
+          byMunicipality={raisByMunicipality.data}
         />
       ) : null}
 

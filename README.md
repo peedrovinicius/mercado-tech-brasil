@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | 2025 auditada e versionada; API anual implementada; métricas aguardam revisão metodológica |
+| RAIS anual | 2025 auditada, dimensão municipal validada e API anual implementada; métricas aguardam revisão metodológica |
 
 ## Série publicada
 
@@ -87,7 +87,9 @@ Os microdados brutos permanecem fora do Git. O repositório versiona agregados p
 
 O processamento anual completo leu **91.710.262 registros** dos sete arquivos de vínculos. Após excluir **720.825 vínculos ativos abandonados**, o estoque qualificado fechou exatamente em **59.970.945 vínculos**, igual à referência oficial. O recorte tech contém **786.296 vínculos ativos**, equivalentes a **1,31%** do estoque formal nacional.
 
-Todos os checks automáticos, nacionais e regionais, passaram. A release permanece fora da API e do dashboard enquanto a aprovação metodológica manual estiver pendente.
+Todos os checks automáticos nacionais e regionais passaram. A dimensão municipal também foi validada contra a Divisão Territorial Brasileira 2025 do IBGE: 3.689 códigos não residuais do estoque tech encontraram correspondência, sem código desconhecido e sem divergência de UF. O único residual é `999999`, com 1 vínculo tech, preservado como `NI`.
+
+A release permanece fora da API e do dashboard enquanto a aprovação metodológica manual estiver pendente.
 
 ### Comparação territorial, Jul/2026
 

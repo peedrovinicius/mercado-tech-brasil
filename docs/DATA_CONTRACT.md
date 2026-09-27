@@ -126,3 +126,23 @@ Os artefatos Gold anuais possuem prefixo `rais-` e não são consumidos pelos en
 `rais-market-<ano>.parquet` agrega ano, UF, família CBO, CBO completa e estoque ativo.
 
 A soma de `active_stock` no Parquet precisa fechar exatamente `active_stock_tech` do overview.
+
+
+### Gold RAIS por município
+
+`rais-by-municipality-<ano>.json` é permitido somente quando a dimensão municipal anual possui validação oficial aprovada.
+
+Cada item contém:
+
+| Campo | Significado |
+|---|---|
+| municipio_codigo_rais | código municipal de seis dígitos observado na RAIS |
+| municipio_codigo_ibge | código IBGE de sete dígitos, nulo apenas no residual |
+| municipio_nome | nome oficial do município |
+| uf | UF validada contra o código IBGE |
+| active_stock | estoque tech ativo em 31/12 |
+| share_of_tech_stock | participação no estoque tech nacional |
+
+O código residual `999999` é preservado como `Não identificado`, UF `NI`, sem código IBGE inventado.
+
+A soma de `active_stock` de todos os municípios precisa fechar exatamente `active_stock_tech` do overview anual.

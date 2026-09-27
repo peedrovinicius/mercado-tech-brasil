@@ -41,7 +41,9 @@ A base necessária para publicar e auditar o produto está implementada:
 - filtro de vínculo abandonado validado nacionalmente e por grupos regionais oficiais;
 - transformação Silver RAIS em streaming com rejeições auditáveis;
 - reconciliação nacional RAIS contra referência oficial do MTE;
-- Gold anual RAIS por overview, UF e família CBO;
+- Gold anual RAIS por overview, UF, município e família CBO;
+- dimensão municipal RAIS 2025 validada contra a DTB oficial do IBGE;
+- 3.689 códigos municipais não residuais com correspondência e zero divergências de UF;
 - gate anual RAIS com fingerprint integral e aprovação metodológica;
 - helpers de serving que ignoram anos sem publicação aprovada;
 - endpoints anuais RAIS protegidos por publishable=true;
@@ -69,7 +71,6 @@ A base necessária para publicar e auditar o produto está implementada:
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
 - concluir a aprovação metodológica manual da release anual;
 - verificar a exposição automática da API e da seção RAIS após publishable=true;
-- validar sistema de códigos municipais da RAIS 2025 antes de agregação municipal;
 - avaliar QBQ para atributos ocupacionais;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
 

@@ -121,3 +121,22 @@ def by_cbo_family(
         **payload,
         "items": items[:limit],
     }
+
+
+
+@router.get("/by-municipality")
+def by_municipality(
+    year: int | None = Query(default=None, ge=1985, le=2100),
+    limit: int = Query(default=15, ge=1, le=100),
+) -> dict[str, object]:
+    resolved = _resolve_year(year)
+    payload = _read_published_json("rais-by-municipality", resolved)
+    items = [
+        item
+        for item in payload.get("items", [])
+        if isinstance(item, dict)
+    ]
+    return {
+        **payload,
+        "items": items[:limit],
+    }
