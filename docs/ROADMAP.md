@@ -47,18 +47,30 @@ A base necessária para publicar e auditar o produto está implementada:
 - gate anual RAIS com fingerprint integral e aprovação metodológica;
 - helpers de serving que ignoram anos sem publicação aprovada;
 - endpoints anuais RAIS protegidos por publishable=true;
-- integração visual RAIS preparada no frontend e condicionada ao registry anual;
+- integração visual RAIS condicionada ao registry anual;
 - relatório técnico de revisão da release RAIS 2025 consolidado;
+- aprovação metodológica manual da RAIS 2025 vinculada ao fingerprint da release;
+- RAIS 2025 publicada com publishable=true;
+- API anual validada contra os artefatos reais publicados;
+- frontend configurado para reconstruir quando o estado de publicação RAIS mudar;
 - publicação pública no Render.
 
 ## Próximas entregas
 
 ### Atualização incremental
 
-- automatizar a preparação da próxima competência após a publicação oficial;
-- manter validação explícita da referência do MTE antes da liberação;
-- preservar a publicação somente após aprovação do gate;
-- ampliar testes de regressão da série histórica.
+Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
+
+- automatizar a preparação da próxima competência do Novo CAGED somente após a publicação oficial;
+- detectar a nova competência disponível sem antecipar período ainda não publicado;
+- baixar e registrar a origem com manifesto e SHA-256;
+- executar Bronze, Silver, Gold, ajustes FOR/EXC e enriquecimentos pelo fluxo existente;
+- manter validação explícita da referência oficial do MTE antes da liberação;
+- gerar o gate da nova competência inicialmente bloqueado;
+- preservar a publicação somente após aprovação metodológica do gate;
+- ampliar testes de regressão para garantir que competências anteriores não sejam alteradas indevidamente;
+- documentar e testar o comportamento para republicações ou revisões oficiais do MTE;
+- acionar build e deploy apenas depois que a nova competência estiver publicável.
 
 ### Expansão temporal
 
@@ -69,10 +81,9 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão analítica
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
-- concluir a aprovação metodológica manual da release anual;
-- verificar a exposição automática da API e da seção RAIS após publishable=true;
 - avaliar QBQ para atributos ocupacionais;
-- ampliar comparações territoriais e ocupacionais mantendo a mesma governança.
+- ampliar comparações territoriais e ocupacionais mantendo a mesma governança;
+- avaliar comparações entre estoque anual RAIS e movimentação mensal Novo CAGED somente onde a interpretação metodológica for válida.
 
 ## Critério de inclusão
 
