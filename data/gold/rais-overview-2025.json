@@ -1,0 +1,27 @@
+{
+  "year": 2025,
+  "reference_date": "2025-12-31",
+  "source": "RAIS / Ministério do Trabalho e Emprego",
+  "scope": "estoque anual de vínculos tech ativos em 31/12",
+  "active_stock_tech": 786296,
+  "active_stock_national_reference": 59970945,
+  "share_tech_of_national_active": 0.01311128,
+  "cbo_scope_version": 2,
+  "cbo_families": [
+    "2122",
+    "2123",
+    "2124",
+    "3171",
+    "3172"
+  ],
+  "uf_count": 28,
+  "market_rows": 496,
+  "reconciliation": {
+    "reconciled": true,
+    "difference": 0,
+    "source": "Ministério do Trabalho e Emprego: RAIS 2025, Sumário Executivo",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/sumario-executivo_rais-2025.pdf"
+  },
+  "status": "generated_not_published",
+  "publication_ready": false
+}

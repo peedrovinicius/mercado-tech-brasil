@@ -1,0 +1,39 @@
+{
+  "year": 2025,
+  "reference_date": "2025-12-31",
+  "source": "RAIS / Ministério do Trabalho e Emprego",
+  "scope": "estoque tech ativo por família CBO",
+  "items": [
+    {
+      "cbo_familia": "2124",
+      "active_stock": 487872,
+      "cbo_familia_nome": "Analistas de tecnologia da informação",
+      "share_of_tech_stock": 0.62046863
+    },
+    {
+      "cbo_familia": "3172",
+      "active_stock": 121680,
+      "cbo_familia_nome": "Técnicos em operação e monitoração de computadores",
+      "share_of_tech_stock": 0.15475088
+    },
+    {
+      "cbo_familia": "3171",
+      "active_stock": 103877,
+      "cbo_familia_nome": "Técnicos de desenvolvimento de sistemas e aplicações",
+      "share_of_tech_stock": 0.13210928
+    },
+    {
+      "cbo_familia": "2123",
+      "active_stock": 47446,
+      "cbo_familia_nome": "Administradores de tecnologia da informação",
+      "share_of_tech_stock": 0.06034114
+    },
+    {
+      "cbo_familia": "2122",
+      "active_stock": 25421,
+      "cbo_familia_nome": "Engenheiros em computação",
+      "share_of_tech_stock": 0.03233006
+    }
+  ],
+  "publication_ready": false
+}

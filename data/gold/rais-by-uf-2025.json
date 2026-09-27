@@ -1,0 +1,149 @@
+{
+  "year": 2025,
+  "reference_date": "2025-12-31",
+  "source": "RAIS / Ministério do Trabalho e Emprego",
+  "scope": "estoque tech ativo por UF",
+  "items": [
+    {
+      "uf": "SP",
+      "active_stock": 346217,
+      "share_of_tech_stock": 0.44031383
+    },
+    {
+      "uf": "MG",
+      "active_stock": 67325,
+      "share_of_tech_stock": 0.08562297
+    },
+    {
+      "uf": "RJ",
+      "active_stock": 57682,
+      "share_of_tech_stock": 0.07335914
+    },
+    {
+      "uf": "RS",
+      "active_stock": 51778,
+      "share_of_tech_stock": 0.06585052
+    },
+    {
+      "uf": "SC",
+      "active_stock": 51061,
+      "share_of_tech_stock": 0.06493865
+    },
+    {
+      "uf": "PR",
+      "active_stock": 46316,
+      "share_of_tech_stock": 0.05890403
+    },
+    {
+      "uf": "DF",
+      "active_stock": 33644,
+      "share_of_tech_stock": 0.04278796
+    },
+    {
+      "uf": "PE",
+      "active_stock": 19562,
+      "share_of_tech_stock": 0.02487867
+    },
+    {
+      "uf": "CE",
+      "active_stock": 18612,
+      "share_of_tech_stock": 0.02367048
+    },
+    {
+      "uf": "BA",
+      "active_stock": 16222,
+      "share_of_tech_stock": 0.02063091
+    },
+    {
+      "uf": "GO",
+      "active_stock": 12242,
+      "share_of_tech_stock": 0.0155692
+    },
+    {
+      "uf": "ES",
+      "active_stock": 11204,
+      "share_of_tech_stock": 0.01424909
+    },
+    {
+      "uf": "PA",
+      "active_stock": 7388,
+      "share_of_tech_stock": 0.00939595
+    },
+    {
+      "uf": "MT",
+      "active_stock": 6686,
+      "share_of_tech_stock": 0.00850316
+    },
+    {
+      "uf": "AM",
+      "active_stock": 6361,
+      "share_of_tech_stock": 0.00808983
+    },
+    {
+      "uf": "PB",
+      "active_stock": 5707,
+      "share_of_tech_stock": 0.00725808
+    },
+    {
+      "uf": "MS",
+      "active_stock": 5059,
+      "share_of_tech_stock": 0.00643396
+    },
+    {
+      "uf": "RN",
+      "active_stock": 3872,
+      "share_of_tech_stock": 0.00492435
+    },
+    {
+      "uf": "MA",
+      "active_stock": 3636,
+      "share_of_tech_stock": 0.00462421
+    },
+    {
+      "uf": "SE",
+      "active_stock": 3628,
+      "share_of_tech_stock": 0.00461404
+    },
+    {
+      "uf": "PI",
+      "active_stock": 3351,
+      "share_of_tech_stock": 0.00426175
+    },
+    {
+      "uf": "AL",
+      "active_stock": 2600,
+      "share_of_tech_stock": 0.00330664
+    },
+    {
+      "uf": "RO",
+      "active_stock": 2167,
+      "share_of_tech_stock": 0.00275596
+    },
+    {
+      "uf": "TO",
+      "active_stock": 2004,
+      "share_of_tech_stock": 0.00254866
+    },
+    {
+      "uf": "AP",
+      "active_stock": 815,
+      "share_of_tech_stock": 0.00103651
+    },
+    {
+      "uf": "AC",
+      "active_stock": 625,
+      "share_of_tech_stock": 0.00079487
+    },
+    {
+      "uf": "RR",
+      "active_stock": 531,
+      "share_of_tech_stock": 0.00067532
+    },
+    {
+      "uf": "NI",
+      "active_stock": 1,
+      "share_of_tech_stock": 1.27e-06
+    }
+  ],
+  "publication_ready": false
+}
