@@ -173,7 +173,7 @@ def profile_rais_values(
 
         layout_item = layout_files.get(filename)
         if not isinstance(layout_item, dict):
-            raise ValueError(
+            raise TypeError(
                 f"Arquivo {filename} ausente no relatório estrutural."
             )
 
