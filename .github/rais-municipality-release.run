@@ -1,0 +1,3 @@
+run=rais-municipality-release-2025-2
+purpose=generate-validated-municipality-gold-and-gate
+fix=frozen-settings-test
