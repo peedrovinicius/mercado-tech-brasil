@@ -49,7 +49,8 @@ Em todas as competências processadas:
 - metodologia salarial MTE;
 - salário real por IPCA;
 - referência municipal IBGE;
-- categoria residual municipal Não identificado.
+- categoria residual municipal Não identificado;
+- governança de intake QBQ com arquivo oficial XLSX, SHA-256 e validação de cobertura CBO.
 
 ## Qualidade e publicação
 
