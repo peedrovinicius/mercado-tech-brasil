@@ -1,0 +1,48 @@
+name: Version RAIS municipality artifacts
+
+on:
+  push:
+    paths:
+      - ".github/rais-municipality-version.run"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download validated municipality release
+        uses: actions/download-artifact@v4
+        with:
+          name: rais-2025-municipality-release
+          path: work/release
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 36309568204
+
+      - name: Copy validated artifacts
+        run: |
+          cp             work/release/data/silver/rais_municipality_validation_2025.json             data/silver/rais_municipality_validation_2025.json
+          cp             work/release/data/gold/rais-by-municipality-2025.json             data/gold/rais-by-municipality-2025.json
+          cp             work/release/data/gold/rais-publication-gate-2025.json             data/gold/rais-publication-gate-2025.json
+
+      - name: Commit validated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             data/silver/rais_municipality_validation_2025.json             data/gold/rais-by-municipality-2025.json             data/gold/rais-publication-gate-2025.json
+          if git diff --cached --quiet; then
+            echo "No artifact changes."
+            exit 0
+          fi
+          git commit -m "data: add validated RAIS municipality release"
+          git push origin HEAD:main
