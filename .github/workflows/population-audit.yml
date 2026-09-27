@@ -1,0 +1,87 @@
+name: IBGE population 2026 audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Ano de referência populacional"
+        required: true
+        default: "2026"
+        type: string
+  push:
+    paths:
+      - ".github/population-2026.run"
+
+concurrency:
+  group: population-audit-${{ github.event.inputs.year || '2026' }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      POPULATION_YEAR: ${{ github.event.inputs.year || '2026' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Fetch official IBGE population estimates
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from src.reference.population import (
+              build_population_url,
+              fetch_population_estimates,
+              save_population_cache,
+          )
+
+          year = int(os.environ["POPULATION_YEAR"])
+          if year != 2026:
+              raise SystemExit("Este audit está travado em 2026.")
+
+          populations = fetch_population_estimates(year, timeout=90)
+          if len(populations) < 5500:
+              raise SystemExit(
+                  f"Quantidade municipal inesperada: {len(populations)}"
+              )
+
+          destination = Path("data/reference/population.json")
+          save_population_cache(
+              populations,
+              year=year,
+              destination=destination,
+          )
+
+          summary = {
+              "year": year,
+              "reference_date": f"{year}-07-01",
+              "source": "IBGE SIDRA",
+              "table": "6579",
+              "variable": "9324",
+              "source_url": build_population_url(year),
+              "municipality_count": len(populations),
+              "population_sum": sum(populations.values()),
+              "minimum_population": min(populations.values()),
+              "maximum_population": max(populations.values()),
+          }
+          Path("population-audit-summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload audit cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: population-2026-audit
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            data/reference/population.json
+            population-audit-summary.json
