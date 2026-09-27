@@ -28,6 +28,10 @@ from src.reference.population import (
     fetch_population_estimates,
     save_population_cache,
 )
+from src.reference.qbq import (
+    validate_qbq_workbook,
+    write_qbq_inspection_report,
+)
 from src.transform.adjustments import transform_adjustment_file
 from src.transform.caged import transform_mov_file
 from src.transform.rais_parts import merge_rais_silver_parts
@@ -64,6 +68,38 @@ from src.validation.rais_regional_reconciliation import (
     evaluate_rais_regional_reconciliation,
     write_rais_regional_reconciliation,
 )
+
+
+def command_qbq_inspect(
+    file: str,
+    *,
+    report: str | None,
+    strict: bool,
+) -> None:
+    source = Path(file).resolve()
+    result = validate_qbq_workbook(
+        source,
+        gold_dir=settings.gold_path,
+    )
+
+    if report:
+        destination = Path(report).resolve()
+        write_qbq_inspection_report(result, destination)
+        report_label = str(destination)
+    else:
+        report_label = "não gravado"
+
+    print(
+        "qbq inspection: "
+        f"sha256={result['source_sha256']} "
+        f"matched={len(result['matched_tech_codes'])}/"
+        f"{len(result['expected_tech_codes'])} "
+        f"coverage_complete={result['coverage_complete']} "
+        f"report={report_label}"
+    )
+
+    if strict and result["coverage_complete"] is not True:
+        raise SystemExit(2)
 
 
 def command_snapshot_published_history(destination: str) -> None:
@@ -928,6 +964,21 @@ def build_parser() -> argparse.ArgumentParser:
     local_pipeline.add_argument("file", help="Caminho do arquivo TXT ou .7z")
     local_pipeline.add_argument("--kind", choices=["MOV", "FOR", "EXC"], default="MOV")
 
+    qbq_inspect = sub.add_parser(
+        "qbq-inspect",
+        help="Inspeciona um Excel oficial do QBQ antes de qualquer enriquecimento.",
+    )
+    qbq_inspect.add_argument("file", help="Caminho do arquivo oficial .xlsx")
+    qbq_inspect.add_argument(
+        "--report",
+        help="Caminho opcional para gravar o relatório JSON de inspeção.",
+    )
+    qbq_inspect.add_argument(
+        "--strict",
+        action="store_true",
+        help="Retorna código 2 se algum CBO tech publicado não for encontrado.",
+    )
+
     history_snapshot = sub.add_parser(
         "snapshot-published-history",
         help="Registra hashes dos artefatos mensais já publicados.",
@@ -1183,6 +1234,14 @@ def main() -> None:
 
     if args.command == "local-pipeline":
         command_local_pipeline(args.yearmonth, args.file, args.kind)
+        return
+
+    if args.command == "qbq-inspect":
+        command_qbq_inspect(
+            args.file,
+            report=args.report,
+            strict=args.strict,
+        )
         return
 
     if args.command == "snapshot-published-history":

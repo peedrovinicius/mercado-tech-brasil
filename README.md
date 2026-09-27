@@ -215,6 +215,7 @@ O pipeline mantém:
 - endpoints e visual anual RAIS condicionados ao gate publishable=true;
 - comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
 - evolução mensal das cinco famílias CBO do recorte, sem agregação indevida de medianas salariais;
+- intake governado do QBQ preparado para workbook oficial, fingerprint e validação dos CBOs tech;
 - pipeline preparado para taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
 
 ## Estado do produto
@@ -372,5 +373,6 @@ docker/      imagens de execução
 | [RAIS anual](docs/RAIS.md) | ingestão anual e separação conceitual de estoque |
 | [Revisão RAIS 2025](docs/RAIS_2025_RELEASE_REVIEW.md) | checklist técnico antes da aprovação metodológica |
 | [Operação de dados](docs/OPERATIONS.md) | auditoria e publicação mensal |
+| [Avaliação QBQ](docs/QBQ_EVALUATION.md) | decisão metodológica e intake de atributos ocupacionais |
 | [Deploy](docs/DEPLOY.md) | produção e execução |
 | [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |
