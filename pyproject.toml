@@ -1,6 +1,6 @@
 [project]
 name = "mercado-tech-brasil"
-version = "0.39.0"
+version = "0.40.0"
 description = "Plataforma de dados do mercado formal de trabalho em tecnologia no Brasil, com pipeline auditável, API e aplicação web."
 keywords = ["data-engineering", "data-analysis", "brazil", "caged", "rais", "labor-market"]
 requires-python = ">=3.11"
