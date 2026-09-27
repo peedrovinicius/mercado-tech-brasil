@@ -1,7 +1,8 @@
 [project]
 name = "mercado-tech-brasil"
 version = "0.39.0"
-description = "Produto de dados sobre o mercado formal de trabalho em tecnologia no Brasil."
+description = "Plataforma de dados do mercado formal de trabalho em tecnologia no Brasil, com pipeline auditável, API e aplicação web."
+keywords = ["data-engineering", "data-analysis", "brazil", "caged", "rais", "labor-market"]
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.116,<1",
@@ -20,6 +21,12 @@ dependencies = [
   "pyyaml>=6,<7",
   "py7zr>=0.22,<1"
 ]
+
+[project.urls]
+Homepage = "https://mercado-tech-brasil.onrender.com"
+Repository = "https://github.com/peedrovinicius/mercado-tech-brasil"
+Documentation = "https://github.com/peedrovinicius/mercado-tech-brasil/tree/main/docs"
+OpenAPI = "https://mercado-tech-brasil.onrender.com/docs"
 
 [project.optional-dependencies]
 dev = [
