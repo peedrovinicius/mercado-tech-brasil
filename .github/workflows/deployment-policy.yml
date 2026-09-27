@@ -53,5 +53,5 @@ jobs:
 
       - name: Validate publication gates
         run: |
-          python scripts/validate_deployment.py \
+          python -m src.validation.deployment_policy \
             --changed-files changed-files.txt
