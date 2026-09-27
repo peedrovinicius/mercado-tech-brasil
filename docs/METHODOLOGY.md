@@ -113,6 +113,16 @@ Municípios sem código IBGE válido, população ausente ou categoria residual 
 
 A referência populacional é sincronizada antes da geração Gold e registra fonte, tabela, variável, ano e data de referência no cache de processamento.
 
+## Quadro Brasileiro de Qualificações
+
+O QBQ é tratado como uma dimensão descritiva da ocupação CBO, separada das medidas de fluxo do Novo CAGED e de estoque da RAIS.
+
+O uso aprovado inclui nível de qualificação, perfil ocupacional, conhecimentos, habilidades e atitudes quando esses atributos forem confirmados no arquivo oficial. Eles descrevem a ocupação e não representam características observadas individualmente nos trabalhadores.
+
+A integração exige arquivo XLSX oficial, SHA-256 registrado, código CBO de seis dígitos como chave e cobertura explícita dos códigos tech publicados. A interface HTML do QBQ não é raspada como fonte de produção.
+
+O schema definitivo só será versionado depois da inspeção do workbook oficial autenticado. Até lá, nenhum atributo QBQ entra na API ou no dashboard.
+
 ## Série histórica
 
 Cada overview Gold é incorporado em `trend.json`. No backend PostgreSQL, a série é construída diretamente a partir das competências publicadas em `dataset_release`.
