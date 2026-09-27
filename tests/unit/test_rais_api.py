@@ -10,21 +10,61 @@ from src.api.main import app
 client = TestClient(app)
 
 
-def test_rais_metrics_remain_blocked_while_release_is_unpublished():
+def _write(path: Path, payload: dict) -> None:
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+def _use_blocked_rais_release(monkeypatch, tmp_path: Path) -> None:
+    _write(
+        tmp_path / "rais-publication-gate-2025.json",
+        {
+            "year": 2025,
+            "automatic_checks_passed": True,
+            "manual_approval_valid": False,
+            "publishable": False,
+            "release_sha256": "a" * 64,
+        },
+    )
+    monkeypatch.setattr(
+        rais_router,
+        "settings",
+        replace(rais_router.settings, gold_path=tmp_path),
+    )
+
+
+def test_rais_metrics_remain_blocked_while_release_is_unpublished(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _use_blocked_rais_release(monkeypatch, tmp_path)
+
     response = client.get("/api/v1/rais/overview")
 
     assert response.status_code == 503
     assert "revisão metodológica" in response.json()["detail"]
 
 
-def test_rais_specific_unpublished_year_returns_404():
+def test_rais_specific_unpublished_year_returns_404(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _use_blocked_rais_release(monkeypatch, tmp_path)
+
     response = client.get("/api/v1/rais/overview?year=2025")
 
     assert response.status_code == 404
     assert "ainda não está publicada" in response.json()["detail"]
 
 
-def test_rais_release_registry_exposes_gate_state_without_metrics():
+def test_rais_release_registry_exposes_gate_state_without_metrics(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _use_blocked_rais_release(monkeypatch, tmp_path)
+
     response = client.get("/api/v1/rais/releases")
 
     assert response.status_code == 200
@@ -36,13 +76,6 @@ def test_rais_release_registry_exposes_gate_state_without_metrics():
     assert by_year[2025]["automatic_checks_passed"] is True
     assert by_year[2025]["manual_approval_valid"] is False
     assert by_year[2025]["publishable"] is False
-
-
-def _write(path: Path, payload: dict) -> None:
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False),
-        encoding="utf-8",
-    )
 
 
 def test_rais_endpoints_serve_only_after_published_gate(
