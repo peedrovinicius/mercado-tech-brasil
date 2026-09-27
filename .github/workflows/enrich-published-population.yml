@@ -7,8 +7,6 @@ on:
       - "config/population_release_targets.json"
       - "src/reference/population.py"
       - "src/validation/population_enrichment.py"
-      - "tests/unit/test_population.py"
-      - ".github/workflows/enrich-published-population.yml"
   workflow_dispatch:
 
 permissions:
