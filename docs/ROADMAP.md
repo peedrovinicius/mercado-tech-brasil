@@ -76,7 +76,10 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 - fingerprint da referência oficial vinculado à aprovação metodológica: implementado;
 - detecção e reauditoria de republicações ou revisões oficiais do MTE: implementadas;
 - cache IPCA incremental para preservar reconstruções históricas: implementado;
-- acionar build e deploy apenas depois que a nova competência estiver publicável.
+- política de deploy bloqueia Gold mensal ou RAIS sem gate publicável: implementada;
+- Blueprint de produção configurado para deploy após checks e build filter: implementado;
+- commits de publicação preservam CI antes da promoção: implementado;
+- manter a configuração operacional do Render sincronizada com o Blueprint versionado.
 
 ### Expansão temporal
 
