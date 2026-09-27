@@ -28,7 +28,7 @@ def test_adjustment_prefers_movement_competence():
     frame = pl.DataFrame(
         {
             "competencia_mov": ["202607"],
-            "competencia_declarada": ["202608"],
+            "competencia_declarada": ["202606"],
         }
     )
     result = frame.with_columns(
