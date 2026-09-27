@@ -379,6 +379,10 @@ alembic/     migrations do PostgreSQL
 docker/      imagens de execução
 ~~~
 
+## Contribuindo
+
+Contribuições externas são bem-vindas. Antes de abrir um Pull Request, consulte o [guia de contribuição](CONTRIBUTING.md) e use as issues para alinhar o escopo da mudança.
+
 ## Documentação
 
 | Documento | Conteúdo |

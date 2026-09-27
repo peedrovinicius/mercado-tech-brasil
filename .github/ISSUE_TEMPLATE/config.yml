@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentação do projeto
+    url: https://github.com/peedrovinicius/mercado-tech-brasil#documentação
+    about: Consulte arquitetura, metodologia, pipeline e operação antes de abrir uma issue.

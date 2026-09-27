@@ -1,0 +1,39 @@
+name: Relatar problema
+description: Reporte um comportamento inesperado, erro de dados ou falha de interface.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: Obrigado por ajudar a melhorar o Mercado Tech Brasil.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Descreva o comportamento observado.
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: O que deveria ter acontecido?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: Informe endpoint, tela, competência, fonte ou etapa do pipeline, quando aplicável.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências
+      description: Inclua logs, mensagens de erro ou passos mínimos para reprodução.
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Dados
+      options:
+        - label: Não incluí dados pessoais ou microdados brutos nesta issue.
+          required: true
