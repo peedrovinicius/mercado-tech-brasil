@@ -12,6 +12,7 @@ from src.db.loader import (
 )
 from src.db.repository import fetch_by_occupation, fetch_by_uf, fetch_overview
 from src.db.schema import dataset_release, market_occupation, market_uf
+from src.validation.official_reference import reference_fingerprint
 
 YEAR_MONTH = "202607"
 SOURCE_SHA = "a" * 64
@@ -174,6 +175,13 @@ def _fixture(tmp_path: Path, *, approved: bool) -> tuple[Path, Path, Path, Path]
                     "reviewer": "test",
                     "notes": "reviewed",
                     "source_sha256": SOURCE_SHA,
+                    "reference_sha256": reference_fingerprint(
+                        {
+                            "admissoes": 3,
+                            "desligamentos": 1,
+                            "saldo": 2,
+                        }
+                    ),
                 }
             }
             if approved
