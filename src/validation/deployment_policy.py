@@ -6,7 +6,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-
 MONTHLY_RE = re.compile(r"(20\d{4})(?=\.[^.]+$)")
 RAIS_RE = re.compile(r"rais-[^/]*-(20\d{2})(?=\.[^.]+$)")
 
