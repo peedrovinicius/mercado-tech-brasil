@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.40.0
+
+- baseline operacional governado consolidado;
+- RAIS 2025 publicada com 786.296 vínculos tech e estoque formal nacional reconciliado em 59.970.945;
+- comparação descritiva entre estoque RAIS e fluxos Novo CAGED por família CBO;
+- Jul/2026 enriquecida com Estimativas da População 2026 do IBGE;
+- 1.274 municípios tech com população, zero ausências e taxas por 100 mil validadas;
+- enriquecimento populacional idempotente em reexecuções;
+- política de deploy bloqueia Gold mensal ou RAIS sem gate publicável;
+- cobertura mensal explicitamente travada em Jul/2026 por política versionada;
+- preparação incremental bloqueia competência fora do teto antes de qualquer download;
+- Roadmap reduzido a pendências reais de Render e QBQ;
+- cobertura mensal publicada permanece de janeiro a julho de 2026.
+
 ## 0.39.0
 
 - dimensão municipal RAIS 2025 validada contra a Divisão Territorial Brasileira oficial do IBGE;
