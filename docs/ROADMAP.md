@@ -64,7 +64,6 @@ A base necessária para publicar e auditar o produto está implementada:
 ### Expansão analítica
 
 - acompanhar a primeira competência Gold enriquecida com população no fluxo de publicação;
-- versionar os derivados reais auditados da RAIS 2025;
 - concluir a aprovação metodológica manual da release anual;
 - expor endpoints RAIS somente depois de a release atingir publishable=true;
 - validar sistema de códigos municipais da RAIS 2025 antes de agregação municipal;

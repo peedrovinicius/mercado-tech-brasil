@@ -63,7 +63,7 @@ python scripts/generate_readme_dashboard.py
 | Serving PostgreSQL | Implementado e disponível por configuração |
 | Consolidação temporal | Trimestres completos e parciais |
 | Ranking municipal normalizado | Ativa quando o Gold possui população IBGE |
-| RAIS anual | Sete arquivos processados; filtro oficial de vínculo abandonado identificado; reprocessamento qualificado pendente |
+| RAIS anual | 2025 processada integralmente; Gold auditado e versionado; publicação aguarda revisão metodológica |
 
 ## Série publicada
 
@@ -81,7 +81,13 @@ python scripts/generate_readme_dashboard.py
 
 Cada MOV mensal foi reconciliado com a referência nacional publicada pelo MTE. FOR e EXC são aplicados às competências de origem antes da construção dos agregados. As medianas reais estão expressas em valores de julho de 2026 pelo IPCA/IBGE.
 
-Os microdados brutos permanecem fora do Git. O repositório versiona somente os agregados publicados, relatórios de qualidade e manifests necessários para reproduzir a proveniência.
+Os microdados brutos permanecem fora do Git. O repositório versiona agregados publicados e, no caso de releases ainda bloqueadas, somente derivados auditados, relatórios de qualidade e manifests necessários para reproduzir a proveniência.
+
+### RAIS 2025, release auditada ainda não publicada
+
+O processamento anual completo leu **91.710.262 registros** dos sete arquivos de vínculos. Após excluir **720.825 vínculos ativos abandonados**, o estoque qualificado fechou exatamente em **59.970.945 vínculos**, igual à referência oficial. O recorte tech contém **786.296 vínculos ativos**, equivalentes a **1,31%** do estoque formal nacional.
+
+Todos os checks automáticos, nacionais e regionais, passaram. A release permanece fora da API e do dashboard enquanto a aprovação metodológica manual estiver pendente.
 
 ### Comparação territorial, Jul/2026
 
