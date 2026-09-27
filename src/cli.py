@@ -15,12 +15,10 @@ from src.ingestion.https_caged import (
 )
 from src.ingestion.local import ingest_local_file
 from src.ingestion.manifest import build_manifest, write_manifest
-from src.ingestion.rais import (
-    discover_files as discover_rais_files,
-    download_year as download_rais_year,
-    extract_year as extract_rais_year,
-    write_download_manifest as write_rais_download_manifest,
-)
+from src.ingestion.rais import discover_files as discover_rais_files
+from src.ingestion.rais import download_year as download_rais_year
+from src.ingestion.rais import extract_year as extract_rais_year
+from src.ingestion.rais import write_download_manifest as write_rais_download_manifest
 from src.reference.ipca import fetch_ipca_indices, save_ipca_cache
 from src.reference.municipalities import (
     fetch_municipalities,
