@@ -88,7 +88,9 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 
 - enriquecimento pós-publicação de Gold municipal com população oficial do IBGE: implementado;
 - gate populacional com cobertura completa, taxas por 100 mil e fingerprint: implementado;
-- alvo Jul/2026 configurado para Estimativas da População 2026;
+- Jul/2026 enriquecida com Estimativas da População 2026: concluído;
+- 1.274 municípios tech identificados cruzados com população, zero ausências;
+- gate populacional de Jul/2026 aprovado sem alterar os totais de movimentação;
 - série temporal por família CBO com agregação das cinco famílias versionadas: implementada;
 - endpoint e visualização de evolução ocupacional por família: implementados;
 - ampliar comparações territoriais e ocupacionais mantendo a mesma governança: primeira expansão ocupacional implementada;
