@@ -50,8 +50,9 @@ Em todas as competências processadas:
 - metodologia salarial MTE;
 - salário real por IPCA;
 - referência municipal IBGE;
-- enriquecimento populacional pós-publicação com Estimativas da População 2026;
-- taxas municipais por 100 mil condicionadas a cobertura completa e gate;
+- Jul/2026 enriquecida com Estimativas da População 2026, referência em 01/07/2026;
+- 1.274 municípios tech identificados com população, zero ausências;
+- taxas municipais por 100 mil ativas em Jul/2026 após gate de cobertura completa;
 - categoria residual municipal Não identificado;
 - governança de intake QBQ com arquivo oficial XLSX, SHA-256 e validação de cobertura CBO.
 
@@ -88,6 +89,7 @@ Em todas as competências processadas:
 - gráficos ECharts modulares;
 - análise visual da evolução mensal das cinco famílias CBO tech;
 - comparação visual RAIS x CAGED com participação e escala por estoque anterior;
+- ranking municipal normalizado por 100 mil habitantes ativo para Jul/2026;
 - frontend responsivo;
 - deploy público no Render.
 
