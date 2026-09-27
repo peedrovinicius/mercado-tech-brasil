@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -30,6 +31,14 @@ class PublicationGateResult:
 
 def _read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _find_mov_manifest(bronze_dir: Path, yearmonth: str) -> tuple[Path, dict] | None:
@@ -240,6 +249,144 @@ def evaluate_publication_gate(
                 ),
             )
         )
+
+        population_source = municipality.get("population_source")
+        if population_source:
+            population_year = municipality.get("population_reference_year")
+            population_date = str(
+                municipality.get("population_reference_date") or ""
+            )
+            population_url = str(
+                municipality.get("population_source_url") or ""
+            )
+            population_published_at = str(
+                municipality.get("population_published_at") or ""
+            )
+            population_sha = str(
+                municipality.get("population_cache_sha256") or ""
+            )
+            metadata_ok = bool(
+                isinstance(population_year, int)
+                and population_year >= 2000
+                and population_date == f"{population_year}-07-01"
+                and population_url.startswith("https://")
+                and len(population_published_at) == 10
+                and len(population_sha) == 64
+                and municipality.get("population_enrichment_status")
+                == "complete"
+            )
+            checks.append(
+                GateCheck(
+                    id="municipality_population_metadata",
+                    passed=metadata_ok,
+                    message=(
+                        "Referência populacional municipal possui proveniência completa."
+                        if metadata_ok
+                        else "Metadados da referência populacional estão incompletos."
+                    ),
+                )
+            )
+
+            population_coverage_ok = dimension_ok
+            identified_count = 0
+            if population_coverage_ok:
+                for item in municipality_items:
+                    code = str(item.get("municipio_codigo_caged") or "")
+                    if code == "999999":
+                        if any(
+                            item.get(key) is not None
+                            for key in (
+                                "population_estimate",
+                                "admissions_per_100k",
+                                "dismissals_per_100k",
+                                "balance_per_100k",
+                            )
+                        ):
+                            population_coverage_ok = False
+                            break
+                        continue
+
+                    identified_count += 1
+                    raw_population = item.get("population_estimate")
+                    if (
+                        raw_population is None
+                        or int(raw_population) <= 0
+                        or item.get("population_reference_year")
+                        != population_year
+                    ):
+                        population_coverage_ok = False
+                        break
+
+                    population_value = int(raw_population)
+                    expected_rates = {
+                        "admissions_per_100k": round(
+                            int(item.get("admissions") or 0)
+                            * 100000
+                            / population_value,
+                            4,
+                        ),
+                        "dismissals_per_100k": round(
+                            int(item.get("dismissals") or 0)
+                            * 100000
+                            / population_value,
+                            4,
+                        ),
+                        "balance_per_100k": round(
+                            int(item.get("balance") or 0)
+                            * 100000
+                            / population_value,
+                            4,
+                        ),
+                    }
+                    if any(
+                        item.get(key) != value
+                        for key, value in expected_rates.items()
+                    ):
+                        population_coverage_ok = False
+                        break
+
+            checks.append(
+                GateCheck(
+                    id="municipality_population_coverage",
+                    passed=population_coverage_ok,
+                    message=(
+                        "População e taxas por 100 mil validadas para "
+                        f"{identified_count} municípios identificados."
+                        if population_coverage_ok
+                        else "Cobertura ou taxa populacional municipal é inválida."
+                    ),
+                )
+            )
+
+            population_report_path = (
+                gold_dir / f"population-enrichment-{yearmonth}.json"
+            )
+            report_ok = False
+            if population_report_path.exists():
+                report = _read_json(population_report_path)
+                report_ok = bool(
+                    report.get("coverage_complete") is True
+                    and int(report.get("population_year") or 0)
+                    == population_year
+                    and report.get("population_cache_sha256")
+                    == population_sha
+                    and report.get("municipality_artifact_sha256")
+                    == _sha256(municipality_path)
+                    and int(report.get("matched_population") or 0)
+                    == identified_count
+                    and int(report.get("missing_population") or -1) == 0
+                )
+            checks.append(
+                GateCheck(
+                    id="municipality_population_report",
+                    passed=report_ok,
+                    message=(
+                        "Relatório de enriquecimento populacional confere com o Gold."
+                        if report_ok
+                        else "Relatório de enriquecimento populacional ausente ou divergente."
+                    ),
+                )
+            )
 
     if reference_path.exists():
         reference = _read_json(reference_path).get(yearmonth)
