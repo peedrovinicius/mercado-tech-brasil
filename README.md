@@ -71,6 +71,8 @@ python scripts/generate_readme_dashboard.py
 
 **Período: janeiro a julho de 2026**
 
+A cobertura mensal está intencionalmente travada em Jul/2026 por uma política versionada. O pipeline calcula a próxima sequência, mas não baixa, audita ou publica competência posterior enquanto esse teto não for revisado explicitamente.
+
 | Competência | Admissões | Desligamentos | Saldo | Mediana real |
 |---|---:|---:|---:|---:|
 | Jan/2026 | 19.633 | 18.041 | +1.592 | R$ 3.839,32 |
@@ -155,7 +157,7 @@ flowchart LR
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-frontend-61DAFB?logo=react&logoColor=000)
 ![TypeScript](https://img.shields.io/badge/TypeScript-frontend-3178C6?logo=typescript&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-runtime-2496ED?logo=docker&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-container-2496ED?logo=docker&logoColor=white)
 
 </div>
 
@@ -208,7 +210,8 @@ O pipeline mantém:
 - referência externa para reconciliação;
 - gate mensal vinculado ao hash do MOV e ao fingerprint da referência oficial;
 - preparação incremental bloqueada até existir referência oficial contínua e efetiva;
-- auditoria mensal impedida de antecipar ou saltar competências;
+- cobertura mensal limitada por política versionada até Jul/2026;
+- auditoria mensal impedida de antecipar, saltar ou ultrapassar a cobertura autorizada;
 - revisão oficial de competência publicada detectada e enviada para reauditoria;
 - alterações históricas por FOR/EXC protegidas por baseline e hashes antes/depois;
 - cache IPCA incremental para preservar reconstruções de competências anteriores;

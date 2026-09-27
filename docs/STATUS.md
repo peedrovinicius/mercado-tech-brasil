@@ -77,7 +77,8 @@ Em todas as competências processadas:
 - registro de releases publicado pela API;
 - regra editorial automatizada para pontuação;
 - política de deploy que bloqueia artefatos mensais ou RAIS sem gate publicável;
-- Blueprint versionado com build filter e promoção após checks de CI.
+- Blueprint versionado com build filter e promoção após checks de CI;
+- serviço Render atualmente com drift operacional: autoDeploy ainda está em commit e o health check do serviço ainda não está configurado.
 
 ## Serving e aplicação
 
