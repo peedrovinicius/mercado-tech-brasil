@@ -4,7 +4,16 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.api.routers import analytics, metadata, overview, provenance, quality, rais, system
+from src.api.routers import (
+    analytics,
+    export,
+    metadata,
+    overview,
+    provenance,
+    quality,
+    rais,
+    system,
+)
 from src.core.settings import settings
 
 app = FastAPI(
@@ -44,6 +53,7 @@ app.include_router(overview.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(rais.router, prefix="/api/v1")
 app.include_router(provenance.router, prefix="/api/v1")
+app.include_router(export.router, prefix="/api/v1")
 
 
 frontend_dist = Path(settings.root) / "frontend" / "dist"
