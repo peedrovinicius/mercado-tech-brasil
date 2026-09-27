@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 from urllib.request import Request, urlopen
@@ -66,6 +67,17 @@ def parse_population_payload(
     return result
 
 
+def _decode_json_response(
+    body: bytes,
+    *,
+    content_encoding: str | None = None,
+) -> object:
+    encoding = (content_encoding or "").lower()
+    if "gzip" in encoding or body.startswith(b"\x1f\x8b"):
+        body = gzip.decompress(body)
+    return json.loads(body.decode("utf-8-sig"))
+
+
 def fetch_population_estimates(
     year: int,
     *,
@@ -75,12 +87,18 @@ def fetch_population_estimates(
     request = Request(
         url,
         headers={
-            "User-Agent": "mercado-tech-brasil/0.22",
+            "User-Agent": "mercado-tech-brasil/0.39",
             "Accept": "application/json",
+            "Accept-Encoding": "identity",
         },
     )
     with urlopen(request, timeout=timeout) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+        body = response.read()
+        content_encoding = response.headers.get("Content-Encoding")
+        payload = _decode_json_response(
+            body,
+            content_encoding=content_encoding,
+        )
 
     return parse_population_payload(payload, year=year)
 

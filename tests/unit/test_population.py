@@ -1,7 +1,9 @@
+import gzip
 import json
 from pathlib import Path
 
 from src.reference.population import (
+    _decode_json_response,
     build_population_url,
     load_population_cache,
     parse_population_payload,
@@ -74,3 +76,23 @@ def test_population_cache_roundtrip(tmp_path: Path):
 
     raw = json.loads(destination.read_text(encoding="utf-8"))
     assert raw["source"] == "IBGE SIDRA"
+
+
+def test_decode_population_response_accepts_gzip():
+    payload = [{"id": "9324", "resultados": []}]
+    compressed = gzip.compress(
+        json.dumps(payload).encode("utf-8")
+    )
+
+    assert _decode_json_response(compressed) == payload
+    assert _decode_json_response(
+        compressed,
+        content_encoding="gzip",
+    ) == payload
+
+
+def test_decode_population_response_accepts_plain_json():
+    payload = [{"id": "9324", "resultados": []}]
+    body = json.dumps(payload).encode("utf-8")
+
+    assert _decode_json_response(body) == payload
