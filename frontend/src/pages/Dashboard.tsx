@@ -164,8 +164,9 @@ export function Dashboard() {
 
   return (
     <main>
+      <a className="skip-link" href="#main-content">Pular para o conteúdo principal</a>
       <header className="topbar">
-        <a className="brand" href="#top" aria-label="Mercado Tech Brasil">
+        <a className="brand" href="#main-content" aria-label="Mercado Tech Brasil">
           <span className="brand__mark">MT</span>
           <span>
             <strong>Mercado Tech Brasil</strong>
@@ -183,7 +184,7 @@ export function Dashboard() {
         </nav>
       </header>
 
-      <section className="hero hero--visual" id="top">
+      <section className="hero hero--visual" id="main-content" tabIndex={-1}>
         <div className="hero__copy">
           <div className="hero__badges">
             <span className="status-badge status-badge--dark">Open data</span>
@@ -243,7 +244,13 @@ export function Dashboard() {
       ) : null}
 
       {isLoading ? (
-        <section className="loading-grid" aria-label="Carregando indicadores">
+        <section
+          className="loading-grid"
+          aria-label="Carregando indicadores"
+          aria-live="polite"
+          role="status"
+        >
+          <span className="sr-only">Carregando indicadores</span>
           {Array.from({ length: 4 }).map((_, index) => <div className="skeleton" key={index} />)}
         </section>
       ) : null}
