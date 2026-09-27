@@ -65,6 +65,11 @@ jobs:
             python -m src.cli validate-incremental-competence "$COMPETENCE"
           fi
 
+      - name: Snapshot published history
+        run: |
+          python -m src.cli snapshot-published-history \
+            --destination /tmp/published-history.json
+
       - name: Sync official references
         run: |
           python -m src.cli sync-municipalities
@@ -188,6 +193,13 @@ jobs:
               path.unlink()
           PY
 
+      - name: Validate historical revisions
+        run: |
+          python -m src.cli validate-history-revisions "$COMPETENCE" \
+            --baseline /tmp/published-history.json \
+            --package-root data/revisions \
+            --strict
+
       - name: Upload audit artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -204,3 +216,4 @@ jobs:
             data/reference/ipca.json
             data/reference/municipalities.json
             data/reference/population.json
+            data/revisions/${{ inputs.competence }}/**

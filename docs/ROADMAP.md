@@ -70,8 +70,12 @@ Este é o próximo bloco prioritário após o fechamento da RAIS 2025.
 - manter validação explícita da referência oficial do MTE antes da liberação;
 - gerar o gate da nova competência inicialmente bloqueado;
 - preservar a publicação somente após aprovação metodológica do gate;
-- ampliar testes de regressão para garantir que competências anteriores não sejam alteradas indevidamente;
-- documentar e testar o comportamento para republicações ou revisões oficiais do MTE;
+- testes de regressão histórica com bloqueio de alterações não explicadas por FOR/EXC: implementados;
+- manifesto e pacote auditável para revisões retroativas de competências publicadas: implementados;
+- proteção contra pacote baseado em baseline histórico desatualizado: implementada;
+- fingerprint da referência oficial vinculado à aprovação metodológica: implementado;
+- detecção e reauditoria de republicações ou revisões oficiais do MTE: implementadas;
+- cache IPCA incremental para preservar reconstruções históricas: implementado;
 - acionar build e deploy apenas depois que a nova competência estiver publicável.
 
 ### Expansão temporal

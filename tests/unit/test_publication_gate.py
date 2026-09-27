@@ -116,6 +116,7 @@ def test_gate_publishes_after_sha_bound_approval(tmp_path: Path):
         reviewer="Pedro",
         notes="Layout, rejeições e metodologia revisados.",
         bronze_dir=bronze,
+        reference_path=reference,
         approvals_path=approvals,
     )
     result = evaluate_publication_gate(
@@ -137,6 +138,7 @@ def test_gate_invalidates_approval_when_source_sha_changes(tmp_path: Path):
         reviewer="Pedro",
         notes="Revisado.",
         bronze_dir=bronze,
+        reference_path=reference,
         approvals_path=approvals,
     )
     manifest = bronze / "202607" / "extracted" / "CAGEDMOV.txt.manifest.json"
@@ -153,6 +155,37 @@ def test_gate_invalidates_approval_when_source_sha_changes(tmp_path: Path):
     )
     assert result.manual_approval_valid is False
     assert result.publishable is False
+
+
+
+
+def test_gate_invalidates_approval_when_reference_changes(tmp_path: Path):
+    bronze, gold, reference, approvals = _fixture(tmp_path)
+    approve_competence(
+        yearmonth="202607",
+        reviewer="Pedro",
+        notes="Revisado.",
+        bronze_dir=bronze,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    payload = json.loads(reference.read_text(encoding="utf-8"))
+    payload["202607"]["admissoes"] += 1
+    payload["202607"]["saldo"] += 1
+    _write_json(reference, payload)
+
+    result = evaluate_publication_gate(
+        yearmonth="202607",
+        bronze_dir=bronze,
+        gold_dir=gold,
+        reference_path=reference,
+        approvals_path=approvals,
+    )
+
+    assert result.manual_approval_valid is False
+    assert result.publishable is False
+    assert result.reference_sha256 is not None
 
 
 def test_gate_detects_overview_arithmetic_error(tmp_path: Path):

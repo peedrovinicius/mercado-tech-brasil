@@ -41,3 +41,28 @@ def test_ipca_cache_roundtrip(tmp_path: Path):
     payload = load_ipca_cache(destination)
     assert payload["base_competence"] == "202607"
     assert payload["indices"]["202607"] == "7300.1"
+
+
+def test_ipca_cache_preserves_existing_periods(tmp_path: Path):
+    destination = tmp_path / "ipca.json"
+    save_ipca_cache(
+        {
+            "202601": Decimal("7000.0"),
+            "202607": Decimal("7300.0"),
+        },
+        base_competence="202607",
+        destination=destination,
+    )
+    save_ipca_cache(
+        {
+            "202607": Decimal("7300.0"),
+            "202609": Decimal("7350.0"),
+        },
+        base_competence="202607",
+        destination=destination,
+    )
+
+    payload = load_ipca_cache(destination)
+    assert payload["indices"]["202601"] == "7000.0"
+    assert payload["indices"]["202607"] == "7300.0"
+    assert payload["indices"]["202609"] == "7350.0"

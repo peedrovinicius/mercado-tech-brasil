@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from src.validation.official_reference import reference_fingerprint
+
 
 @dataclass(frozen=True)
 class GateCheck:
@@ -21,6 +23,7 @@ class PublicationGateResult:
     manual_approval_valid: bool
     publishable: bool
     source_sha256: str | None
+    reference_sha256: str | None
     generated_at_utc: str
     checks: tuple[GateCheck, ...]
 
@@ -65,6 +68,7 @@ def evaluate_publication_gate(
     min_valid_rate: float = 0.99,
 ) -> PublicationGateResult:
     checks: list[GateCheck] = []
+    reference_sha256: str | None = None
 
     quality_path = gold_dir / f"quality-{yearmonth}.json"
     overview_path = gold_dir / f"overview-{yearmonth}.json"
@@ -240,6 +244,7 @@ def evaluate_publication_gate(
     if reference_path.exists():
         reference = _read_json(reference_path).get(yearmonth)
         if reference:
+            reference_sha256 = reference_fingerprint(reference)
             ref_adm = int(reference["admissoes"])
             ref_des = int(reference["desligamentos"])
             ref_balance = int(reference["saldo"])
@@ -324,16 +329,21 @@ def evaluate_publication_gate(
         approval
         and approval.get("approved") is True
         and source_sha256
+        and reference_sha256
         and approval.get("source_sha256") == source_sha256
+        and approval.get("reference_sha256") == reference_sha256
     )
     checks.append(
         GateCheck(
             id="manual_methodology_approval",
             passed=approval_valid,
             message=(
-                "Revisão metodológica aprovada e vinculada ao SHA-256 atual."
+                "Revisão metodológica aprovada e vinculada à origem e à referência atuais."
                 if approval_valid
-                else "Revisão metodológica pendente ou vinculada a outro SHA-256."
+                else (
+                    "Revisão metodológica pendente ou vinculada a outra origem "
+                    "ou referência oficial."
+                )
             ),
         )
     )
@@ -344,6 +354,7 @@ def evaluate_publication_gate(
         manual_approval_valid=approval_valid,
         publishable=automatic_checks_passed and approval_valid,
         source_sha256=source_sha256,
+        reference_sha256=reference_sha256,
         generated_at_utc=datetime.now(UTC).isoformat(),
         checks=tuple(checks),
     )
@@ -365,6 +376,7 @@ def approve_competence(
     reviewer: str,
     notes: str,
     bronze_dir: Path,
+    reference_path: Path,
     approvals_path: Path,
 ) -> dict:
     manifest_result = _find_mov_manifest(bronze_dir, yearmonth)
@@ -376,12 +388,21 @@ def approve_competence(
     if not source_sha256:
         raise ValueError("Manifesto MOV sem SHA-256.")
 
+    references = _read_json(reference_path) if reference_path.exists() else {}
+    reference = references.get(yearmonth)
+    if not isinstance(reference, dict):
+        raise FileNotFoundError(
+            f"Referência oficial não encontrada para {yearmonth}."
+        )
+    reference_sha256 = reference_fingerprint(reference)
+
     approvals = _read_json(approvals_path) if approvals_path.exists() else {}
     approval = {
         "approved": True,
         "reviewer": reviewer,
         "notes": notes,
         "source_sha256": source_sha256,
+        "reference_sha256": reference_sha256,
         "approved_at_utc": datetime.now(UTC).isoformat(),
     }
     approvals[yearmonth] = approval

@@ -23,8 +23,10 @@ Antes de qualquer download ele:
 5. valida fonte, URL, data de publicação e aritmética nacional;
 6. impede referências com `published_at` no futuro;
 7. bloqueia saltos de competência;
-8. lê a base IPCA já versionada;
-9. aciona `Audit data competence` somente quando o candidato é elegível.
+8. verifica se alguma referência de competência já publicada mudou em relação ao fingerprint aprovado;
+9. prioriza a reauditoria dessa competência quando existe uma revisão oficial;
+10. lê a base IPCA já versionada;
+11. aciona `Audit data competence` somente quando o candidato é elegível.
 
 Quando nenhuma nova referência oficial está registrada, o workflow termina sem baixar microdados.
 
@@ -69,9 +71,9 @@ O resultado da auditoria não é publicado automaticamente.
 
 ## Aprovação metodológica
 
-A aprovação fica em `config/publication_approvals.json` e contém o SHA-256 do MOV auditado.
+A aprovação fica em `config/publication_approvals.json` e contém dois vínculos criptográficos: o SHA-256 do MOV auditado e o fingerprint da referência oficial usada na reconciliação.
 
-O gate invalida uma aprovação quando o hash da origem muda.
+O gate invalida a aprovação se a origem ou a referência oficial mudar. Uma revisão de referência já publicada volta para reauditoria antes de qualquer nova publicação.
 
 ## Publicação
 
@@ -82,7 +84,11 @@ Entradas:
 - `competence`;
 - `audit_run_id`: ID da execução de auditoria que gerou o artefato.
 
-O workflow baixa o artefato derivado, refaz o gate em modo estrito e só então versiona Gold, auditoria e manifests.
+O workflow baixa o artefato derivado, aplica apenas revisões históricas que passaram pela auditoria, confere se o baseline publicado continua igual ao observado durante a auditoria, refaz o gate em modo estrito e só então versiona Gold, auditoria e manifests.
+
+Antes do processamento, a auditoria registra hashes dos artefatos já publicados. Se FOR ou EXC alterarem uma competência anterior, é gerado um manifesto de impacto com hashes antes/depois e métricas do overview. Alterações históricas sem uma competência efetiva correspondente em FOR/EXC são bloqueadas. O pacote de revisão só é aplicado se o histórico de produção ainda corresponder ao baseline auditado.
+
+O cache de IPCA é incremental: novas sincronizações preservam índices de competências anteriores para que reconstruções históricas mantenham o cálculo de salário real.
 
 Antes do commit de publicação, o mesmo workflow executa `python scripts/generate_readme_dashboard.py`. O SVG do dashboard é regenerado a partir da camada Gold e entra no mesmo commit da competência, evitando que o visual do README fique defasado.
 
@@ -94,7 +100,11 @@ Os microdados brutos não entram no Git.
 - não saltar competências na série mensal;
 - não publicar competência sem referência oficial;
 - não publicar quando qualquer check bloqueante falhar;
-- não reutilizar aprovação após mudança do SHA-256;
+- não reutilizar aprovação após mudança do SHA-256 do MOV ou do fingerprint da referência;
+- bloquear alteração histórica sem justificativa em FOR/EXC;
+- bloquear ajuste com competência efetiva posterior à competência de ingestão;
+- não aplicar pacote histórico se o baseline de produção mudou depois da auditoria;
+- preservar índices IPCA anteriores durante sincronizações incrementais;
 - manter a competência base do IPCA explícita;
 - evitar reprocessamento quando um artefato auditado ainda estiver disponível;
 - manter CI e build do frontend separados da operação de microdados.

@@ -36,6 +36,12 @@ from src.transform.rais_schema import inspect_rais_directory
 from src.transform.rais_semantics import validate_layout_semantics
 from src.transform.rais_silver import transform_rais_year
 from src.transform.rais_value_semantics import validate_value_semantics
+from src.validation.historical_regression import (
+    apply_history_revision_package,
+    evaluate_history_revisions,
+    snapshot_published_history,
+    write_history_snapshot,
+)
 from src.validation.incremental_release import (
     evaluate_next_competence,
     validate_requested_competence,
@@ -60,10 +66,61 @@ from src.validation.rais_regional_reconciliation import (
 )
 
 
+def command_snapshot_published_history(destination: str) -> None:
+    snapshot = snapshot_published_history(settings.gold_path)
+    output = Path(destination).resolve()
+    write_history_snapshot(snapshot, output)
+    print(
+        f"historical snapshot: {len(snapshot['published_competencies'])} "
+        f"competências em {output}"
+    )
+
+
+def command_validate_history_revisions(
+    yearmonth: str,
+    *,
+    baseline: str,
+    package_root: str,
+    strict: bool,
+) -> None:
+    result = evaluate_history_revisions(
+        ingest_competence=yearmonth,
+        baseline_path=Path(baseline).resolve(),
+        gold_dir=settings.gold_path,
+        silver_dir=settings.silver_path,
+        package_root=Path(package_root).resolve(),
+    )
+    print(
+        "historical revisions: "
+        f"passed={result['passed']} "
+        f"changed={result['changed_published_competencies']} "
+        f"unexpected={result['unexpected_changed_competencies']}"
+    )
+    if strict and result["passed"] is not True:
+        raise SystemExit(2)
+
+
+def command_apply_history_revisions(
+    yearmonth: str,
+    *,
+    package_root: str,
+) -> None:
+    applied = apply_history_revision_package(
+        ingest_competence=yearmonth,
+        gold_dir=settings.gold_path,
+        package_root=Path(package_root).resolve(),
+    )
+    print(
+        f"historical revisions applied: competence={yearmonth} "
+        f"files={len(applied)}"
+    )
+
+
 def command_next_competence(*, json_output: bool) -> None:
     result = evaluate_next_competence(
         reference_path=settings.reference_totals_path,
         gold_path=settings.gold_path,
+        approvals_path=settings.publication_approvals_path,
     )
 
     if json_output:
@@ -92,6 +149,7 @@ def command_validate_incremental_competence(
             yearmonth,
             reference_path=settings.reference_totals_path,
             gold_path=settings.gold_path,
+            approvals_path=settings.publication_approvals_path,
             allow_published=allow_published,
         )
     except (TypeError, ValueError) as exc:
@@ -364,6 +422,7 @@ def command_approve_release(
         reviewer=reviewer,
         notes=notes,
         bronze_dir=settings.bronze_path,
+        reference_path=settings.reference_totals_path,
         approvals_path=settings.publication_approvals_path,
     )
     print(
@@ -869,6 +928,32 @@ def build_parser() -> argparse.ArgumentParser:
     local_pipeline.add_argument("file", help="Caminho do arquivo TXT ou .7z")
     local_pipeline.add_argument("--kind", choices=["MOV", "FOR", "EXC"], default="MOV")
 
+    history_snapshot = sub.add_parser(
+        "snapshot-published-history",
+        help="Registra hashes dos artefatos mensais já publicados.",
+    )
+    history_snapshot.add_argument(
+        "--destination",
+        required=True,
+        help="Arquivo JSON de baseline histórico.",
+    )
+
+    history_validate = sub.add_parser(
+        "validate-history-revisions",
+        help="Valida alterações históricas produzidas por FOR e EXC.",
+    )
+    history_validate.add_argument("yearmonth", help="Competência de ingestão AAAAMM")
+    history_validate.add_argument("--baseline", required=True)
+    history_validate.add_argument("--package-root", required=True)
+    history_validate.add_argument("--strict", action="store_true")
+
+    history_apply = sub.add_parser(
+        "apply-history-revisions",
+        help="Aplica pacote histórico após conferir hashes do baseline.",
+    )
+    history_apply.add_argument("yearmonth", help="Competência de ingestão AAAAMM")
+    history_apply.add_argument("--package-root", required=True)
+
     next_competence = sub.add_parser(
         "next-competence",
         help="Resolve a próxima competência elegível pelas referências oficiais.",
@@ -1098,6 +1183,26 @@ def main() -> None:
 
     if args.command == "local-pipeline":
         command_local_pipeline(args.yearmonth, args.file, args.kind)
+        return
+
+    if args.command == "snapshot-published-history":
+        command_snapshot_published_history(args.destination)
+        return
+
+    if args.command == "validate-history-revisions":
+        command_validate_history_revisions(
+            args.yearmonth,
+            baseline=args.baseline,
+            package_root=args.package_root,
+            strict=args.strict,
+        )
+        return
+
+    if args.command == "apply-history-revisions":
+        command_apply_history_revisions(
+            args.yearmonth,
+            package_root=args.package_root,
+        )
         return
 
     if args.command == "next-competence":

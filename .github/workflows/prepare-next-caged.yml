@@ -53,6 +53,14 @@ jobs:
           print(f"reason={payload['reason']}")
           print(f"candidate={payload['candidate'] or ''}")
           print(f"next_expected={payload['next_expected'] or ''}")
+          print(
+              "allow_reaudit="
+              + (
+                  "true"
+                  if payload["reason"] == "published_reference_revision"
+                  else "false"
+              )
+          )
           PY
 
       - name: Resolve IPCA base
@@ -83,7 +91,7 @@ jobs:
             --ref main \
             -f competence="$CANDIDATE" \
             -f ipca_base="$IPCA_BASE" \
-            -f allow_reaudit=false
+            -f allow_reaudit="${{ steps.next.outputs.allow_reaudit }}"
 
       - name: Nothing to prepare
         if: steps.next.outputs.ready != 'true'

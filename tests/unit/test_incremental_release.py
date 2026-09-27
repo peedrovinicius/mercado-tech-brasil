@@ -8,6 +8,7 @@ from src.validation.incremental_release import (
     evaluate_next_competence,
     validate_requested_competence,
 )
+from src.validation.official_reference import reference_fingerprint
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -193,3 +194,91 @@ def test_published_competence_can_be_explicitly_reaudited(tmp_path: Path):
     assert result.ready is True
     assert result.reason == "published_reaudit"
     assert result.candidate == "202412"
+
+
+def test_published_reference_revision_is_prioritized(tmp_path: Path):
+    reference_path = tmp_path / "reference.json"
+    approvals_path = tmp_path / "approvals.json"
+    gold = tmp_path / "gold"
+    _published_gate(gold, "202412")
+
+    original = _reference("2025-01-10")
+    _write_json(
+        reference_path,
+        {
+            "202412": original,
+            "202501": _reference("2025-02-10"),
+        },
+    )
+    _write_json(
+        approvals_path,
+        {
+            "202412": {
+                "approved": True,
+                "source_sha256": "abc123",
+                "reference_sha256": reference_fingerprint(original),
+            }
+        },
+    )
+
+    revised = json.loads(reference_path.read_text(encoding="utf-8"))
+    revised["202412"]["admissoes"] += 2
+    revised["202412"]["saldo"] += 2
+    _write_json(reference_path, revised)
+
+    result = evaluate_next_competence(
+        reference_path=reference_path,
+        gold_path=gold,
+        approvals_path=approvals_path,
+        today=date(2025, 2, 11),
+    )
+
+    assert result.ready is True
+    assert result.reason == "published_reference_revision"
+    assert result.candidate == "202412"
+    assert result.next_expected == "202501"
+
+
+def test_reference_revision_requires_explicit_reaudit(tmp_path: Path):
+    reference_path = tmp_path / "reference.json"
+    approvals_path = tmp_path / "approvals.json"
+    gold = tmp_path / "gold"
+    _published_gate(gold, "202412")
+
+    original = _reference("2025-01-10")
+    _write_json(reference_path, {"202412": original})
+    _write_json(
+        approvals_path,
+        {
+            "202412": {
+                "approved": True,
+                "source_sha256": "abc123",
+                "reference_sha256": reference_fingerprint(original),
+            }
+        },
+    )
+
+    revised = json.loads(reference_path.read_text(encoding="utf-8"))
+    revised["202412"]["admissoes"] += 1
+    revised["202412"]["saldo"] += 1
+    _write_json(reference_path, revised)
+
+    with pytest.raises(ValueError, match="não elegível"):
+        validate_requested_competence(
+            "202412",
+            reference_path=reference_path,
+            gold_path=gold,
+            approvals_path=approvals_path,
+            today=date(2025, 2, 11),
+        )
+
+    result = validate_requested_competence(
+        "202412",
+        reference_path=reference_path,
+        gold_path=gold,
+        approvals_path=approvals_path,
+        allow_published=True,
+        today=date(2025, 2, 11),
+    )
+
+    assert result.reason == "published_reference_revision"

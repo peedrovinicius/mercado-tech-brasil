@@ -4,48 +4,55 @@
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "577814d43f2ff2acf26d34a79fb3a758267ae89fffcec2e24c37cc164dfcc3dc",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "d807c39e83015540819a44c12b54cf0485d49e6c2bdce8eb989226ddcf0ad585"
   },
   "202602": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "5534a81c3469b75a901d1904a02cc589f6945a3fdd12983b913afc7df75c965c",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "67e07ca44f5b6636089cb85a73f3299cb560e29a29b0d140799942435ec7ee6c"
   },
   "202603": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "fbddc1adb38befcf1230a2f2073e94d57543479ccb322bed55a9d1fde8c89e2a",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "6094037d1c6f096ac976baea9fb7ccd39879f1ddeea785c540de9584d2d37287"
   },
   "202604": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "9c334f22d013cd11b9e47494cb313e475f4d86a8f80d0abf9eccb5c3b859cfc7",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "be68a175fd34f2acb3c580f4a784f8ade9d4b62e3cde30d401cf97384f4094f1"
   },
   "202605": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "9b6f2652e3e68a2fe6482c022daf77bbd8fb229d810c05cb925b64e38362e7ad",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "69d663e19a69342254e20361307f54f484c88f07d73e80b60804e18f9c8b8535"
   },
   "202606": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "MOV reconciliado com a referência oficial do MTE. MOV, FOR e EXC com taxa válida de 100%. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Ajustes foram aplicados às competências de origem. Dimensão municipal revisada, incluindo categoria residual Não identificado quando aplicável.",
     "source_sha256": "ff9ee116b70fd13e3978358f71e48a915d42256c2d1f877adbaa82f0b8610131",
-    "approved_at_utc": "2026-09-26T09:04:04Z"
+    "approved_at_utc": "2026-09-26T09:04:04Z",
+    "reference_sha256": "1e3e3c3a68c3af0cbeb4dda4ec1365be1a0a3324ce155d7df474b352bfb8b55c"
   },
   "202607": {
     "approved": true,
     "reviewer": "Mercado Tech Brasil",
     "notes": "Layout oficial revisado. MOV, FOR e EXC com taxa válida de 100%. MOV nacional reconciliado exatamente com a referência oficial, incluindo Não identificado. Recorte CBO restrito às cinco famílias versionadas. Agregados por UF, ocupação e município fecham com o overview. Metodologia salarial e proveniência revisadas antes da publicação.",
     "source_sha256": "07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f",
-    "approved_at_utc": "2026-09-26T08:25:00Z"
+    "approved_at_utc": "2026-09-26T08:25:00Z",
+    "reference_sha256": "78f4f5f230c6dc63fe66bdaf3a2f600ce7f63362b1d73c64dd594cedff5cef05"
   }
 }

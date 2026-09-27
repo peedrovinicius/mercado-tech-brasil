@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -150,3 +151,13 @@ def validate_official_reference(reference: dict) -> tuple[ReferenceCheck, ...]:
 
 def reference_is_valid(reference: dict) -> bool:
     return all(check.passed for check in validate_official_reference(reference))
+
+
+def reference_fingerprint(reference: dict) -> str:
+    payload = json.dumps(
+        reference,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    return hashlib.sha256(payload).hexdigest()
