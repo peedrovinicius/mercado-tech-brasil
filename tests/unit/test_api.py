@@ -71,6 +71,30 @@ def test_published_analytics_are_served():
     assert by_key["NE"]["balance"] == 155
     assert by_key["CE"]["balance"] == 107
 
+    stock_flow = client.get("/api/v1/analytics/stock-flow-context")
+    assert stock_flow.status_code == 200
+    stock_flow_payload = stock_flow.json()
+    assert stock_flow_payload["rais_year"] == 2025
+    assert stock_flow_payload["stock_reference_date"] == "2025-12-31"
+    assert stock_flow_payload["caged_from"] == "202601"
+    assert stock_flow_payload["caged_to"] == "202607"
+    assert stock_flow_payload["published_months"] == 7
+    assert stock_flow_payload["totals"]["active_stock"] == 786296
+    assert stock_flow_payload["totals"]["admissions"] == 134209
+    assert stock_flow_payload["totals"]["dismissals"] == 127865
+    assert stock_flow_payload["totals"]["balance"] == 6344
+    stock_flow_families = {
+        item["cbo_familia"]: item
+        for item in stock_flow_payload["families"]
+    }
+    assert stock_flow_families["3172"]["active_stock"] == 121680
+    assert stock_flow_families["3172"]["admissions"] == 31132
+    assert stock_flow_families["3172"]["balance"] == 5232
+    assert round(
+        stock_flow_families["3172"]["composition_gap_pp"],
+        2,
+    ) == 7.72
+
     occupation_trend = client.get(
         "/api/v1/analytics/occupation-family-trend"
     )
