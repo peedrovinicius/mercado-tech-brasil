@@ -183,6 +183,24 @@ export type TemporalSummary = {
   periods: TemporalPeriod[]
 }
 
+export type ReleaseState = {
+  project: string
+  version: string
+  environment: string
+  data_backend: string
+  monthly: {
+    published_count: number
+    first_competence: string | null
+    latest_competence: string | null
+    competencies: string[]
+    policy_mode: string
+    policy_max_competence: string | null
+  }
+  rais: {
+    latest_published_year: number | null
+  }
+}
+
 export type Readiness = {
   api: string
   data_loaded: boolean
@@ -405,6 +423,7 @@ export const api = {
   temporalSummary: () =>
     get<TemporalSummary>('/analytics/temporal-summary'),
   readiness: () => get<Readiness>('/system/readiness'),
+  releaseState: () => get<ReleaseState>('/system/release'),
   coverage: () => get<Coverage>('/metadata/coverage'),
   releases: () => get<Releases>('/metadata/releases'),
   raisReleases: () => get<RaisReleases>('/rais/releases'),
