@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "config/reference_totals.json"
+      - "config/monthly_coverage_policy.json"
   workflow_dispatch:
 
 permissions:
