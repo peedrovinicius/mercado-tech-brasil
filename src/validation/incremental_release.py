@@ -46,7 +46,7 @@ def _next_month(yearmonth: str) -> str:
 def _reference_effective_date(reference: dict[str, Any]) -> date:
     raw = reference.get("published_at")
     if not isinstance(raw, str):
-        raise ValueError("Referência oficial sem published_at.")
+        raise TypeError("Referência oficial sem published_at.")
 
     try:
         return date.fromisoformat(raw)
