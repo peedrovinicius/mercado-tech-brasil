@@ -1,11 +1,21 @@
 services:
   - type: web
     name: mercado-tech-brasil
-    runtime: docker
+    runtime: python
     plan: free
-    dockerfilePath: ./docker/app/Dockerfile
-    dockerContext: .
+    region: virginia
+    branch: main
+    buildCommand: pip install -e . && cd frontend && npm install --no-audit --no-fund && npm run build
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/system/health
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - src/**
+        - frontend/**
+        - data/gold/**
+        - pyproject.toml
+        - render.yaml
     envVars:
       - key: APP_ENV
         value: production
