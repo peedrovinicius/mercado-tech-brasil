@@ -7,6 +7,7 @@ Plataforma de dados para análise do mercado formal de trabalho em tecnologia no
 [![CI](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml)
 [![Frontend](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml)
 [![Production](https://img.shields.io/badge/production-live-2ea44f)](https://mercado-tech-brasil.onrender.com)
+[![Release](https://img.shields.io/github/v/release/peedrovinicius/mercado-tech-brasil?display_name=tag)](https://github.com/peedrovinicius/mercado-tech-brasil/releases)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
 [Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Health](https://mercado-tech-brasil.onrender.com/api/v1/system/health)
