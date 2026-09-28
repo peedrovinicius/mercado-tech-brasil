@@ -46,6 +46,29 @@ def test_security_headers_are_present():
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
 
 
+def test_every_response_has_unique_request_id():
+    first = client.get("/api/v1/system/health")
+    second = client.get("/api/v1/system/health")
+
+    first_id = first.headers["x-request-id"]
+    second_id = second.headers["x-request-id"]
+    assert len(first_id) == 32
+    assert len(second_id) == 32
+    assert first_id != second_id
+    assert all(char in "0123456789abcdef" for char in first_id + second_id)
+
+
+def test_large_api_response_supports_gzip():
+    response = client.get(
+        "/api/v1/analytics/by-uf",
+        headers={"Accept-Encoding": "gzip"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-encoding"] == "gzip"
+    assert "Accept-Encoding" in response.headers["vary"]
+
+
 def test_cache_policy_distinguishes_live_state_from_published_data():
     health = client.get("/api/v1/system/health")
     readiness = client.get("/api/v1/system/readiness")

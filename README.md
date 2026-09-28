@@ -400,3 +400,8 @@ Contribuições externas são bem-vindas. Antes de abrir um Pull Request, consul
 | [Avaliação QBQ](docs/QBQ_EVALUATION.md) | decisão metodológica e intake de atributos ocupacionais |
 | [Deploy](docs/DEPLOY.md) | produção e execução |
 | [Roadmap](docs/ROADMAP.md) | próximos blocos técnicos |
+| [Contribuição](CONTRIBUTING.md) | fluxo e critérios para contribuições |
+| [Segurança](SECURITY.md) | reporte privado e versões suportadas |
+| [Suporte](SUPPORT.md) | canais, escopo e limites de suporte |
+| [Acessibilidade](ACCESSIBILITY.md) | controles atuais e princípios de interface |
+| [Código de Conduta](CODE_OF_CONDUCT.md) | regras de colaboração e revisão baseada em evidências |
