@@ -340,6 +340,7 @@ Contribuições externas são bem-vindas. Antes de abrir um Pull Request, consul
 | Documento | Conteúdo |
 |---|---|
 | [Arquitetura](docs/ARCHITECTURE.md) | componentes e responsabilidades |
+| [Exemplos da API](docs/API_EXAMPLES.md) | comandos reproduzíveis para consultar os endpoints públicos |
 | [Visão técnica](docs/PROJECT_OVERVIEW.md) | desenho geral do produto |
 | [Contrato de dados](docs/DATA_CONTRACT.md) | campos e expectativas de schema |
 | [Metodologia](docs/METHODOLOGY.md) | regras de cálculo e reconciliação |
