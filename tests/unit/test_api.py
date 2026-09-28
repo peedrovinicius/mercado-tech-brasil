@@ -44,6 +44,10 @@ def test_security_headers_are_present():
         == "camera=(), microphone=(), geolocation=()"
     )
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
+    csp = response.headers["content-security-policy"]
+    assert "default-src 'self'" in csp
+    assert "object-src 'none'" in csp
+    assert "frame-ancestors 'none'" in csp
 
 
 def test_sources_are_exposed():
