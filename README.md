@@ -200,66 +200,18 @@ A justificativa e as regras de governança estão em [docs/CBO_SCOPE.md](docs/CB
 
 ## Qualidade e governança
 
-O pipeline mantém:
+O pipeline mantém controles em quatro pontos:
 
-- Bronze imutável com manifesto e SHA-256;
-- detecção de mudança de layout;
-- normalização e tipagem antes das agregações;
-- registros rejeitados preservados para auditoria;
-- recorte CBO versionado;
-- metodologia salarial alinhada às regras publicadas pelo MTE;
-- salário real com número índice do IPCA pelo SIDRA/IBGE;
-- ajustes FOR e EXC incorporados como deltas auditáveis;
-- referência externa para reconciliação;
-- gate mensal vinculado ao hash do MOV e ao fingerprint da referência oficial;
-- preparação incremental bloqueada até existir referência oficial contínua e efetiva;
-- cobertura mensal limitada por política versionada até Jul/2026;
-- auditoria mensal impedida de antecipar, saltar ou ultrapassar a cobertura autorizada;
-- revisão oficial de competência publicada detectada e enviada para reauditoria;
-- alterações históricas por FOR/EXC protegidas por baseline e hashes antes/depois;
-- cache IPCA incremental para preservar reconstruções de competências anteriores;
-- gate anual RAIS vinculado ao fingerprint de entradas, reconciliação e Gold;
-- downloader RAIS retomável após queda de conexão FTP;
-- fallback HTTPS de transporte auditável quando o FTP estiver instável;
-- contrato RAIS 2025 alinhado ao layout real observado;
-- estoque anual qualificado por vínculo ativo em 31/12 e exclusão de vínculo abandonado;
-- carga PostgreSQL transacional e idempotente;
-- contratos de API versionados;
-- endpoints e visual anual RAIS condicionados ao gate publishable=true;
-- comparação Ceará, Nordeste e Brasil na competência mais recente publicada;
-- evolução mensal das cinco famílias CBO do recorte, sem agregação indevida de medianas salariais;
-- comparação descritiva entre estoque RAIS e fluxos CAGED por família, sem rotular a razão como turnover;
-- intake governado do QBQ preparado para workbook oficial, fingerprint e validação dos CBOs tech;
-- enriquecimento populacional pós-publicação governado por SHA-256 e cobertura completa;
-- taxas municipais por 100 mil habitantes com Estimativas da População do IBGE.
-
-## Estado do produto
-
-~~~mermaid
-flowchart LR
-    A["Aplicação pública<br/>operacional"] --> B["API + OpenAPI<br/>operacional"]
-    B --> C["Pipeline de dados<br/>implementado"]
-    C --> D["Gate de publicação<br/>implementado"]
-    D --> E["Arquivos Gold<br/>serving ativo"]
-    D --> F["PostgreSQL<br/>serving disponível"]
-~~~
-
-| Componente | Estado |
-|---|---|
-| Aplicação pública | Operacional |
-| API / OpenAPI | Operacional, incluindo RAIS 2025 publicada pelo gate anual |
-| Frontend de produção | Operacional, seção RAIS habilitada automaticamente para releases publicadas |
-| Bronze / Silver / Gold | Implementado |
-| Gate de publicação | Implementado |
-| Serving ativo em produção | Arquivos Gold publicados |
-| PostgreSQL serving | Implementado e opcional |
-| Reconciliação oficial jan-jul/2026 | Implementada |
-| Transporte FTP com fallback HTTPS | Implementado |
-| Tratamento de MOV, FOR e EXC | Implementado |
-| Agregação municipal | Implementada |
-| Série histórica publicada | Jan-jul/2026 |
-| Salário real por IPCA | Implementado |
-| Competências tech publicadas | 7, de jan/2026 a jul/2026 |
+- origem: Bronze imutável, manifesto, SHA-256 e proveniência de transporte;
+- schema: detecção de mudança, normalização, tipagem e rejeições auditáveis;
+- metodologia: recorte CBO e regras salariais versionados, IPCA/IBGE e tratamento explícito de MOV, FOR e EXC;
+- publicação: reconciliação externa, gates mensal e anual, aprovação metodológica e invalidação quando a origem muda;
+- histórico: baselines e hashes protegem revisões retroativas;
+- RAIS: reconciliação nacional e regional antes da exposição anual;
+- municípios: referência IBGE, cobertura populacional e validação das taxas por 100 mil;
+- serving: carga PostgreSQL transacional e idempotente, além dos arquivos Gold publicados;
+- API: contratos versionados e endpoints condicionados ao estado de publicação;
+- CI: testes, auditoria de dependências, CodeQL e política de deploy.
 
 ## Execução local
 
