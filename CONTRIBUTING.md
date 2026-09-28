@@ -8,6 +8,18 @@ Contribuições são bem-vindas quando preservam a rastreabilidade, a metodologi
 2. Se a mudança não estiver registrada, abra uma issue descrevendo problema, motivação e escopo.
 3. Para alterações metodológicas, informe explicitamente qual indicador, fonte, recorte ou regra de publicação será afetado.
 
+## Boas primeiras contribuições
+
+Mudanças pequenas também são úteis quando melhoram a qualidade do projeto sem alterar resultados publicados. Bons pontos de entrada incluem:
+
+- corrigir documentação, links ou exemplos de uso;
+- ampliar testes de validações já existentes;
+- melhorar mensagens de erro, tipagem ou legibilidade do código;
+- aprimorar acessibilidade e detalhes de interface sem mudar a metodologia;
+- propor verificações adicionais de qualidade de dados com caso reproduzível.
+
+Quando houver dúvida sobre o escopo, abra uma issue antes de implementar.
+
 ## Fluxo recomendado
 
 1. Crie uma branch curta e específica a partir de `main`.
