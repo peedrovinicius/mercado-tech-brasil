@@ -12,7 +12,7 @@ Plataforma de dados para análise do mercado formal de trabalho em tecnologia no
 [![Release](https://img.shields.io/github/v/release/peedrovinicius/mercado-tech-brasil?display_name=tag)](https://github.com/peedrovinicius/mercado-tech-brasil/releases)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
-[Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Arquitetura](docs/ARCHITECTURE.md) · [Metodologia](docs/METHODOLOGY.md) · [Como contribuir](CONTRIBUTING.md)
+[Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Arquitetura](docs/ARCHITECTURE.md) · [Metodologia](docs/METHODOLOGY.md) · [Issues](https://github.com/peedrovinicius/mercado-tech-brasil/issues) · [Como contribuir](CONTRIBUTING.md)
 
 </div>
 
