@@ -2,7 +2,7 @@
 
 # Mercado Tech Brasil
 
-Plataforma de dados para análise do mercado formal de trabalho em tecnologia no Brasil com fontes públicas oficiais, rastreabilidade e metodologia versionada.
+Novo CAGED e RAIS transformados em pipeline auditável, API e dashboard para acompanhar o mercado formal de trabalho em tecnologia no Brasil.
 
 [![CI](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/ci.yml)
 [![Frontend](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml/badge.svg)](https://github.com/peedrovinicius/mercado-tech-brasil/actions/workflows/frontend.yml)
@@ -13,6 +13,8 @@ Plataforma de dados para análise do mercado formal de trabalho em tecnologia no
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
 [Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Arquitetura](docs/ARCHITECTURE.md) · [Metodologia](docs/METHODOLOGY.md) · [Issues](https://github.com/peedrovinicius/mercado-tech-brasil/issues) · [Como contribuir](CONTRIBUTING.md)
+
+**Cobertura publicada:** Novo CAGED Jan–Jul/2026 · RAIS 2025 · API e dashboard em produção
 
 </div>
 
