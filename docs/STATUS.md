@@ -30,55 +30,23 @@ Em todas as competências processadas:
 
 ## Dados
 
-- Bronze, Silver e Gold;
-- ingestão FTP oficial com fallback HTTPS;
-- extração de arquivos .7z;
-- manifestos SHA-256;
-- proveniência de transporte;
-- detecção de mudança de layout;
-- normalização e tipagem;
-- rejeições auditáveis;
-- MOV, FOR e EXC;
-- Gold por UF;
-- Gold por ocupação;
-- Gold por município;
-- série histórica;
-- série temporal por família CBO com admissões, desligamentos, saldo e participação;
-- contexto estoque RAIS x fluxo CAGED por família CBO, com interpretação descritiva;
-- referências oficiais nacionais por competência;
-- recorte CBO v2;
-- metodologia salarial MTE;
-- salário real por IPCA;
-- referência municipal IBGE;
-- Jul/2026 enriquecida com Estimativas da População 2026, referência em 01/07/2026;
-- 1.274 municípios tech identificados com população, zero ausências;
-- taxas municipais por 100 mil ativas em Jul/2026 após gate de cobertura completa;
-- categoria residual municipal Não identificado;
-- governança de intake QBQ com arquivo oficial XLSX, SHA-256 e validação de cobertura CBO.
+- Bronze, Silver e Gold com manifestos, SHA-256 e proveniência;
+- MOV, FOR e EXC tratados por competência de origem;
+- agregados por UF, ocupação e município;
+- série histórica e série por família CBO;
+- RAIS 2025 e comparação descritiva com os fluxos CAGED;
+- referências do MTE e IBGE, incluindo IPCA, municípios e população 2026;
+- recorte CBO versionado e intake do QBQ preparado para arquivo oficial.
 
 ## Qualidade e publicação
 
-- checks automáticos;
-- reconciliação nacional por competência;
-- qualidade da dimensão municipal;
-- validação de proveniência, cobertura e aritmética da população municipal;
-- gate de publicação por competência;
-- resolvedor da próxima competência oficial elegível;
-- bloqueio de auditoria para competência antecipada, com lacuna temporal ou acima do teto de cobertura;
-- política mensal versionada com cobertura máxima em Jul/2026;
-- disparo automático da auditoria quando uma nova referência oficial é versionada;
-- aprovação metodológica vinculada ao SHA-256 do MOV e ao fingerprint da referência;
-- invalidação da aprovação quando a origem ou a referência oficial muda;
-- detecção de revisão oficial em competência já publicada;
-- snapshot e regressão dos artefatos históricos;
-- pacote de revisão histórica protegido por hashes antes/depois;
-- rejeição de alterações históricas não justificadas por FOR/EXC;
-- cache IPCA incremental para preservar competências anteriores;
-- registro de releases publicado pela API;
-- regra editorial automatizada para pontuação;
-- política de deploy que bloqueia artefatos mensais ou RAIS sem gate publicável;
-- Blueprint versionado com build filter e promoção após checks de CI;
-- serviço Render atualmente com drift operacional: autoDeploy ainda está em commit e o health check do serviço ainda não está configurado.
+- reconciliação nacional por competência e validação territorial;
+- gates mensal e anual com aprovação metodológica vinculada às entradas;
+- regressão dos artefatos históricos e controle de revisões FOR/EXC;
+- validação de proveniência e cobertura populacional;
+- política de cobertura mensal e detecção de revisão oficial;
+- política de deploy para impedir promoção de artefatos não publicáveis;
+- serviço Render ainda difere do Blueprint em `autoDeployTrigger` e health check.
 
 ## Serving e aplicação
 

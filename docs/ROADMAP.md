@@ -6,35 +6,15 @@ O núcleo do Mercado Tech Brasil está operacional e publicado.
 
 Entregas concluídas:
 
-- pipeline Bronze, Silver e Gold para Novo CAGED;
-- ingestão e ajustes MOV, FOR e EXC;
-- manifestos e SHA-256 da origem;
-- detecção de mudança de layout;
-- recorte CBO versionado;
-- reconciliação nacional por competência;
-- gates automáticos e aprovação metodológica;
-- série mensal publicada de jan/2026 a jul/2026;
-- política versionada que bloqueia competências posteriores a jul/2026;
-- regressão histórica e pacotes auditáveis para revisões FOR/EXC;
-- salário real por IPCA;
-- dimensão municipal IBGE;
-- população municipal 2026 e taxas por 100 mil em jul/2026;
-- série temporal por família CBO;
-- comparação Ceará, Nordeste e Brasil;
-- comparação descritiva RAIS x CAGED;
-- pipeline anual RAIS 2025 completo;
-- 91.710.262 registros RAIS processados;
-- estoque qualificado RAIS reconciliado em 59.970.945 vínculos;
-- 786.296 vínculos tech RAIS publicados;
-- dimensão municipal RAIS validada contra DTB 2025;
-- API FastAPI e OpenAPI;
-- frontend React + TypeScript;
-- serving por arquivos Gold;
-- serving PostgreSQL disponível por configuração;
-- aplicação pública no Render;
-- política de deploy que bloqueia Gold mensal ou RAIS sem gate publicável;
-- enriquecimento populacional pós-publicação idempotente;
-- intake auditável do QBQ preparado para workbook oficial.
+- pipeline Bronze, Silver e Gold do Novo CAGED, com MOV, FOR e EXC;
+- série mensal auditada de jan/2026 a jul/2026, com reconciliação oficial e salário real por IPCA;
+- dimensões territoriais do IBGE, população 2026 e taxas municipais por 100 mil;
+- recorte CBO versionado, série por família e comparação Brasil, Nordeste e Ceará;
+- RAIS 2025 processada, reconciliada, validada por município e publicada;
+- FastAPI, OpenAPI, frontend React/TypeScript e aplicação pública;
+- serving por arquivos Gold e suporte PostgreSQL;
+- gates de publicação, regressão histórica e política de deploy;
+- intake do QBQ preparado para o arquivo oficial.
 
 ## Pendências reais
 
@@ -52,7 +32,7 @@ O serviço existente no Render ainda apresenta drift operacional:
 - `autoDeployTrigger=commit`;
 - health check não configurado.
 
-A correção depende de alteração da configuração do serviço no Render. O conector usado pelo projeto permite leitura e deploy, mas não expõe mutação dessas propriedades.
+A correção depende de atualizar a configuração do serviço existente no Render para refletir o Blueprint versionado.
 
 ### 2. QBQ: obter o workbook oficial autenticado
 
