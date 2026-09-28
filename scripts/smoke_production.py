@@ -52,13 +52,19 @@ def validate(
         "referrer-policy": "strict-origin-when-cross-origin",
         "permissions-policy": "camera=(), microphone=(), geolocation=()",
         "cross-origin-opener-policy": "same-origin",
+        "content-security-policy": "default-src 'self'",
     }
     for key, value in expected_headers.items():
-        if health_headers.get(key) != value:
+        actual = health_headers.get(key, "")
+        if value not in actual:
             raise RuntimeError(
                 f"Header de segurança divergente: {key}="
-                f"{health_headers.get(key)!r}."
+                f"{actual!r}."
             )
+
+    hsts = health_headers.get("strict-transport-security", "")
+    if "max-age=31536000" not in hsts or "includeSubDomains" not in hsts:
+        raise RuntimeError(f"HSTS ausente ou divergente: {hsts!r}.")
 
     readiness, _ = _json(base_url, "/api/v1/system/readiness")
     if readiness.get("api") != "ready" or readiness.get("data_loaded") is not True:
