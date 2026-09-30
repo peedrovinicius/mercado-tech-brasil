@@ -31,6 +31,54 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+_ALLOWED_PREPUBLICATION_FAILURES = {
+    "municipality_population_metadata",
+    "municipality_population_report",
+    "manual_methodology_approval",
+}
+
+
+def _validate_gate_for_population_enrichment(
+    gate: dict[str, Any],
+    *,
+    yearmonth: str,
+    allow_unpublished_candidate: bool,
+) -> None:
+    if str(gate.get("competence") or "") != yearmonth:
+        raise ValueError("Competência do gate diverge do alvo populacional.")
+
+    if gate.get("publishable") is True:
+        return
+
+    if not allow_unpublished_candidate:
+        raise ValueError(
+            f"Competência {yearmonth} não está publicada."
+        )
+
+    checks = gate.get("checks")
+    if not isinstance(checks, list):
+        raise ValueError(
+            "Gate candidato não possui checks suficientes para enriquecimento."
+        )
+
+    blocking_failures = {
+        str(item.get("id") or "")
+        for item in checks
+        if isinstance(item, dict)
+        and item.get("blocking", True) is True
+        and item.get("passed") is not True
+    }
+    unexpected = sorted(
+        blocking_failures - _ALLOWED_PREPUBLICATION_FAILURES
+    )
+    if unexpected:
+        raise ValueError(
+            "Candidato possui falhas bloqueantes anteriores ao "
+            "enriquecimento populacional: "
+            + ", ".join(unexpected)
+        )
+
+
 def enrich_published_municipality_population(
     *,
     yearmonth: str,
@@ -39,6 +87,7 @@ def enrich_published_municipality_population(
     population_cache_path: Path,
     source_url: str,
     published_at: str,
+    allow_unpublished_candidate: bool = False,
 ) -> dict[str, Any]:
     if len(yearmonth) != 6 or not yearmonth.isdigit():
         raise ValueError("Competência deve usar o formato AAAAMM.")
@@ -49,10 +98,11 @@ def enrich_published_municipality_population(
             f"Gate publicado ausente para {yearmonth}."
         )
     gate = _read_json(gate_path)
-    if gate.get("publishable") is not True:
-        raise ValueError(
-            f"Competência {yearmonth} não está publicada."
-        )
+    _validate_gate_for_population_enrichment(
+        gate,
+        yearmonth=yearmonth,
+        allow_unpublished_candidate=allow_unpublished_candidate,
+    )
 
     municipality_path = gold_dir / f"by-municipality-{yearmonth}.json"
     if not municipality_path.exists():
