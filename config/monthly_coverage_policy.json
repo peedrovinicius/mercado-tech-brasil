@@ -1,6 +1,6 @@
 {
-  "version": 1,
+  "version": 2,
   "mode": "locked",
-  "max_competence": "202607",
-  "reason": "A cobertura mensal publicada do produto permanece limitada a janeiro-julho de 2026 até revisão explícita desta política."
+  "max_competence": "202608",
+  "reason": "A competência agosto/2026 foi oficialmente publicada pelo MTE em 29/09/2026. A cobertura pode avançar até 202608, mantendo ingestão, reconciliação, gate automático e aprovação metodológica como requisitos para publicação."
 }
