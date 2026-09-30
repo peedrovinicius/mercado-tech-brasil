@@ -14,7 +14,7 @@ Novo CAGED e RAIS transformados em pipeline auditável, API e dashboard para aco
 
 [Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Arquitetura](docs/ARCHITECTURE.md) · [Metodologia](docs/METHODOLOGY.md) · [Issues](https://github.com/peedrovinicius/mercado-tech-brasil/issues) · [Como contribuir](CONTRIBUTING.md)
 
-**Cobertura publicada:** Novo CAGED Jan–Jul/2026 · RAIS 2025 · API e dashboard em produção
+**Cobertura publicada:** Novo CAGED Jan-Jul/2026 · RAIS 2025 · API e dashboard em produção
 
 </div>
 
