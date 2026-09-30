@@ -220,3 +220,147 @@ def test_enrichment_is_idempotent_for_same_population_reference(
         second["municipality_artifact_before_sha256"]
         == first["municipality_artifact_before_sha256"]
     )
+
+
+def test_prepublication_candidate_allows_population_only_failures(
+    tmp_path: Path,
+):
+    gold = tmp_path / "gold"
+    population = tmp_path / "population.json"
+    _population_fixture(population)
+
+    _write_json(
+        gold / "publication-gate-202608.json",
+        {
+            "competence": "202608",
+            "publishable": False,
+            "checks": [
+                {
+                    "id": "quality_report",
+                    "passed": True,
+                    "blocking": True,
+                },
+                {
+                    "id": "municipality_population_metadata",
+                    "passed": False,
+                    "blocking": True,
+                },
+                {
+                    "id": "municipality_population_report",
+                    "passed": False,
+                    "blocking": True,
+                },
+                {
+                    "id": "manual_methodology_approval",
+                    "passed": False,
+                    "blocking": True,
+                },
+            ],
+        },
+    )
+    _write_json(
+        gold / "by-municipality-202608.json",
+        {
+            "competence": "202608",
+            "source": "Novo CAGED / MTE",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 270,
+                    "dismissals": 135,
+                    "balance": 135,
+                }
+            ],
+        },
+    )
+
+    report = enrich_published_municipality_population(
+        yearmonth="202608",
+        population_year=2026,
+        gold_dir=gold,
+        population_cache_path=population,
+        source_url="https://www.ibge.gov.br/estimativas",
+        published_at="2026-08-28",
+        allow_unpublished_candidate=True,
+    )
+
+    assert report["coverage_complete"] is True
+    assert report["matched_population"] == 1
+    payload = json.loads(
+        (gold / "by-municipality-202608.json").read_text(encoding="utf-8")
+    )
+    assert payload["population_enrichment_status"] == "complete"
+
+
+def test_prepublication_candidate_rejects_other_blocking_failures(
+    tmp_path: Path,
+):
+    gold = tmp_path / "gold"
+    population = tmp_path / "population.json"
+    _population_fixture(population)
+
+    _write_json(
+        gold / "publication-gate-202608.json",
+        {
+            "competence": "202608",
+            "publishable": False,
+            "checks": [
+                {
+                    "id": "national_reference_reconciliation",
+                    "passed": False,
+                    "blocking": True,
+                },
+                {
+                    "id": "municipality_population_metadata",
+                    "passed": False,
+                    "blocking": True,
+                },
+                {
+                    "id": "municipality_population_report",
+                    "passed": False,
+                    "blocking": True,
+                },
+                {
+                    "id": "manual_methodology_approval",
+                    "passed": False,
+                    "blocking": True,
+                },
+            ],
+        },
+    )
+    _write_json(
+        gold / "by-municipality-202608.json",
+        {
+            "competence": "202608",
+            "items": [
+                {
+                    "municipio_codigo_caged": "230440",
+                    "municipio_codigo_ibge": "2304400",
+                    "municipio_nome": "Fortaleza",
+                    "uf": "CE",
+                    "admissions": 1,
+                    "dismissals": 0,
+                    "balance": 1,
+                }
+            ],
+        },
+    )
+
+    try:
+        enrich_published_municipality_population(
+            yearmonth="202608",
+            population_year=2026,
+            gold_dir=gold,
+            population_cache_path=population,
+            source_url="https://www.ibge.gov.br/estimativas",
+            published_at="2026-08-28",
+            allow_unpublished_candidate=True,
+        )
+    except ValueError as exc:
+        assert "falhas bloqueantes anteriores" in str(exc)
+        assert "national_reference_reconciliation" in str(exc)
+    else:
+        raise AssertionError("Expected blocking gate failure to reject enrichment")
