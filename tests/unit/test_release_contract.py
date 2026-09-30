@@ -59,3 +59,13 @@ def test_approved_caged_publication_dispatch_is_governed():
     assert "caged-$COMPETENCE-audit" in workflow
     assert "gh workflow run publish-data.yml" in workflow
     assert "actions: write" in workflow
+
+
+def test_readme_dashboard_supports_all_calendar_months():
+    dashboard = (
+        ROOT / "scripts" / "generate_readme_dashboard.py"
+    ).read_text(encoding="utf-8")
+
+    for month in range(1, 13):
+        key = f'{month:02d}'
+        assert f'"{key}":' in dashboard
