@@ -98,7 +98,7 @@ def _territory_item(
 
 @router.get("/territorial-comparison")
 def territorial_comparison() -> dict[str, object]:
-    payload = _by_uf_payload(27)
+    payload = _by_uf_payload(28)
     raw_items = payload.get("items", [])
     items = [
         item
