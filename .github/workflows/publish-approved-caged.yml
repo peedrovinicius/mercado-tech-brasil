@@ -6,6 +6,7 @@ on:
     paths:
       - "config/publication_approvals.json"
       - ".github/workflows/publish-approved-caged.yml"
+      - "scripts/generate_readme_dashboard.py"
   workflow_dispatch:
 
 permissions:
