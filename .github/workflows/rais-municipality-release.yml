@@ -43,7 +43,7 @@ jobs:
           npm run build
 
       - name: Download validated RAIS release artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: rais-2025-v035-full-reprocess
           path: work/release
