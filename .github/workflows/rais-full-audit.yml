@@ -31,7 +31,7 @@ jobs:
           python scripts/rais_discover_full.py "${{ inputs.year }}"
 
       - name: Upload discovery
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-2025-discovery
           retention-days: 3
@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload regional derivatives
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-part-${{ matrix.key }}
           retention-days: 3
@@ -152,7 +152,7 @@ jobs:
 
       - name: Upload national derivatives
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-2025-full-audit
           retention-days: 3
