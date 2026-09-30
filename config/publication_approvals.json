@@ -54,5 +54,13 @@
     "source_sha256": "07b580d8d6da65ed9b87f693262981027e417ab56a111301494ee5532983475f",
     "approved_at_utc": "2026-09-26T08:25:00Z",
     "reference_sha256": "78f4f5f230c6dc63fe66bdaf3a2f600ce7f63362b1d73c64dd594cedff5cef05"
+  },
+  "202608": {
+    "approved": true,
+    "reviewer": "Mercado Tech Brasil",
+    "notes": "Layout oficial revisado. MOV com 4.423.299 registros e taxa válida de 100%. MOV nacional reconciliado exatamente com a referência oficial: 2.294.563 admissões, 2.128.736 desligamentos e saldo +165.827. FOR com 58.024 registros e EXC com 13.056 registros, ambos com taxa válida de 100%. Recorte CBO tech validado em 19.524 admissões, 17.971 desligamentos e saldo +1.553. Agregados por UF, ocupação e município fecham com o overview. Cobertura populacional IBGE 2026 completa para 1.265 municípios identificados. Revisões históricas sem alterações inesperadas nas competências já publicadas.",
+    "source_sha256": "109cbe2e02949d4bac78859f62bd3863a78c719958449ab1d97f606922737cce",
+    "approved_at_utc": "2026-09-30T21:27:15Z",
+    "reference_sha256": "782a412bc8f38a4b40da81376a484e48c28f92c6a784b8f2f6a9a1edfb90f479"
   }
 }
