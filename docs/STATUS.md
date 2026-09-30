@@ -11,11 +11,11 @@
 
 ## Série publicada
 
-O produto cobre sete competências oficiais de 2026, de janeiro a julho.
+O produto cobre oito competências oficiais de 2026, de janeiro a agosto.
 
 | Período | Admissões tech | Desligamentos tech | Saldo |
 |---|---:|---:|---:|
-| Jan-jul/2026 | 134.209 | 127.865 | +6.344 |
+| Jan-ago/2026 | 153.733 | 145.836 | +7.897 |
 
 Em todas as competências processadas:
 
@@ -61,7 +61,7 @@ Em todas as competências processadas:
 - gráficos ECharts modulares;
 - análise visual da evolução mensal das cinco famílias CBO tech;
 - comparação visual RAIS x CAGED com participação e escala por estoque anterior;
-- ranking municipal normalizado por 100 mil habitantes ativo para Jul/2026;
+- ranking municipal normalizado por 100 mil habitantes ativo para Ago/2026;
 - frontend responsivo;
 - deploy público no Render.
 
