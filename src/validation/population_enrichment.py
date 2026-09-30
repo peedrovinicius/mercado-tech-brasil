@@ -57,7 +57,7 @@ def _validate_gate_for_population_enrichment(
 
     checks = gate.get("checks")
     if not isinstance(checks, list):
-        raise ValueError(
+        raise TypeError(
             "Gate candidato não possui checks suficientes para enriquecimento."
         )
 
