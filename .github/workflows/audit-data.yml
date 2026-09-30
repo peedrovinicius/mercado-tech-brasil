@@ -193,6 +193,108 @@ jobs:
               path.unlink()
           PY
 
+      - name: Enrich candidate population provenance
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import date
+          from pathlib import Path
+
+          from src.core.settings import settings
+          from src.validation.population_enrichment import (
+              enrich_published_municipality_population,
+          )
+          from src.validation.publication_gate import (
+              evaluate_publication_gate,
+              write_publication_gate,
+          )
+
+          competence = os.environ["COMPETENCE"]
+          targets = json.loads(
+              Path("config/population_release_targets.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          eligible = []
+          for effective_from, target in targets.items():
+              if target.get("enabled") is not True:
+                  continue
+              if (
+                  len(effective_from) != 6
+                  or not effective_from.isdigit()
+                  or effective_from > competence
+              ):
+                  continue
+
+              population_year = int(target["population_year"])
+              if target.get("reference_date") != f"{population_year}-07-01":
+                  raise SystemExit(
+                      f"Referência populacional inválida: {effective_from}"
+                  )
+
+              published_at = date.fromisoformat(target["published_at"])
+              if published_at > date.today():
+                  continue
+
+              source_url = str(target.get("source_url") or "")
+              if not source_url.startswith("https://www.ibge.gov.br/"):
+                  raise SystemExit(
+                      f"Fonte populacional não oficial: {effective_from}"
+                  )
+              eligible.append((effective_from, target))
+
+          if not eligible:
+              raise SystemExit(
+                  f"Sem referência populacional elegível para {competence}."
+              )
+
+          effective_from, target = max(
+              eligible,
+              key=lambda item: item[0],
+          )
+          report = enrich_published_municipality_population(
+              yearmonth=competence,
+              population_year=int(target["population_year"]),
+              gold_dir=settings.gold_path,
+              population_cache_path=settings.population_cache_path,
+              source_url=target["source_url"],
+              published_at=target["published_at"],
+              allow_unpublished_candidate=True,
+          )
+
+          gate = evaluate_publication_gate(
+              yearmonth=competence,
+              bronze_dir=settings.bronze_path,
+              gold_dir=settings.gold_path,
+              reference_path=settings.reference_totals_path,
+              approvals_path=settings.publication_approvals_path,
+          )
+          write_publication_gate(
+              gate,
+              settings.gold_path / f"publication-gate-{competence}.json",
+          )
+
+          failures = [
+              item.id
+              for item in gate.checks
+              if item.blocking and not item.passed
+          ]
+          print(
+              "population candidate enrichment: "
+              f"competence={competence} "
+              f"reference_effective_from={effective_from} "
+              f"matched={report['matched_population']} "
+              f"automatic={gate.automatic_checks_passed} "
+              f"remaining_failures={failures}"
+          )
+          if not gate.automatic_checks_passed:
+              raise SystemExit(
+                  "Checks automáticos continuam bloqueados após "
+                  "enriquecimento populacional."
+              )
+          PY
+
       - name: Validate historical revisions
         run: |
           python -m src.cli validate-history-revisions "$COMPETENCE" \
