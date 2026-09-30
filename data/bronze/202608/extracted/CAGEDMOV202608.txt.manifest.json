@@ -1,0 +1,10 @@
+{
+  "source": "novo_caged_mte",
+  "competence": "202608",
+  "original_name": "CAGEDMOV202608.txt",
+  "size_bytes": 465183202,
+  "sha256": "109cbe2e02949d4bac78859f62bd3863a78c719958449ab1d97f606922737cce",
+  "ingested_at_utc": "2026-09-30T21:27:11.757162+00:00",
+  "transport": "ftp_mte",
+  "source_url": "ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202608/CAGEDMOV202608.7z"
+}

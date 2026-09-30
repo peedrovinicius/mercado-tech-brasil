@@ -13,7 +13,7 @@
     font-weight="800" fill="#171719">Dashboard executivo</text>
   <text x="60" y="150" font-family="Inter,Arial,sans-serif" font-size="15"
     fill="#707078">Série publicada: Jan/2026 a
-    Jul/2026</text>
+    Ago/2026</text>
   <rect x="930" y="70" width="186" height="34" rx="17"
     fill="#edf1ff" stroke="#d5deff"/>
   <circle cx="953" cy="87" r="5" fill="#2f63ff"/>
@@ -25,7 +25,7 @@
     <text x="82" y="220" font-size="12" font-weight="700" fill="#a9a9b1"
       letter-spacing="1">ADMISSÕES TECH</text>
     <text x="82" y="264" font-size="34" font-weight="800"
-      fill="#ffffff">134.209</text>
+      fill="#ffffff">153.733</text>
     <text x="82" y="284" font-size="11" fill="#a9a9b1">acumulado da série</text>
 
     <rect x="330" y="190" width="250" height="108" rx="16"
@@ -33,7 +33,7 @@
     <text x="352" y="220" font-size="12" font-weight="700" fill="#7a7a82"
       letter-spacing="1">DESLIGAMENTOS</text>
     <text x="352" y="264" font-size="34" font-weight="800"
-      fill="#171719">127.865</text>
+      fill="#171719">145.836</text>
     <text x="352" y="284" font-size="11" fill="#888890">acumulado da série</text>
 
     <rect x="600" y="190" width="250" height="108" rx="16"
@@ -41,15 +41,15 @@
     <text x="622" y="220" font-size="12" font-weight="700" fill="#7a7a82"
       letter-spacing="1">SALDO ACUMULADO</text>
     <text x="622" y="264" font-size="34" font-weight="800"
-      fill="#17643b">+6.344</text>
-    <text x="622" y="284" font-size="11" fill="#888890">7 competências</text>
+      fill="#17643b">+7.897</text>
+    <text x="622" y="284" font-size="11" fill="#888890">8 competências</text>
 
     <rect x="870" y="190" width="246" height="108" rx="16"
       fill="#edf1ff" stroke="#d7e0ff"/>
     <text x="892" y="220" font-size="12" font-weight="700" fill="#5e6f9b"
-      letter-spacing="1">JUL/2026</text>
+      letter-spacing="1">AGO/2026</text>
     <text x="892" y="264" font-size="34" font-weight="800"
-      fill="#2459ff">+906</text>
+      fill="#2459ff">+1.553</text>
     <text x="892" y="284" font-size="11" fill="#68769b">saldo da competência</text>
   </g>
 
@@ -63,13 +63,13 @@
   <line x1="90" y1="510" x2="790" y2="510" stroke="#eeeef2"/>
   <line x1="90" y1="555" x2="790" y2="555" stroke="#eeeef2"/>
 
-  <polyline points="90.0,465.4 206.7,552.6 323.3,420.0 440.0,467.1 556.7,551.3 673.3,500.9 790.0,487.4" fill="none" stroke="#171719"
+  <polyline points="90.0,465.4 190.0,552.6 290.0,420.0 390.0,467.1 490.0,551.3 590.0,500.9 690.0,487.4 790.0,471.7" fill="none" stroke="#171719"
     stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="90.0,557.8 206.7,578.8 323.3,472.1 440.0,497.0 556.7,577.2 673.3,590.0 790.0,540.0" fill="none" stroke="#2459ff"
+  <polyline points="90.0,557.8 190.0,578.8 290.0,472.1 390.0,497.0 490.0,577.2 590.0,590.0 690.0,540.0 790.0,561.9" fill="none" stroke="#2459ff"
     stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <g><circle cx="90.0" cy="465.4" r="4" fill="#171719"/><circle cx="206.7" cy="552.6" r="4" fill="#171719"/><circle cx="323.3" cy="420.0" r="4" fill="#171719"/><circle cx="440.0" cy="467.1" r="4" fill="#171719"/><circle cx="556.7" cy="551.3" r="4" fill="#171719"/><circle cx="673.3" cy="500.9" r="4" fill="#171719"/><circle cx="790.0" cy="487.4" r="4" fill="#171719"/></g>
-  <g><circle cx="90.0" cy="557.8" r="4" fill="#2459ff"/><circle cx="206.7" cy="578.8" r="4" fill="#2459ff"/><circle cx="323.3" cy="472.1" r="4" fill="#2459ff"/><circle cx="440.0" cy="497.0" r="4" fill="#2459ff"/><circle cx="556.7" cy="577.2" r="4" fill="#2459ff"/><circle cx="673.3" cy="590.0" r="4" fill="#2459ff"/><circle cx="790.0" cy="540.0" r="4" fill="#2459ff"/></g>
-  <g><text x="90.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jan</text><text x="206.7" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Fev</text><text x="323.3" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Mar</text><text x="440.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Abr</text><text x="556.7" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Mai</text><text x="673.3" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jun</text><text x="790.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jul</text></g>
+  <g><circle cx="90.0" cy="465.4" r="4" fill="#171719"/><circle cx="190.0" cy="552.6" r="4" fill="#171719"/><circle cx="290.0" cy="420.0" r="4" fill="#171719"/><circle cx="390.0" cy="467.1" r="4" fill="#171719"/><circle cx="490.0" cy="551.3" r="4" fill="#171719"/><circle cx="590.0" cy="500.9" r="4" fill="#171719"/><circle cx="690.0" cy="487.4" r="4" fill="#171719"/><circle cx="790.0" cy="471.7" r="4" fill="#171719"/></g>
+  <g><circle cx="90.0" cy="557.8" r="4" fill="#2459ff"/><circle cx="190.0" cy="578.8" r="4" fill="#2459ff"/><circle cx="290.0" cy="472.1" r="4" fill="#2459ff"/><circle cx="390.0" cy="497.0" r="4" fill="#2459ff"/><circle cx="490.0" cy="577.2" r="4" fill="#2459ff"/><circle cx="590.0" cy="590.0" r="4" fill="#2459ff"/><circle cx="690.0" cy="540.0" r="4" fill="#2459ff"/><circle cx="790.0" cy="561.9" r="4" fill="#2459ff"/></g>
+  <g><text x="90.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jan</text><text x="190.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Fev</text><text x="290.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Mar</text><text x="390.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Abr</text><text x="490.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Mai</text><text x="590.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jun</text><text x="690.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Jul</text><text x="790.0" y="618" font-family="Inter,Arial,sans-serif" font-size="11" fill="#77777f" text-anchor="middle">Ago</text></g>
 
   <circle cx="90" cy="647" r="5" fill="#171719"/>
   <text x="104" y="652" font-family="Inter,Arial,sans-serif" font-size="12"
@@ -83,30 +83,30 @@
   <text x="866" y="386" font-family="Inter,Arial,sans-serif" font-size="12"
     font-weight="700" fill="#77777f" letter-spacing="1">RECORTE TERRITORIAL</text>
   <text x="866" y="418" font-family="Inter,Arial,sans-serif" font-size="21"
-    font-weight="800" fill="#171719">Jul/2026</text>
+    font-weight="800" fill="#171719">Ago/2026</text>
 
   <text x="866" y="468" font-family="Inter,Arial,sans-serif" font-size="13"
     fill="#55555c">Nordeste / Brasil</text>
   <text x="1082" y="468" text-anchor="end" font-family="Inter,Arial,sans-serif"
-    font-size="18" font-weight="800" fill="#171719">10,13%</text>
+    font-size="18" font-weight="800" fill="#171719">9,71%</text>
   <rect x="866" y="482" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
-  <rect x="866" y="482" width="21.9" height="9" rx="4.5"
+  <rect x="866" y="482" width="21.0" height="9" rx="4.5"
     fill="#171719"/>
 
   <text x="866" y="534" font-family="Inter,Arial,sans-serif" font-size="13"
     fill="#55555c">Ceará / Brasil</text>
   <text x="1082" y="534" text-anchor="end" font-family="Inter,Arial,sans-serif"
-    font-size="18" font-weight="800" fill="#2459ff">2,71%</text>
+    font-size="18" font-weight="800" fill="#2459ff">2,85%</text>
   <rect x="866" y="548" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
-  <rect x="866" y="548" width="5.9" height="9" rx="4.5"
+  <rect x="866" y="548" width="6.2" height="9" rx="4.5"
     fill="#2459ff"/>
 
   <text x="866" y="600" font-family="Inter,Arial,sans-serif" font-size="13"
     fill="#55555c">Ceará / Nordeste</text>
   <text x="1082" y="600" text-anchor="end" font-family="Inter,Arial,sans-serif"
-    font-size="18" font-weight="800" fill="#17643b">26,76%</text>
+    font-size="18" font-weight="800" fill="#17643b">29,38%</text>
   <rect x="866" y="614" width="216" height="9" rx="4.5" fill="#e3e3e8"/>
-  <rect x="866" y="614" width="57.8" height="9" rx="4.5"
+  <rect x="866" y="614" width="63.5" height="9" rx="4.5"
     fill="#17643b"/>
 
   <text x="60" y="704" font-family="Inter,Arial,sans-serif" font-size="11"

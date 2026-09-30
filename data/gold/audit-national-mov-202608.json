@@ -1,0 +1,14 @@
+{
+  "source": "Novo CAGED / MTE",
+  "competence": "202608",
+  "scope": "MOV nacional, incluindo Não identificado",
+  "rows": 4423299,
+  "admissions": 2294563,
+  "dismissals": 2128736,
+  "balance": 165827,
+  "non_identified": {
+    "admissions": 749,
+    "dismissals": 597,
+    "balance": 152
+  }
+}

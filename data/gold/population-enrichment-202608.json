@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "competence": "202608",
+  "population_year": 2026,
+  "population_reference_date": "2026-07-01",
+  "population_source": "IBGE SIDRA",
+  "population_source_url": "https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html",
+  "population_published_at": "2026-08-28",
+  "population_cache_sha256": "9d0ff6edcd84b767a024716717946b6ae101e6feaf30d9b300a58511c8ec122b",
+  "municipality_artifact_before_sha256": "50ace1ef885ce974674d141d0fe03d2d771b42aec54233a4b474edd44843d29c",
+  "municipality_artifact_sha256": "563f941087b79e843314ae6e09a8a2a34ae736ba1a6764ba8e4457c6d636c195",
+  "identified_municipalities": 1265,
+  "residual_municipalities": 1,
+  "matched_population": 1265,
+  "missing_population": 0,
+  "coverage_complete": true,
+  "totals_before": {
+    "admissions": 19524,
+    "dismissals": 17971,
+    "balance": 1553
+  },
+  "totals_after": {
+    "admissions": 19524,
+    "dismissals": 17971,
+    "balance": 1553
+  }
+}

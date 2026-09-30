@@ -1,0 +1,119 @@
+{
+  "competence": "202608",
+  "automatic_checks_passed": true,
+  "manual_approval_valid": true,
+  "publishable": true,
+  "source_sha256": "109cbe2e02949d4bac78859f62bd3863a78c719958449ab1d97f606922737cce",
+  "reference_sha256": "782a412bc8f38a4b40da81376a484e48c28f92c6a784b8f2f6a9a1edfb90f479",
+  "generated_at_utc": "2026-09-30T21:37:20.598894+00:00",
+  "checks": [
+    {
+      "id": "quality_report",
+      "passed": true,
+      "message": "Artefato encontrado: quality-202608.json",
+      "blocking": true
+    },
+    {
+      "id": "overview",
+      "passed": true,
+      "message": "Artefato encontrado: overview-202608.json",
+      "blocking": true
+    },
+    {
+      "id": "gold_market",
+      "passed": true,
+      "message": "Artefato encontrado: market-202608.parquet",
+      "blocking": true
+    },
+    {
+      "id": "national_mov_audit",
+      "passed": true,
+      "message": "Artefato encontrado: audit-national-mov-202608.json",
+      "blocking": true
+    },
+    {
+      "id": "municipality_gold",
+      "passed": true,
+      "message": "Artefato encontrado: by-municipality-202608.json",
+      "blocking": true
+    },
+    {
+      "id": "mov_provenance",
+      "passed": true,
+      "message": "Proveniência MOV registrada com SHA-256 109cbe2e02949d4bac78859f62bd3863a78c719958449ab1d97f606922737cce.",
+      "blocking": true
+    },
+    {
+      "id": "quality_competence",
+      "passed": true,
+      "message": "Competência do relatório de qualidade confere.",
+      "blocking": true
+    },
+    {
+      "id": "quality_counts",
+      "passed": true,
+      "message": "Contagens coerentes: lidas=4423299, válidas=4423299, rejeitadas=0.",
+      "blocking": true
+    },
+    {
+      "id": "valid_rate",
+      "passed": true,
+      "message": "Taxa válida=100.0000%; mínimo=99.00%.",
+      "blocking": true
+    },
+    {
+      "id": "overview_competence",
+      "passed": true,
+      "message": "Competência do overview confere.",
+      "blocking": true
+    },
+    {
+      "id": "overview_arithmetic",
+      "passed": true,
+      "message": "Saldo confere: 19524 - 17971 = 1553.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_dimension_quality",
+      "passed": true,
+      "message": "Dimensão municipal identificada e residual controlado: 1266 itens, 1 residual.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_population_metadata",
+      "passed": true,
+      "message": "Referência populacional municipal possui proveniência completa.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_population_coverage",
+      "passed": true,
+      "message": "População e taxas por 100 mil validadas para 1265 municípios identificados.",
+      "blocking": true
+    },
+    {
+      "id": "municipality_population_report",
+      "passed": true,
+      "message": "Relatório de enriquecimento populacional confere com o Gold.",
+      "blocking": true
+    },
+    {
+      "id": "official_reference_integrity",
+      "passed": true,
+      "message": "Referência oficial publicada é internamente consistente.",
+      "blocking": true
+    },
+    {
+      "id": "national_reference_reconciliation",
+      "passed": true,
+      "message": "MOV nacional reconciliado exatamente com a referência oficial.",
+      "blocking": true
+    },
+    {
+      "id": "manual_methodology_approval",
+      "passed": true,
+      "message": "Revisão metodológica aprovada e vinculada à origem e à referência atuais.",
+      "blocking": true
+    }
+  ]
+}

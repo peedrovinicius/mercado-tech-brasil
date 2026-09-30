@@ -78,6 +78,17 @@
       "salary_mean_admissions_real": 6155.046008565744,
       "salary_median_admissions_real": 3990.0550000000003,
       "salary_real_base_competence": "202607"
+    },
+    {
+      "competence": "202608",
+      "admissions": 19524,
+      "dismissals": 17971,
+      "balance": 1553,
+      "salary_mean_admissions": 5993.960285919989,
+      "salary_median_admissions": 3800.0,
+      "salary_mean_admissions_real": 6013.1988031669525,
+      "salary_median_admissions_real": 3812.1966716580005,
+      "salary_real_base_competence": "202607"
     }
   ]
 }
