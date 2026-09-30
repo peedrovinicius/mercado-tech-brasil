@@ -1,0 +1,114 @@
+name: Publish newly approved CAGED
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "config/publication_approvals.json"
+      - ".github/workflows/publish-approved-caged.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: publish-newly-approved-caged
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Resolve approved unpublished competence
+        id: candidate
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          approvals = json.loads(
+              Path("config/publication_approvals.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          published = set()
+          for gate_path in Path("data/gold").glob(
+              "publication-gate-*.json"
+          ):
+              gate = json.loads(gate_path.read_text(encoding="utf-8"))
+              competence = str(gate.get("competence") or "")
+              if gate.get("publishable") is True:
+                  published.add(competence)
+
+          candidates = sorted(
+              competence
+              for competence, approval in approvals.items()
+              if isinstance(approval, dict)
+              and approval.get("approved") is True
+              and competence not in published
+          )
+
+          if not candidates:
+              print("ready=false")
+              print("competence=")
+          else:
+              print("ready=true")
+              print(f"competence={candidates[0]}")
+          PY
+
+      - name: Resolve latest matching audit
+        if: steps.candidate.outputs.ready == 'true'
+        id: audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMPETENCE: ${{ steps.candidate.outputs.competence }}
+        run: |
+          AUDIT_RUN_ID=""
+
+          for RUN_ID in $(gh run list \
+            --workflow audit-data.yml \
+            --branch main \
+            --status success \
+            --limit 30 \
+            --json databaseId \
+            --jq '.[].databaseId'); do
+            MATCHES=$(gh api \
+              "repos/$REPOSITORY/actions/runs/$RUN_ID/artifacts" \
+              --jq "[.artifacts[] | select(.name == \"caged-$COMPETENCE-audit\" and .expired == false)] | length")
+
+            if [[ "$MATCHES" -gt 0 ]]; then
+              AUDIT_RUN_ID="$RUN_ID"
+              break
+            fi
+          done
+
+          if [[ -z "$AUDIT_RUN_ID" ]]; then
+            echo "Nenhum artefato de auditoria válido encontrado para $COMPETENCE."
+            exit 1
+          fi
+
+          echo "audit_run_id=$AUDIT_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "audit run resolved: $AUDIT_RUN_ID"
+
+      - name: Dispatch governed publication
+        if: steps.candidate.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMPETENCE: ${{ steps.candidate.outputs.competence }}
+          AUDIT_RUN_ID: ${{ steps.audit.outputs.audit_run_id }}
+        run: |
+          gh workflow run publish-data.yml \
+            --ref main \
+            -f competence="$COMPETENCE" \
+            -f audit_run_id="$AUDIT_RUN_ID"
+
+      - name: Nothing to publish
+        if: steps.candidate.outputs.ready != 'true'
+        run: echo "Nenhuma competência CAGED aprovada aguarda publicação."
