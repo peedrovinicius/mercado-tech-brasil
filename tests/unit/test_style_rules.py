@@ -138,8 +138,8 @@ def test_readme_dashboard_asset_is_versioned():
     assert 'src="assets/readme-dashboard.svg"' in readme
 
     svg = dashboard.read_text(encoding="utf-8")
-    assert "134.209" in svg
-    assert "127.865" in svg
-    assert "+6.344" in svg
-    assert "10,13%" in svg
-    assert "26,76%" in svg
+    assert "153.733" in svg
+    assert "145.836" in svg
+    assert "+7.897" in svg
+    assert "9,71%" in svg
+    assert "29,38%" in svg
