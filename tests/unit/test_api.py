@@ -27,7 +27,7 @@ def test_release_state_exposes_governed_baseline():
     assert payload["monthly"]["first_competence"] == "202601"
     assert payload["monthly"]["latest_competence"] == "202607"
     assert payload["monthly"]["policy_mode"] == "locked"
-    assert payload["monthly"]["policy_max_competence"] == "202607"
+    assert payload["monthly"]["policy_max_competence"] == "202608"
     assert payload["rais"]["latest_published_year"] == 2025
 
 
