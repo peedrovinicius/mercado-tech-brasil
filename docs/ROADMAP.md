@@ -7,7 +7,7 @@ O núcleo do Mercado Tech Brasil está operacional e publicado.
 Entregas concluídas:
 
 - pipeline Bronze, Silver e Gold do Novo CAGED, com MOV, FOR e EXC;
-- série mensal auditada de jan/2026 a jul/2026, com reconciliação oficial e salário real por IPCA;
+- série mensal auditada de jan/2026 a ago/2026, com reconciliação oficial e salário real por IPCA;
 - dimensões territoriais do IBGE, população 2026 e taxas municipais por 100 mil;
 - recorte CBO versionado, série por família e comparação Brasil, Nordeste e Ceará;
 - RAIS 2025 processada, reconciliada, validada por município e publicada;
@@ -52,7 +52,7 @@ Nenhum schema será inferido ou reconstruído a partir de cópias não oficiais.
 
 ### Cobertura mensal
 
-A cobertura permanece explicitamente limitada a **jul/2026** por `config/monthly_coverage_policy.json`.
+A cobertura permanece explicitamente limitada a **ago/2026** por `config/monthly_coverage_policy.json`.
 
 Uma nova competência só poderá entrar depois de revisão explícita dessa política. Quando isso ocorrer, o fluxo já está preparado para:
 
@@ -68,7 +68,7 @@ Uma nova competência só poderá entrar depois de revisão explícita dessa pol
 
 ### Comparações anuais
 
-Comparações anuais adicionais só entram quando houver cobertura temporal suficiente e metodologia defensável. Não serão extrapoladas a partir de sete competências mensais.
+Comparações anuais adicionais só entram quando houver cobertura temporal suficiente e metodologia defensável. Não serão extrapoladas a partir de oito competências mensais.
 
 ## Critério de inclusão
 
