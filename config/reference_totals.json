@@ -73,5 +73,15 @@
       "desligamentos": 566,
       "saldo": 237
     }
+  },
+  "202608": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, agosto de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/agosto",
+    "published_at": "2026-09-29",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2294563,
+    "desligamentos": 2128736,
+    "saldo": 165827,
+    "note": "Totais oficiais da competência agosto/2026 publicados pelo MTE em 29/09/2026. A publicação dos agregados tech permanece condicionada à ingestão dos microdados, reconciliação e gate metodológico."
   }
 }
