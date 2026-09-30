@@ -14,7 +14,7 @@ Novo CAGED e RAIS transformados em pipeline auditável, API e dashboard para aco
 
 [Aplicação](https://mercado-tech-brasil.onrender.com) · [Swagger](https://mercado-tech-brasil.onrender.com/docs) · [Arquitetura](docs/ARCHITECTURE.md) · [Metodologia](docs/METHODOLOGY.md) · [Issues](https://github.com/peedrovinicius/mercado-tech-brasil/issues) · [Como contribuir](CONTRIBUTING.md)
 
-**Cobertura publicada:** Novo CAGED Jan-Jul/2026 · RAIS 2025 · API e dashboard em produção
+**Cobertura publicada:** Novo CAGED Jan-Ago/2026 · RAIS 2025 · API e dashboard em produção
 
 </div>
 
@@ -33,7 +33,7 @@ O Mercado Tech Brasil transforma dados públicos do trabalho formal em uma cadei
 ## Dashboard executivo
 
 <p align="center">
-  <img src="assets/readme-dashboard.svg" alt="Dashboard executivo do Mercado Tech Brasil com série publicada de janeiro a julho de 2026" width="100%" />
+  <img src="assets/readme-dashboard.svg" alt="Dashboard executivo do Mercado Tech Brasil com série publicada de janeiro a agosto de 2026" width="100%" />
 </p>
 
 O painel acima é derivado dos artefatos Gold versionados. Para regenerá-lo após uma nova publicação:
@@ -44,22 +44,22 @@ python scripts/generate_readme_dashboard.py
 
 <table>
 <tr>
-<td align="center"><strong>134.209</strong><br/><sub>Admissões tech</sub></td>
-<td align="center"><strong>127.865</strong><br/><sub>Desligamentos tech</sub></td>
-<td align="center"><strong>+6.344</strong><br/><sub>Saldo acumulado</sub></td>
-<td align="center"><strong>7</strong><br/><sub>Competências publicadas</sub></td>
+<td align="center"><strong>153.733</strong><br/><sub>Admissões tech</sub></td>
+<td align="center"><strong>145.836</strong><br/><sub>Desligamentos tech</sub></td>
+<td align="center"><strong>+7.897</strong><br/><sub>Saldo acumulado</sub></td>
+<td align="center"><strong>8</strong><br/><sub>Competências publicadas</sub></td>
 </tr>
 <tr>
-<td align="center"><strong>19.253</strong><br/><sub>Admissões em Jul/2026</sub></td>
-<td align="center"><strong>+906</strong><br/><sub>Saldo em Jul/2026</sub></td>
-<td align="center"><strong>10,13%</strong><br/><sub>Nordeste nas admissões nacionais</sub></td>
-<td align="center"><strong>26,76%</strong><br/><sub>Ceará nas admissões do Nordeste</sub></td>
+<td align="center"><strong>19.524</strong><br/><sub>Admissões em Ago/2026</sub></td>
+<td align="center"><strong>+1.553</strong><br/><sub>Saldo em Ago/2026</sub></td>
+<td align="center"><strong>9,71%</strong><br/><sub>Nordeste nas admissões nacionais</sub></td>
+<td align="center"><strong>29,38%</strong><br/><sub>Ceará nas admissões do Nordeste</sub></td>
 </tr>
 </table>
 
 | Estado operacional | Situação |
 |---|---|
-| Série publicada | Jan/2026 a Jul/2026 |
+| Série publicada | Jan/2026 a Ago/2026 |
 | Pipeline Bronze, Silver e Gold | Implementado |
 | Gate de publicação | Implementado |
 | API e OpenAPI | Implementados |
@@ -69,14 +69,14 @@ python scripts/generate_readme_dashboard.py
 | Consolidação temporal | Trimestres completos e parciais |
 | Evolução ocupacional | Série mensal das cinco famílias CBO tech |
 | Estoque x fluxo | RAIS 2025 contextualizada com movimentações CAGED 2026 |
-| Ranking municipal normalizado | Ativo em Jul/2026 com população IBGE 2026 e gate aprovado |
+| Ranking municipal normalizado | Ativo em Ago/2026 com população IBGE 2026 e gate aprovado |
 | RAIS anual | 2025 auditada, aprovada e publicada pelo gate anual |
 
 ## Série publicada
 
-**Período: janeiro a julho de 2026**
+**Período: janeiro a agosto de 2026**
 
-A cobertura mensal está intencionalmente travada em Jul/2026 por uma política versionada. O pipeline calcula a próxima sequência, mas não baixa, audita ou publica competência posterior enquanto esse teto não for revisado explicitamente.
+A cobertura mensal está intencionalmente travada em Ago/2026 por uma política versionada. O pipeline calcula a próxima sequência, mas não baixa, audita ou publica competência posterior enquanto esse teto não for revisado explicitamente.
 
 | Competência | Admissões | Desligamentos | Saldo | Mediana real |
 |---|---:|---:|---:|---:|
@@ -87,6 +87,7 @@ A cobertura mensal está intencionalmente travada em Jul/2026 por uma política 
 | Mai/2026 | 18.153 | 17.706 | +447 | R$ 4.009,20 |
 | Jun/2026 | 19.021 | 17.486 | +1.535 | R$ 3.902,73 |
 | Jul/2026 | 19.253 | 18.347 | +906 | R$ 3.990,06 |
+| Ago/2026 | 19.524 | 17.971 | +1.553 | R$ 3.812,20 |
 
 Cada MOV mensal foi reconciliado com a referência nacional publicada pelo MTE. FOR e EXC são aplicados às competências de origem antes da construção dos agregados. As medianas reais estão expressas em valores de julho de 2026 pelo IPCA/IBGE.
 
@@ -100,21 +101,21 @@ Todos os checks automáticos nacionais e regionais passaram. A dimensão municip
 
 A release 2025 passou pelo gate automático e pela aprovação metodológica manual. A API anual fica liberada por `publishable=true`, e o frontend habilita automaticamente a seção RAIS ao detectar 2025 no registro de releases publicadas.
 
-### Normalização municipal, Jul/2026
+### Normalização municipal, Ago/2026
 
-O Gold municipal de julho de 2026 foi enriquecido com as **Estimativas da População 2026 do IBGE**, com referência em 1º de julho. Os **1.274 municípios tech identificados** encontraram denominador populacional, com **zero ausências**. O enriquecimento preservou exatamente **19.253 admissões, 18.347 desligamentos e saldo +906**.
+O Gold municipal de agosto de 2026 foi enriquecido com as **Estimativas da População 2026 do IBGE**, com referência em 1º de julho. Os **1.265 municípios tech identificados** encontraram denominador populacional, com **zero ausências**. O enriquecimento preservou exatamente **19.524 admissões, 17.971 desligamentos e saldo +1.553**.
 
 O gate valida a proveniência da referência, o SHA-256 do cache populacional, a cobertura municipal e a aritmética das taxas de admissões, desligamentos e saldo por 100 mil habitantes. O ranking normalizado do dashboard fica disponível somente quando esses checks passam.
 
-### Comparação territorial, Jul/2026
+### Comparação territorial, Ago/2026
 
 | Território | Admissões | Desligamentos | Saldo | Participação nas admissões tech nacionais |
 |---|---:|---:|---:|---:|
-| Brasil | 19.253 | 18.347 | +906 | 100,00% |
-| Nordeste | 1.951 | 1.796 | +155 | 10,13% |
-| Ceará | 522 | 415 | +107 | 2,71% |
+| Brasil | 19.524 | 17.971 | +1.553 | 100,00% |
+| Nordeste | 1.896 | 1.718 | +178 | 9,71% |
+| Ceará | 557 | 449 | +108 | 2,85% |
 
-O Ceará representa **26,76%** das admissões tech do Nordeste em julho de 2026. A comparação é derivada dos agregados publicados por UF da competência mais recente, mantendo a mesma regra de recorte e publicação aplicada aos demais indicadores.
+O Ceará representa **29,38%** das admissões tech do Nordeste em agosto de 2026. A comparação é derivada dos agregados publicados por UF da competência mais recente, mantendo a mesma regra de recorte e publicação aplicada aos demais indicadores.
 
 ## Arquitetura
 
@@ -184,7 +185,7 @@ flowchart LR
 | CBO, MTE | definição versionada das ocupações de tecnologia |
 | IBGE | municípios, estimativas populacionais, território e IPCA para valores reais |
 
-As referências nacionais de janeiro a julho de 2026 estão versionadas em **config/reference_totals.json**. A referência detalhada de julho permanece em **config/official_reference_202607.json**.
+As referências nacionais de janeiro a agosto de 2026 estão versionadas em **config/reference_totals.json**. A referência detalhada de julho permanece em **config/official_reference_202607.json**.
 
 ## Recorte de tecnologia
 
@@ -264,7 +265,7 @@ Sincronização das referências oficiais:
 ~~~bash
 python -m src.cli sync-municipalities
 python -m src.cli sync-population 2026
-python -m src.cli enrich-published-population 202607 \
+python -m src.cli enrich-published-population 202608 \
   --population-year 2026 \
   --source-url "https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html" \
   --published-at 2026-08-28 \
@@ -288,21 +289,21 @@ python -m src.cli rais-validate-release 2025
 Processamento por competência:
 
 ~~~bash
-python -m src.cli pipeline 202607
+python -m src.cli pipeline 202608
 ~~~
 
 Processamento de arquivo oficial local:
 
 ~~~bash
-python -m src.cli local-pipeline 202607 "/caminho/CAGEDMOV202607.7z" --kind MOV
+python -m src.cli local-pipeline 202608 "/caminho/CAGEDMOV202608.7z" --kind MOV
 ~~~
 
 Validação e aprovação:
 
 ~~~bash
-python -m src.cli validate-release 202607
+python -m src.cli validate-release 202608
 
-python -m src.cli approve-release 202607 \
+python -m src.cli approve-release 202608 \
   --reviewer "responsavel" \
   --notes "Layout, rejeições e metodologia revisados." \
   --acknowledge-methodology-reviewed
@@ -317,7 +318,7 @@ Carga no serving:
 
 ~~~bash
 alembic upgrade head
-python -m src.cli load-postgres 202607
+python -m src.cli load-postgres 202608
 ~~~
 
 ## Estrutura

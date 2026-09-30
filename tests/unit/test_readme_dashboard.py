@@ -22,13 +22,13 @@ def test_readme_dashboard_generator_uses_published_gold(tmp_path: Path):
     committed = Path("assets/readme-dashboard.svg").read_text(encoding="utf-8")
 
     expected_metrics = (
-        "134.209",
-        "127.865",
-        "+6.344",
-        "+906",
-        "10,13%",
-        "2,71%",
-        "26,76%",
+        "153.733",
+        "145.836",
+        "+7.897",
+        "+1.553",
+        "9,71%",
+        "2,85%",
+        "29,38%",
     )
 
     for metric in expected_metrics:

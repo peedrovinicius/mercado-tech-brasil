@@ -23,9 +23,9 @@ def test_release_state_exposes_governed_baseline():
 
     assert payload["project"] == "Mercado Tech Brasil"
     assert payload["version"] == "0.40.0"
-    assert payload["monthly"]["published_count"] == 7
+    assert payload["monthly"]["published_count"] == 8
     assert payload["monthly"]["first_competence"] == "202601"
-    assert payload["monthly"]["latest_competence"] == "202607"
+    assert payload["monthly"]["latest_competence"] == "202608"
     assert payload["monthly"]["policy_mode"] == "locked"
     assert payload["monthly"]["policy_max_competence"] == "202608"
     assert payload["rais"]["latest_published_year"] == 2025
@@ -88,7 +88,7 @@ def test_release_provenance_exposes_hashed_published_artifacts():
     payload = response.json()
 
     assert payload["version"] == "0.40.0"
-    assert payload["monthly"]["competence"] == "202607"
+    assert payload["monthly"]["competence"] == "202608"
     assert payload["rais"]["year"] == 2025
 
     monthly = payload["monthly"]["artifacts"]
@@ -96,7 +96,7 @@ def test_release_provenance_exposes_hashed_published_artifacts():
     assert monthly
     assert rais
     assert any(
-        item["path"].endswith("publication-gate-202607.json")
+        item["path"].endswith("publication-gate-202608.json")
         for item in monthly
     )
     assert any(
@@ -111,16 +111,16 @@ def test_release_provenance_exposes_hashed_published_artifacts():
 def test_csv_export_serves_latest_published_dataset():
     response = client.get("/api/v1/export/latest/by-uf.csv")
     assert response.status_code == 200
-    assert response.headers["x-data-competence"] == "202607"
+    assert response.headers["x-data-competence"] == "202608"
     assert (
         response.headers["content-disposition"]
-        == 'attachment; filename="mercado-tech-brasil-by-uf-202607.csv"'
+        == 'attachment; filename="mercado-tech-brasil-by-uf-202608.csv"'
     )
     body = response.content.decode("utf-8-sig")
     header, *rows = body.splitlines()
     assert "uf" in header.split(",")
     assert "admissions" in header.split(",")
-    assert len(rows) == 27
+    assert len(rows) == 28
 
 
 def test_sources_are_exposed():
@@ -137,22 +137,22 @@ def test_published_overview_is_served():
     assert response.status_code == 200
 
     payload = response.json()
-    assert payload["competence"] == "202607"
-    assert payload["admissions"] == 19253
-    assert payload["dismissals"] == 18347
-    assert payload["balance"] == 906
+    assert payload["competence"] == "202608"
+    assert payload["admissions"] == 19524
+    assert payload["dismissals"] == 17971
+    assert payload["balance"] == 1553
     assert payload["admissions"] - payload["dismissals"] == payload["balance"]
 
 
 def test_published_analytics_are_served():
     by_uf = client.get("/api/v1/analytics/by-uf")
     assert by_uf.status_code == 200
-    assert by_uf.json()["competence"] == "202607"
+    assert by_uf.json()["competence"] == "202608"
     assert len(by_uf.json()["items"]) == 27
 
     by_occupation = client.get("/api/v1/analytics/by-occupation")
     assert by_occupation.status_code == 200
-    assert by_occupation.json()["competence"] == "202607"
+    assert by_occupation.json()["competence"] == "202608"
     assert by_occupation.json()["items"]
 
     by_municipality = client.get("/api/v1/analytics/by-municipality?limit=15")
@@ -180,13 +180,13 @@ def test_published_analytics_are_served():
     comparison = client.get("/api/v1/analytics/territorial-comparison")
     assert comparison.status_code == 200
     payload = comparison.json()
-    assert payload["competence"] == "202607"
+    assert payload["competence"] == "202608"
     by_key = {item["key"]: item for item in payload["items"]}
-    assert by_key["BR"]["admissions"] == 19253
-    assert by_key["NE"]["admissions"] == 1951
-    assert by_key["CE"]["admissions"] == 522
-    assert by_key["NE"]["balance"] == 155
-    assert by_key["CE"]["balance"] == 107
+    assert by_key["BR"]["admissions"] == 19524
+    assert by_key["NE"]["admissions"] == 1896
+    assert by_key["CE"]["admissions"] == 557
+    assert by_key["NE"]["balance"] == 178
+    assert by_key["CE"]["balance"] == 108
 
     stock_flow = client.get("/api/v1/analytics/stock-flow-context")
     assert stock_flow.status_code == 200
@@ -194,30 +194,30 @@ def test_published_analytics_are_served():
     assert stock_flow_payload["rais_year"] == 2025
     assert stock_flow_payload["stock_reference_date"] == "2025-12-31"
     assert stock_flow_payload["caged_from"] == "202601"
-    assert stock_flow_payload["caged_to"] == "202607"
-    assert stock_flow_payload["published_months"] == 7
+    assert stock_flow_payload["caged_to"] == "202608"
+    assert stock_flow_payload["published_months"] == 8
     assert stock_flow_payload["totals"]["active_stock"] == 786296
-    assert stock_flow_payload["totals"]["admissions"] == 134209
-    assert stock_flow_payload["totals"]["dismissals"] == 127865
-    assert stock_flow_payload["totals"]["balance"] == 6344
+    assert stock_flow_payload["totals"]["admissions"] == 153733
+    assert stock_flow_payload["totals"]["dismissals"] == 145836
+    assert stock_flow_payload["totals"]["balance"] == 7897
     stock_flow_families = {
         item["cbo_familia"]: item
         for item in stock_flow_payload["families"]
     }
     assert stock_flow_families["3172"]["active_stock"] == 121680
-    assert stock_flow_families["3172"]["admissions"] == 31132
-    assert stock_flow_families["3172"]["balance"] == 5232
+    assert stock_flow_families["3172"]["admissions"] == 36091
+    assert stock_flow_families["3172"]["balance"] == 6514
     assert round(
         stock_flow_families["3172"]["composition_gap_pp"],
         2,
-    ) == 7.72
+    ) == 8.0
 
     occupation_trend = client.get(
         "/api/v1/analytics/occupation-family-trend"
     )
     assert occupation_trend.status_code == 200
     occupation_payload = occupation_trend.json()
-    assert occupation_payload["published_months"] == 7
+    assert occupation_payload["published_months"] == 8
     assert len(occupation_payload["families"]) == 5
     assert {
         item["cbo_familia"]
@@ -226,28 +226,28 @@ def test_published_analytics_are_served():
     assert sum(
         item["admissions"]
         for item in occupation_payload["families"]
-    ) == 134209
+    ) == 153733
     assert sum(
         item["dismissals"]
         for item in occupation_payload["families"]
-    ) == 127865
+    ) == 145836
     assert sum(
         item["balance"]
         for item in occupation_payload["families"]
-    ) == 6344
+    ) == 7897
     assert all(
-        len(item["monthly"]) == 7
+        len(item["monthly"]) == 8
         for item in occupation_payload["families"]
     )
 
     temporal = client.get("/api/v1/analytics/temporal-summary")
     assert temporal.status_code == 200
     temporal_payload = temporal.json()
-    assert temporal_payload["published_months"] == 7
+    assert temporal_payload["published_months"] == 8
     assert temporal_payload["cumulative"] == {
-        "admissions": 134209,
-        "dismissals": 127865,
-        "balance": 6344,
+        "admissions": 153733,
+        "dismissals": 145836,
+        "balance": 7897,
     }
 
     periods = {item["key"]: item for item in temporal_payload["periods"]}
@@ -257,8 +257,8 @@ def test_published_analytics_are_served():
     assert periods["2026Q2"]["admissions"] == 56777
     assert periods["2026Q2"]["balance"] == 2496
     assert periods["2026Q2"]["complete"] is True
-    assert periods["2026Q3"]["published_months"] == 1
-    assert periods["2026Q3"]["balance"] == 906
+    assert periods["2026Q3"]["published_months"] == 2
+    assert periods["2026Q3"]["balance"] == 2459
     assert periods["2026Q3"]["complete"] is False
 
 
