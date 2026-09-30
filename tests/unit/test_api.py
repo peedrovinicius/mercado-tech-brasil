@@ -120,7 +120,7 @@ def test_csv_export_serves_latest_published_dataset():
     header, *rows = body.splitlines()
     assert "uf" in header.split(",")
     assert "admissions" in header.split(",")
-    assert len(rows) == 27
+    assert len(rows) == 28
 
 
 def test_sources_are_exposed():
