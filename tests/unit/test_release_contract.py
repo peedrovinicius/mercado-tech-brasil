@@ -46,3 +46,16 @@ def test_render_blueprint_keeps_governed_production_contract():
     assert "frontend/**" in paths
     assert "data/gold/**" in paths
     assert "docs/**" not in paths
+
+
+def test_approved_caged_publication_dispatch_is_governed():
+    workflow = (
+        ROOT / ".github" / "workflows" / "publish-approved-caged.yml"
+    ).read_text(encoding="utf-8")
+
+    assert "config/publication_approvals.json" in workflow
+    assert "publication-gate-*.json" in workflow
+    assert "gate.get(\"publishable\") is True" in workflow
+    assert "caged-$COMPETENCE-audit" in workflow
+    assert "gh workflow run publish-data.yml" in workflow
+    assert "actions: write" in workflow
