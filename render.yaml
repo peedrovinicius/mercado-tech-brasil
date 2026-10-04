@@ -5,7 +5,7 @@ services:
     plan: free
     region: virginia
     branch: main
-    buildCommand: pip install -e . && cd frontend && npm install --no-audit --no-fund && npm run build
+    buildCommand: pip install -e . && cd frontend && npm ci --no-audit --no-fund && npm run build
     startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/system/health
     autoDeployTrigger: checksPass

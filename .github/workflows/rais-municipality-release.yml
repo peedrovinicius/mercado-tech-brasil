@@ -39,7 +39,7 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: |
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
           npm run build
 
       - name: Download validated RAIS release artifact
