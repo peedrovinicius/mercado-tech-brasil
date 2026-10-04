@@ -4,7 +4,7 @@ Interface React + TypeScript para a camada pública de análise do Mercado Tech 
 
 ## Estado atual
 
-O frontend consome exclusivamente a API do projeto e apresenta a série publicada de janeiro a julho de 2026 sem manter indicadores fixos no código da interface.
+O frontend consome exclusivamente a API do projeto e apresenta a série publicada de janeiro a agosto de 2026 sem manter indicadores fixos no código da interface.
 
 A experiência atual inclui:
 
