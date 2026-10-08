@@ -28,6 +28,13 @@ def _csv_bytes(items: list[dict[str, object]]) -> bytes:
                 seen.add(key)
                 fieldnames.append(key)
 
+    # Preserve numeric values while preventing spreadsheet formula execution
+    # from untrusted text cells in downloaded CSV files.
+    def safe_cell(value: object) -> object:
+        if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@")):
+            return "'" + value
+        return value
+
     buffer = io.StringIO()
     writer = csv.DictWriter(
         buffer,
@@ -36,7 +43,7 @@ def _csv_bytes(items: list[dict[str, object]]) -> bytes:
         lineterminator="\n",
     )
     writer.writeheader()
-    writer.writerows(items)
+    writer.writerows({key: safe_cell(value) for key, value in item.items()} for item in items)
     return ("\ufeff" + buffer.getvalue()).encode("utf-8")
 
 
