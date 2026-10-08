@@ -8,6 +8,7 @@ on:
 permissions:
   actions: read
   contents: write
+  pull-requests: write
 
 jobs:
   version:
@@ -35,7 +36,9 @@ jobs:
           cp             work/release/data/gold/rais-by-municipality-2025.json             data/gold/rais-by-municipality-2025.json
           cp             work/release/data/gold/rais-publication-gate-2025.json             data/gold/rais-publication-gate-2025.json
 
-      - name: Commit validated artifacts
+      - name: Open pull request for validated artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -45,4 +48,10 @@ jobs:
             exit 0
           fi
           git commit -m "data: add validated RAIS municipality release"
-          git push origin HEAD:main
+          BRANCH="automation/rais-municipality-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git push origin "HEAD:${BRANCH}"
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "data: add validated RAIS municipality release" \
+            --body "Versionamento automático dos artefatos municipais da RAIS já validados pelo workflow."
