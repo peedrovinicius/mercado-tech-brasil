@@ -31,13 +31,15 @@ def _gate_is_clean(payload: dict) -> bool:
         return False
 
     checks = payload.get("checks")
-    if not isinstance(checks, list):
+    if not isinstance(checks, list) or not checks:
+        return False
+
+    if any(not isinstance(check, dict) for check in checks):
         return False
 
     return all(
         not check.get("blocking", True) or check.get("passed") is True
         for check in checks
-        if isinstance(check, dict)
     )
 
 
