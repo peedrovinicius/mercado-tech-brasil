@@ -15,7 +15,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  actions: read
+  actions: write
 
 concurrency:
   group: publish-data-${{ inputs.competence }}
@@ -153,3 +153,5 @@ jobs:
             --head "${BRANCH}" \
             --title "data: publish validated ${COMPETENCE} release" \
             --body "Publicação automática da competência ${COMPETENCE}, validada pelo workflow de auditoria."
+          gh workflow run ci.yml --ref "${BRANCH}"
+          gh workflow run frontend.yml --ref "${BRANCH}"
