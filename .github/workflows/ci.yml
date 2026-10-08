@@ -17,19 +17,7 @@ on:
       - ".github/workflows/publish-approved-caged.yml"
       - ".github/workflows/ci.yml"
   pull_request:
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "config/**"
-      - "alembic/**"
-      - "scripts/**"
-      - "pyproject.toml"
-      - "SECURITY.md"
-      - ".github/dependabot.yml"
-      - ".github/workflows/codeql.yml"
-      - ".github/workflows/production-smoke.yml"
-      - ".github/workflows/publish-approved-caged.yml"
-      - ".github/workflows/ci.yml"
+    branches: [main]
   workflow_dispatch:
 
 permissions:
