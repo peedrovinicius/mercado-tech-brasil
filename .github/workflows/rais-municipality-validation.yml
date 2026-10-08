@@ -28,7 +28,7 @@ jobs:
           pip install -e .
 
       - name: Download validated RAIS release artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: rais-2025-v035-full-reprocess
           path: work/release
@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload validation report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-municipality-validation-2025
           retention-days: 3

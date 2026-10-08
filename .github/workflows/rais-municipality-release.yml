@@ -43,7 +43,7 @@ jobs:
           npm run build
 
       - name: Download validated RAIS release artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: rais-2025-v035-full-reprocess
           path: work/release
@@ -56,7 +56,7 @@ jobs:
           PYTHONPATH=. python scripts/rais_build_municipality_release.py             --silver work/release/data/silver/rais_tech_2025.parquet             --year 2025
 
       - name: Upload municipal release
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rais-2025-municipality-release
           retention-days: 3
