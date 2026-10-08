@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -153,3 +154,5 @@ jobs:
             --head "${BRANCH}" \
             --title "data: enrich published municipalities with IBGE population" \
             --body "Atualização automática de dados populacionais gerada pelo GitHub Actions."
+          gh workflow run ci.yml --ref "${BRANCH}"
+          gh workflow run frontend.yml --ref "${BRANCH}"

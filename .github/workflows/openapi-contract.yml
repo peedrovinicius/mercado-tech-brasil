@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -63,3 +64,5 @@ jobs:
             --head "${BRANCH}" \
             --title "docs: refresh versioned OpenAPI" \
             --body "Atualização automática do contrato OpenAPI gerada pelo GitHub Actions."
+          gh workflow run ci.yml --ref "${BRANCH}"
+          gh workflow run frontend.yml --ref "${BRANCH}"
