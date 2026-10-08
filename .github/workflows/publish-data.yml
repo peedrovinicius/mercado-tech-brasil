@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
   actions: read
 
 concurrency:
@@ -121,7 +122,9 @@ jobs:
       - name: Refresh README dashboard
         run: python scripts/generate_readme_dashboard.py
 
-      - name: Persist derived release
+      - name: Persist derived release through pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -143,4 +146,10 @@ jobs:
           fi
 
           git commit -m "data: publish validated $COMPETENCE release"
-          git push
+          BRANCH="automation/publish-${COMPETENCE}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git push origin "HEAD:${BRANCH}"
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "data: publish validated ${COMPETENCE} release" \
+            --body "Publicação automática da competência ${COMPETENCE}, validada pelo workflow de auditoria."
