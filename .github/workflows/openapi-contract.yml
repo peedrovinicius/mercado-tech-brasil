@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: openapi-contract
@@ -41,7 +42,9 @@ jobs:
       - name: Export OpenAPI
         run: PYTHONPATH=. python scripts/export_openapi.py
 
-      - name: Persist contract
+      - name: Persist contract through pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -53,5 +56,10 @@ jobs:
           fi
 
           git commit -m "docs: refresh versioned OpenAPI [skip render]"
-          git pull --rebase origin main
-          git push
+          BRANCH="automation/openapi-contract-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git push origin "HEAD:${BRANCH}"
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "docs: refresh versioned OpenAPI" \
+            --body "Atualização automática do contrato OpenAPI gerada pelo GitHub Actions."
