@@ -9,11 +9,7 @@ on:
       - "data/gold/rais-publication-gate-*.json"
       - ".github/workflows/frontend.yml"
   pull_request:
-    paths:
-      - "frontend/**"
-      - "config/rais_publication_approvals.json"
-      - "data/gold/rais-publication-gate-*.json"
-      - ".github/workflows/frontend.yml"
+    branches: [main]
   workflow_dispatch:
 
 permissions:
