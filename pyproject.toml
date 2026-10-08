@@ -32,7 +32,7 @@ OpenAPI = "https://mercado-tech-brasil.onrender.com/docs"
 dev = [
   "pytest>=8.4,<9",
   "ruff>=0.12,<1",
-  "mypy>=1.16,<2",
+  "mypy>=1.16,<3",
   "httpx>=0.28,<1"
 ]
 
