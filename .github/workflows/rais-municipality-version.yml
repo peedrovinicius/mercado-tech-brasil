@@ -6,7 +6,7 @@ on:
       - ".github/rais-municipality-version.run"
 
 permissions:
-  actions: read
+  actions: write
   contents: write
   pull-requests: write
 
@@ -55,3 +55,5 @@ jobs:
             --head "${BRANCH}" \
             --title "data: add validated RAIS municipality release" \
             --body "Versionamento automático dos artefatos municipais da RAIS já validados pelo workflow."
+          gh workflow run ci.yml --ref "${BRANCH}"
+          gh workflow run frontend.yml --ref "${BRANCH}"
