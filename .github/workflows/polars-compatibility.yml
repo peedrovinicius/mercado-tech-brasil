@@ -38,7 +38,7 @@ jobs:
         run: |
           # Only this isolated job overrides main's <2 constraint,
           # simulating Dependabot PR #79 without modifying production dependencies.
-          python -m pip install --no-deps --force-reinstall 'polars==2.0.0'
+          python -m pip install --force-reinstall 'polars==2.0.0'
           python -c 'import polars; assert polars.__version__ == "2.0.0"'
           python -m pytest -q
           python scripts/polars_compatibility_snapshot.py --output "${RUNNER_TEMP}/polars-2.json"
