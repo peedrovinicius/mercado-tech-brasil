@@ -1,0 +1,51 @@
+name: Polars compatibility (synthetic)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/polars_compatibility_snapshot.py"
+      - ".github/workflows/polars-compatibility.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-synthetic-results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -e '.[dev]'
+
+      - name: Polars 1.30.0 baseline
+        run: |
+          python -m pip install --force-reinstall 'polars==1.30.0'
+          python -c 'import polars; assert polars.__version__ == "1.30.0"'
+          python -m pytest -q
+          python scripts/polars_compatibility_snapshot.py --output "${RUNNER_TEMP}/polars-1.json"
+
+      - name: Polars 2.0.0 candidate
+        run: |
+          # Only this isolated job overrides main's <2 constraint,
+          # simulating Dependabot PR #79 without modifying production dependencies.
+          python -m pip install --force-reinstall 'polars==2.0.0'
+          python -c 'import polars; assert polars.__version__ == "2.0.0"'
+          python -m pytest -q
+          python scripts/polars_compatibility_snapshot.py --output "${RUNNER_TEMP}/polars-2.json"
+
+      - name: Compare synthetic CAGED/RAIS results
+        run: |
+          python scripts/polars_compatibility_snapshot.py --compare \
+            "${RUNNER_TEMP}/polars-1.json" "${RUNNER_TEMP}/polars-2.json"
