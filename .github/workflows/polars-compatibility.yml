@@ -15,6 +15,8 @@ jobs:
   compare-synthetic-results:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PYTHONPATH: .
     steps:
       - name: Checkout
         uses: actions/checkout@v7
