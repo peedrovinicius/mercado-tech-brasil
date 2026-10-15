@@ -3,13 +3,13 @@ __pycache__/
 *.py[cod]
 .env
 .DS_Store
-.vscode/
 .idea/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 htmlcov/
+temp_auto_push.bat
 
 data/bronze/*
 data/silver/*
@@ -22,3 +22,5 @@ data/gold/*
 node_modules/
 *.tsbuildinfo
 frontend/dist/
+.gitignore
+branch_structure.json
