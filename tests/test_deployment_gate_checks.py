@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from src.validation.deployment_policy import _gate_is_clean
@@ -63,9 +66,6 @@ def test_rejects_missing_or_invalid_summary_approvals() -> None:
 
 
 def test_accepts_real_published_monthly_and_rais_gate_shapes() -> None:
-    from pathlib import Path
-    import json
-
     gold = Path(__file__).resolve().parents[1] / "data" / "gold"
     for path in [
         *sorted(gold.glob("publication-gate-*.json")),
