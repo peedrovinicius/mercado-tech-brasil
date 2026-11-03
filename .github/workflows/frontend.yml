@@ -37,6 +37,72 @@ jobs:
         working-directory: frontend
         run: npm ci --no-audit --no-fund
 
+      - name: Verify React and React DOM runtime pairing
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import React from "react";
+          import ReactDOM from "react-dom";
+          import { renderToStaticMarkup } from "react-dom/server";
+
+          if (React.version !== "19.3.1" || ReactDOM.version !== React.version) {
+            throw new Error(`React/React DOM versions mismatch: ${React.version} / ${ReactDOM.version}`);
+          }
+
+          const markup = renderToStaticMarkup(React.createElement("main", null, "OK"));
+          if (markup !== "<main>OK</main>") {
+            throw new Error("React DOM server-side rendering smoke test failed");
+          }
+          NODE
+
+      - name: Verify React Query cache and provider integration
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import React from "react";
+          import { renderToStaticMarkup } from "react-dom/server";
+          import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+
+          const client = new QueryClient({
+            defaultOptions: { queries: { retry: false, staleTime: 60_000 } },
+          });
+          const key = ["synthetic", "frontend-smoke"];
+          const record = await client.fetchQuery({
+            queryKey: key,
+            queryFn: async () => ({ label: "OK", count: 2 }),
+          });
+          if (record.count !== 2 || client.getQueryData(key)?.label !== "OK") {
+            throw new Error("React Query fetch/cache smoke test failed");
+          }
+
+          function Probe() {
+            const { data, isSuccess } = useQuery({
+              queryKey: key,
+              queryFn: async () => { throw new Error("Unexpected fetch in SSR"); },
+            });
+            return React.createElement("main", null, isSuccess ? data.label : "FAILED");
+          }
+
+          const markup = renderToStaticMarkup(
+            React.createElement(QueryClientProvider, { client }, React.createElement(Probe)),
+          );
+          client.clear();
+          if (markup !== "<main>OK</main>") {
+            throw new Error("React Query provider SSR smoke failed: " + markup);
+          }
+          NODE
+
+      - name: Verify TypeScript 5.9.3 compiler
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import ts from "typescript";
+          if (ts.version !== "5.9.3") {
+            throw new Error("Unexpected TypeScript compiler version: " + ts.version);
+          }
+          NODE
+          npx --no-install tsc -b --pretty false
+
       - name: Build
         working-directory: frontend
         run: npm run build
