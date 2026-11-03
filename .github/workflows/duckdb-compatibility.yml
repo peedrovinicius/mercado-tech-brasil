@@ -1,0 +1,50 @@
+name: DuckDB 1.x / 2.x parity (synthetic)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "scripts/duckdb_compatibility_snapshot.py"
+      - ".github/workflows/duckdb-compatibility.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-duckdb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+
+      - name: DuckDB 1.5.6 baseline
+        run: |
+          python -m pip install --force-reinstall "duckdb==1.5.6"
+          python -c 'import duckdb; assert duckdb.__version__ == "1.5.6"'
+          python -m pytest -q
+          python scripts/duckdb_compatibility_snapshot.py --output "$RUNNER_TEMP/duckdb-1.json"
+
+      - name: DuckDB 2.0.0 candidate
+        run: |
+          python -m pip install --force-reinstall "duckdb==2.0.0"
+          python -c 'import duckdb; assert duckdb.__version__ == "2.0.0"'
+          python -m pytest -q
+          python scripts/duckdb_compatibility_snapshot.py --output "$RUNNER_TEMP/duckdb-2.json"
+
+      - name: Compare synthetic CAGED and RAIS Gold outputs
+        run: |
+          python scripts/duckdb_compatibility_snapshot.py --compare \
+            "$RUNNER_TEMP/duckdb-1.json" "$RUNNER_TEMP/duckdb-2.json"

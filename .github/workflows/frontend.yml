@@ -37,6 +37,24 @@ jobs:
         working-directory: frontend
         run: npm ci --no-audit --no-fund
 
+      - name: Verify React and React DOM runtime pairing
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import React from "react";
+          import ReactDOM from "react-dom";
+          import { renderToStaticMarkup } from "react-dom/server";
+
+          if (React.version !== "19.3.1" || ReactDOM.version !== React.version) {
+            throw new Error(`React/React DOM versions mismatch: ${React.version} / ${ReactDOM.version}`);
+          }
+
+          const markup = renderToStaticMarkup(React.createElement("main", null, "OK"));
+          if (markup !== "<main>OK</main>") {
+            throw new Error("React DOM server-side rendering smoke test failed");
+          }
+          NODE
+
       - name: Build
         working-directory: frontend
         run: npm run build
