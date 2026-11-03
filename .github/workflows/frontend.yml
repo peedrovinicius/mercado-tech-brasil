@@ -55,6 +55,43 @@ jobs:
           }
           NODE
 
+      - name: Verify React Query cache and provider integration
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import React from "react";
+          import { renderToStaticMarkup } from "react-dom/server";
+          import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+
+          const client = new QueryClient({
+            defaultOptions: { queries: { retry: false, staleTime: 60_000 } },
+          });
+          const key = ["synthetic", "frontend-smoke"];
+          const record = await client.fetchQuery({
+            queryKey: key,
+            queryFn: async () => ({ label: "OK", count: 2 }),
+          });
+          if (record.count !== 2 || client.getQueryData(key)?.label !== "OK") {
+            throw new Error("React Query fetch/cache smoke test failed");
+          }
+
+          function Probe() {
+            const { data, isSuccess } = useQuery({
+              queryKey: key,
+              queryFn: async () => { throw new Error("Unexpected fetch in SSR"); },
+            });
+            return React.createElement("main", null, isSuccess ? data.label : "FAILED");
+          }
+
+          const markup = renderToStaticMarkup(
+            React.createElement(QueryClientProvider, { client }, React.createElement(Probe)),
+          );
+          client.clear();
+          if (markup !== "<main>OK</main>") {
+            throw new Error("React Query provider SSR smoke failed: " + markup);
+          }
+          NODE
+
       - name: Build
         working-directory: frontend
         run: npm run build
