@@ -92,6 +92,17 @@ jobs:
           }
           NODE
 
+      - name: Verify TypeScript 5.9.3 compiler
+        working-directory: frontend
+        run: |
+          node --input-type=module <<'NODE'
+          import ts from "typescript";
+          if (ts.version !== "5.9.3") {
+            throw new Error("Unexpected TypeScript compiler version: " + ts.version);
+          }
+          NODE
+          npx --no-install tsc -b --pretty false
+
       - name: Build
         working-directory: frontend
         run: npm run build
