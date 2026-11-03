@@ -31,14 +31,26 @@ def _gate_is_clean(payload: dict) -> bool:
         return False
 
     checks = payload.get("checks")
-    if not isinstance(checks, list):
+    if not isinstance(checks, list) or not checks:
         return False
 
-    return all(
-        not check.get("blocking", True) or check.get("passed") is True
+    # A non-blocking item still needs a complete, well-typed result.
+    # Otherwise {"blocking": false} could silently pass this gate.
+    if any(
+        not isinstance(check, dict)
+        or not isinstance(check.get("id"), str)
+        or not check["id"].strip()
+        or not isinstance(check.get("blocking"), bool)
+        or not isinstance(check.get("passed"), bool)
         for check in checks
-        if isinstance(check, dict)
-    )
+    ):
+        return False
+
+    ids = [check["id"] for check in checks]
+    if len(ids) != len(set(ids)):
+        return False
+
+    return all(not check["blocking"] or check["passed"] for check in checks)
 
 
 def _monthly_from_path(path: str) -> str | None:

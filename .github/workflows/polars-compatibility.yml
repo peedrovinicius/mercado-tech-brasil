@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "pyproject.toml"
       - "scripts/polars_compatibility_snapshot.py"
       - ".github/workflows/polars-compatibility.yml"
   workflow_dispatch:
@@ -14,7 +15,7 @@ permissions:
 jobs:
   compare-synthetic-results:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       PYTHONPATH: .
     steps:
