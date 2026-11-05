@@ -1,6 +1,6 @@
 {
   "version": 2,
   "mode": "locked",
-  "max_competence": "202608",
-  "reason": "A competência 202608 foi oficialmente publicada pelo MTE em 29/09/2026 e está liberada para auditoria incremental. A auditoria inclui proveniência e cobertura populacional do IBGE antes da aprovação metodológica e da publicação."
+  "max_competence": "202609",
+  "reason": "A competência 202609 foi divulgada oficialmente pelo MTE em 04/11/2026. MOV, FOR e EXC foram listados e transferidos do FTP oficial em 05/11/2026, com tamanhos e SHA-256 registrados e assinaturas 7z confirmadas. A liberação se restringe à auditoria incremental; não representa aprovação metodológica nem autorização de publicação."
 }
