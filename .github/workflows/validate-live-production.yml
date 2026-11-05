@@ -1,0 +1,77 @@
+name: Validate live production after deployment
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/validate-live-production.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    name: Check deployed CAGED and RAIS endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Resolve published and auditable competencies
+        id: expected
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import tomllib
+          from pathlib import Path
+
+          version = tomllib.loads(
+              Path("pyproject.toml").read_text(encoding="utf-8")
+          )["project"]["version"]
+          coverage = json.loads(
+              Path("config/monthly_coverage_policy.json").read_text(
+                  encoding="utf-8"
+              )
+          )["max_competence"]
+
+          def published(pattern, field):
+              candidates = []
+              for path in Path("data/gold").glob(pattern):
+                  gate = json.loads(path.read_text(encoding="utf-8"))
+                  if gate.get("publishable") is True:
+                      candidates.append(str(gate[field]))
+              if not candidates:
+                  raise SystemExit("Não há gates publicáveis de CAGED/RAIS.")
+              return max(candidates)
+
+          monthly = published("publication-gate-*.json", "competence")
+          rais = published("rais-publication-gate-*.json", "year")
+          if monthly > coverage:
+              raise SystemExit("Competência publicada excede cobertura auditável.")
+
+          print(f"version={version}")
+          print(f"published_monthly={monthly}")
+          print(f"policy_max={coverage}")
+          print(f"rais_year={rais}")
+          PY
+
+      - name: Validate current production against published baseline
+        shell: bash
+        run: |
+          python scripts/smoke_production.py \
+            --base-url "https://mercado-tech-brasil.onrender.com" \
+            --expected-version "${{ steps.expected.outputs.version }}" \
+            --expected-monthly "${{ steps.expected.outputs.published_monthly }}" \
+            --expected-policy-max "${{ steps.expected.outputs.policy_max }}" \
+            --expected-rais-year "${{ steps.expected.outputs.rais_year }}" \
+            --attempts 6 \
+            --delay-seconds 10
