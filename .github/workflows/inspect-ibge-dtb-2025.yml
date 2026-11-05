@@ -1,0 +1,93 @@
+name: Inspect official IBGE DTB 2025
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/inspect-ibge-dtb-2025.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dtb-inspection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install spreadsheet readers
+        run: python -m pip install "openpyxl>=3.1,<4" "xlrd>=2,<3"
+      - name: Inspect official ZIP and workbook schema (read-only)
+        run: |
+          python - <<'PY'
+          import hashlib
+          import io
+          import json
+          import urllib.request
+          import zipfile
+
+          url = (
+              "https://geoftp.ibge.gov.br/organizacao_do_territorio/"
+              "estrutura_territorial/divisao_territorial/2025/DTB_2025.zip"
+          )
+          request = urllib.request.Request(
+              url, headers={"User-Agent": "mercado-tech-brasil/0.40"}
+          )
+          with urllib.request.urlopen(request, timeout=70) as response:
+              data = response.read(8 * 1024 * 1024 + 1)
+          if len(data) > 8 * 1024 * 1024 or not zipfile.is_zipfile(io.BytesIO(data)):
+              raise SystemExit("IBGE: arquivo maior que o limite ou formato ZIP inválido.")
+          report = {
+              "source_url": url,
+              "bytes": len(data),
+              "sha256": hashlib.sha256(data).hexdigest(),
+              "members": [],
+          }
+          with zipfile.ZipFile(io.BytesIO(data)) as archive:
+              for item in archive.infolist():
+                  report["members"].append({
+                      "name": item.filename,
+                      "size": item.file_size,
+                  })
+                  if (
+                      item.is_dir()
+                      or item.file_size > 5 * 1024 * 1024
+                      or "MUNICIP" not in item.filename.upper()
+                  ):
+                      continue
+                  lower = item.filename.lower()
+                  if lower.endswith(".xls"):
+                      import xlrd
+                      book = xlrd.open_workbook(file_contents=archive.read(item))
+                      for sheet in book.sheets()[:2]:
+                          report.setdefault("sheets", []).append({
+                              "file": item.filename,
+                              "sheet": sheet.name,
+                              "rows": sheet.nrows,
+                              "sample": [
+                                  sheet.row_values(i)[:14]
+                                  for i in range(min(sheet.nrows, 6))
+                              ],
+                          })
+                  elif lower.endswith(".xlsx"):
+                      import openpyxl
+                      book = openpyxl.load_workbook(
+                          io.BytesIO(archive.read(item)), read_only=True, data_only=True
+                      )
+                      for sheet in book.worksheets[:2]:
+                          report.setdefault("sheets", []).append({
+                              "file": item.filename,
+                              "sheet": sheet.title,
+                              "rows": sheet.max_row,
+                              "sample": [
+                                  list(row[:14])
+                                  for row in list(sheet.iter_rows(values_only=True))[:6]
+                              ],
+                          })
+          print(json.dumps(report, indent=2, ensure_ascii=False, default=str))
+          if not report.get("sheets"):
+              raise SystemExit("Não identifiquei planilha municipal. Inspecione members.")
+          PY
