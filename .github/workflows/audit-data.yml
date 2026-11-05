@@ -94,9 +94,25 @@ jobs:
 
       - name: Sync official references
         run: |
-          python -m src.cli sync-municipalities
-          python -m src.cli sync-population "${COMPETENCE:0:4}"
-          python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
+          retry_official() {
+            local attempt=1
+            while [[ "$attempt" -le 3 ]]; do
+              if "$@"; then
+                return 0
+              fi
+              if [[ "$attempt" -eq 3 ]]; then
+                echo "Fonte oficial indisponível após 3 tentativas: $*"
+                return 1
+              fi
+              echo "Falha temporária na fonte oficial; nova tentativa $((attempt + 1))/3."
+              sleep "$((5 * attempt))"
+              attempt=$((attempt + 1))
+            done
+          }
+
+          retry_official python -m src.cli sync-municipalities
+          retry_official python -m src.cli sync-population "${COMPETENCE:0:4}"
+          retry_official python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
 
       - name: Download official competence
         run: |
