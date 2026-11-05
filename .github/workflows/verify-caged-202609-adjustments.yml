@@ -1,0 +1,159 @@
+name: Validate official CAGED 202609 adjustments
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-caged-202609-adjustments.yml"
+      - "config/reference_totals.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  official-adjustments:
+    name: Validate FOR and EXC layout and provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download and validate official adjustments
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+
+          from src.cli import command_extract
+          from src.core.settings import settings
+          from src.ingestion.https_caged import (
+              download_month_resilient,
+              write_download_manifest,
+          )
+          from src.transform.adjustments import transform_adjustment_file
+
+          competence = "202609"
+          expected_hashes = {
+              "FOR": "2646a98e115577be8606fb0f3ba772a2e5dde7e749211a35065f2cce8f13c056",
+              "EXC": "96cd1af3eac03ec65e0dd12693f9fa4669ca3c049bbc21b6fc1d45f862124ba8",
+          }
+          archive_dir = settings.bronze_path / competence / "archives"
+          extracted_dir = settings.bronze_path / competence / "extracted"
+          archive_dir.mkdir(parents=True, exist_ok=True)
+
+          try:
+              downloads = download_month_resilient(
+                  competence,
+                  archive_dir,
+                  file_types=("FOR", "EXC"),
+                  official_only=True,
+              )
+              actual_kinds = [item.kind for item in downloads]
+              if sorted(actual_kinds) != ["EXC", "FOR"]:
+                  raise SystemExit(
+                      f"Ajustes oficiais incompletos ou duplicados: {actual_kinds}"
+                  )
+
+              for item in downloads:
+                  if item.transport != "ftp_mte":
+                      raise SystemExit("Ajuste proveniente de origem não oficial.")
+                  digest = sha256()
+                  with item.path.open("rb") as handle:
+                      for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                          digest.update(chunk)
+                  if digest.hexdigest() != expected_hashes[item.kind]:
+                      raise SystemExit(
+                          f"SHA-256 do {item.kind} alterado: revisão humana exigida."
+                      )
+
+              write_download_manifest(
+                  downloads,
+                  archive_dir / "download-manifest.json",
+              )
+              command_extract(competence)
+              summary = {"competence": competence, "source": "FTP oficial MTE"}
+              for kind in ("FOR", "EXC"):
+                  extracted = list(
+                      extracted_dir.glob(f"CAGED{kind}{competence}*.txt")
+                  )
+                  if len(extracted) != 1:
+                      raise SystemExit(
+                          f"Esperado um TXT do ajuste {kind}; encontrados {len(extracted)}."
+                      )
+                  transformed = transform_adjustment_file(
+                      extracted[0],
+                      ingest_competence=competence,
+                      kind=kind,
+                      silver_dir=settings.silver_path,
+                      gold_dir=settings.gold_path,
+                      cbo_config_path=settings.cbo_config_path,
+                  )
+                  quality = json.loads(
+                      transformed.quality_path.read_text(encoding="utf-8")
+                  )
+                  if (
+                      quality["rows_read"] <= 0
+                      or quality["valid_rate"] < 0.99
+                  ):
+                      raise SystemExit(
+                          f"Qualidade do ajuste {kind} insuficiente."
+                      )
+                  summary[kind] = {
+                      "archive_sha256": expected_hashes[kind],
+                      "rows_read": quality["rows_read"],
+                      "rows_valid": quality["rows_valid"],
+                      "rows_rejected": quality["rows_rejected"],
+                      "rows_tech": quality["rows_tech"],
+                      "valid_rate": quality["valid_rate"],
+                      "effective_competencies": quality["effective_competencies"],
+                  }
+
+              summary["quality_passed"] = True
+              summary["historical_revisions_validated"] = False
+              summary["published"] = False
+              report_path = (
+                  settings.gold_path
+                  / f"official-adjustments-check-{competence}.json"
+              )
+              report_path.write_text(
+                  json.dumps(summary, ensure_ascii=False, indent=2),
+                  encoding="utf-8",
+              )
+              print(json.dumps(summary, ensure_ascii=False, indent=2))
+          finally:
+              for folder in (archive_dir, extracted_dir):
+                  if folder.exists():
+                      for file in folder.rglob("*"):
+                          if file.is_file() and (
+                              file.suffix.lower() in {".txt", ".7z", ".part"}
+                          ):
+                              file.unlink()
+          PY
+
+      - name: Upload derived reports only
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: caged-202609-adjustments-check
+          if-no-files-found: warn
+          retention-days: 3
+          path: |
+            data/gold/quality-for-202609.json
+            data/gold/quality-exc-202609.json
+            data/gold/official-adjustments-check-202609.json
+            data/bronze/202609/archives/download-manifest.json
+            data/bronze/202609/extracted/*.manifest.json
