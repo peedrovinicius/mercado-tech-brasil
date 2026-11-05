@@ -111,8 +111,23 @@ jobs:
           }
 
           retry_official python -m src.cli sync-municipalities
-          retry_official python -m src.cli sync-population "${COMPETENCE:0:4}"
-          retry_official python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
+
+          # IBGE SIDRA não está respondendo no runner. O repositório inclui
+          # snapshots oficiais versionados, usados somente se suas fontes,
+          # competências e cobertura passarem nas verificações estritas.
+          python - <<'PY'
+          import os
+
+          from src.core.settings import settings
+          from src.reference.cache_validation import verify_audit_references
+
+          verify_audit_references(
+              population_path=settings.population_cache_path,
+              ipca_path=settings.ipca_cache_path,
+              competence=os.environ["COMPETENCE"],
+              base_competence=os.environ["IPCA_BASE"],
+          )
+          PY
 
       - name: Validate IBGE municipality coverage
         run: |
