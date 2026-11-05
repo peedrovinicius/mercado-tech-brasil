@@ -79,7 +79,11 @@ def test_regional_response_cannot_be_incomplete(
         pytest.fail(f"URL externa inesperada: {url}")
 
     monkeypatch.setattr(ibge, "_fetch_municipalities_payload", partial)
-    with pytest.raises(ValueError, match="lista vazia"):
+    def no_dtb(*, timeout: int):
+        raise ValueError("DTB oficial indisponível")
+
+    monkeypatch.setattr(ibge, "fetch_municipalities_dtb", no_dtb)
+    with pytest.raises(ValueError, match="DTB oficial indisponível"):
         ibge.fetch_municipalities(timeout=10)
 
 
@@ -97,5 +101,9 @@ def test_regional_response_requires_minimum_municipalities(
         pytest.fail(f"URL externa inesperada: {url}")
 
     monkeypatch.setattr(ibge, "_fetch_municipalities_payload", small)
-    with pytest.raises(ValueError, match="referência parcial"):
+    def no_dtb(*, timeout: int):
+        raise ValueError("DTB oficial indisponível")
+
+    monkeypatch.setattr(ibge, "fetch_municipalities_dtb", no_dtb)
+    with pytest.raises(ValueError, match="DTB oficial indisponível"):
         ibge.fetch_municipalities(timeout=10)
