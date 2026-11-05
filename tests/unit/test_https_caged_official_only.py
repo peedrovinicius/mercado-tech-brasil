@@ -1,4 +1,5 @@
 import json
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -114,6 +115,7 @@ def test_download_manifest_identifies_official_transport(
     tmp_path: Path,
 ) -> None:
     archive = tmp_path / "CAGEDMOV202609.7z"
+    archive.write_bytes(b"conteudo sintetico para hash")
     manifest = tmp_path / "download-manifest.json"
     artifact = https_caged.DownloadArtifact(
         path=archive,
@@ -128,3 +130,6 @@ def test_download_manifest_identifies_official_transport(
     assert payload["transport_repository"].startswith("ftp://ftp.mtps.gov.br/")
     assert payload["files"][0]["transport"] == "ftp_mte"
     assert payload["files"][0]["path"] == archive.name
+    assert payload["files"][0]["size_bytes"] == archive.stat().st_size
+    assert payload["files"][0]["sha256"] == sha256(archive.read_bytes()).hexdigest()
+    assert payload["files"][0]["ingested_at_utc"].endswith("+00:00")
