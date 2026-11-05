@@ -1,0 +1,75 @@
+name: Verify official CAGED 202609 files
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-caged-202609-files.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  official-source-check:
+    name: MTE FTP directory listing (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: List MOV FOR EXC files without downloading microdata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import UTC, datetime
+          from ftplib import FTP, all_errors
+          from pathlib import PurePosixPath
+
+          competence = "202609"
+          directory = f"pdet/microdados/NOVO CAGED/2026/{competence}"
+          host = "ftp.mtps.gov.br"
+          summary = {
+              "checked_at_utc": datetime.now(UTC).isoformat(),
+              "competence": competence,
+              "source": f"ftp://{host}/{directory}/",
+              "check_kind": "directory_listing_only",
+              "sha256_verified": False,
+          }
+
+          try:
+              with FTP(host, timeout=25) as ftp:
+                  ftp.login()
+                  ftp.cwd(directory)
+                  listing = [PurePosixPath(name).name for name in ftp.nlst()]
+          except all_errors as exc:
+              summary["result"] = "source_unreachable"
+              summary["error_type"] = type(exc).__name__
+              print(json.dumps(summary, indent=2))
+              raise SystemExit(
+                  "FTP oficial inacessível neste runner. "
+                  "Isso não comprova que os arquivos não existem."
+              ) from exc
+
+          found = {}
+          for kind in ("MOV", "FOR", "EXC"):
+              prefix = f"CAGED{kind}{competence}"
+              matches = sorted(
+                  item for item in listing
+                  if item.upper().startswith(prefix)
+                  and item.upper().endswith(".7Z")
+              )
+              found[kind] = matches
+
+          summary["files"] = found
+          summary["result"] = (
+              "all_types_listed" if all(found.values())
+              else "incomplete_directory_listing"
+          )
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          if not all(found.values()):
+              raise SystemExit(
+                  "Falta ao menos um dos tipos MOV/FOR/EXC no diretório "
+                  "consultado. Não liberar a competência."
+              )
+          print("Listagem confirmada. Ainda faltam download, hashes e auditoria.")
+          PY

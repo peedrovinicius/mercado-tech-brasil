@@ -1,0 +1,174 @@
+name: Reconcile official CAGED 202609 MOV
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-caged-202609-mov.yml"
+      - "config/reference_totals.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mov-national-reconciliation:
+    name: Validate official MOV against MTE totals
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download, transform and reconcile official MOV
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+
+          from src.cli import command_extract, command_transform
+          from src.core.settings import settings
+          from src.ingestion.https_caged import (
+              download_month_resilient,
+              write_download_manifest,
+          )
+
+          competence = "202609"
+          expected_archive_sha = (
+              "967a29800166b32ba4f9d786e95b53122eed6dbd78ca94da783290d67cd5d50d"
+          )
+          archive_dir = settings.bronze_path / competence / "archives"
+          extracted_dir = settings.bronze_path / competence / "extracted"
+          archive_dir.mkdir(parents=True, exist_ok=True)
+
+          try:
+              downloads = download_month_resilient(
+                  competence,
+                  archive_dir,
+                  file_types=("MOV",),
+                  official_only=True,
+              )
+              if len(downloads) != 1 or downloads[0].kind != "MOV":
+                  raise SystemExit("MOV oficial ausente ou duplicado.")
+              if downloads[0].transport != "ftp_mte":
+                  raise SystemExit("Origem diferente do FTP oficial do MTE.")
+
+              digest = sha256()
+              with downloads[0].path.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      digest.update(chunk)
+              if digest.hexdigest() != expected_archive_sha:
+                  raise SystemExit(
+                      "SHA-256 do MOV mudou desde a captura oficial em 05/11/2026. "
+                      "Revisão manual obrigatória antes de aceitar novos valores."
+                  )
+
+              write_download_manifest(
+                  downloads,
+                  archive_dir / "download-manifest.json",
+              )
+              command_extract(competence)
+              command_transform(competence)
+
+              actual = json.loads(
+                  (
+                      settings.gold_path
+                      / f"audit-national-mov-{competence}.json"
+                  ).read_text(encoding="utf-8")
+              )
+              reference = json.loads(
+                  settings.reference_totals_path.read_text(encoding="utf-8")
+              )[competence]
+              checks = {
+                  "admissoes": (
+                      actual["admissions"] == reference["admissoes"]
+                  ),
+                  "desligamentos": (
+                      actual["dismissals"] == reference["desligamentos"]
+                  ),
+                  "saldo": actual["balance"] == reference["saldo"],
+                  "identidade": (
+                      actual["admissions"] - actual["dismissals"]
+                      == actual["balance"]
+                  ),
+              }
+              quality = json.loads(
+                  (
+                      settings.gold_path / f"quality-{competence}.json"
+                  ).read_text(encoding="utf-8")
+              )
+              checks["layout_e_validade"] = (
+                  quality["rows_read"] > 0
+                  and quality["valid_rate"] >= 0.99
+              )
+              report = {
+                  "competence": competence,
+                  "source": "FTP oficial MTE",
+                  "archive_sha256": digest.hexdigest(),
+                  "reference": {
+                      "admissions": reference["admissoes"],
+                      "dismissals": reference["desligamentos"],
+                      "balance": reference["saldo"],
+                  },
+                  "actual": {
+                      "admissions": actual["admissions"],
+                      "dismissals": actual["dismissals"],
+                      "balance": actual["balance"],
+                  },
+                  "rows_read": quality["rows_read"],
+                  "rows_rejected": quality["rows_rejected"],
+                  "valid_rate": quality["valid_rate"],
+                  "checks": checks,
+                  "reconciled": all(checks.values()),
+                  "published": False,
+              }
+              report_path = (
+                  settings.gold_path
+                  / f"national-source-reconciliation-{competence}.json"
+              )
+              report_path.write_text(
+                  json.dumps(report, ensure_ascii=False, indent=2),
+                  encoding="utf-8",
+              )
+              print(json.dumps(report, ensure_ascii=False, indent=2))
+              if not report["reconciled"]:
+                  raise SystemExit(
+                      "Falha de reconciliação nacional MOV. "
+                      "A publicação permanece bloqueada."
+                  )
+          finally:
+              for folder in (archive_dir, extracted_dir):
+                  if folder.exists():
+                      for file in folder.rglob("*"):
+                          if file.is_file() and (
+                              file.suffix.lower() in {".txt", ".7z", ".part"}
+                          ):
+                              file.unlink()
+          PY
+
+      - name: Upload derived audit reports only
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: caged-202609-national-mov-check
+          if-no-files-found: warn
+          retention-days: 3
+          path: |
+            data/gold/audit-national-mov-202609.json
+            data/gold/quality-202609.json
+            data/gold/national-source-reconciliation-202609.json
+            data/bronze/202609/archives/download-manifest.json
+            data/bronze/202609/extracted/*.manifest.json

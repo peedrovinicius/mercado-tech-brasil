@@ -1,0 +1,98 @@
+name: Verify CAGED 202609 official archives
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-caged-202609-archives.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  official-archive-check:
+    name: Stream MTE archives and verify metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Stream MOV FOR EXC with no persistence of raw microdata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import UTC, datetime
+          from ftplib import FTP, error_perm
+          from hashlib import sha256
+
+          competence = "202609"
+          host = "ftp.mtps.gov.br"
+          directory = f"pdet/microdados/NOVO CAGED/2026/{competence}"
+          signature_7z = bytes.fromhex("377abcaf271c")
+
+          class HashingSink:
+              def __init__(self):
+                  self.digest = sha256()
+                  self.size = 0
+                  self.prefix = b""
+
+              def __call__(self, block):
+                  self.digest.update(block)
+                  self.size += len(block)
+                  if len(self.prefix) < len(signature_7z):
+                      needed = len(signature_7z) - len(self.prefix)
+                      self.prefix += block[:needed]
+
+          results = {}
+          with FTP(host, timeout=90) as ftp:
+              ftp.login()
+              ftp.cwd(directory)
+              ftp.voidcmd("TYPE I")
+              listing = set(ftp.nlst())
+
+              for kind in ("MOV", "FOR", "EXC"):
+                  filename = f"CAGED{kind}{competence}.7z"
+                  if filename not in listing:
+                      raise SystemExit(
+                          f"Arquivo oficial não encontrado na listagem: {filename}"
+                      )
+
+                  try:
+                      expected_size = ftp.size(filename)
+                  except error_perm:
+                      expected_size = None
+
+                  sink = HashingSink()
+                  ftp.retrbinary(f"RETR {filename}", sink, blocksize=1024 * 1024)
+
+                  if sink.size <= 1024:
+                      raise SystemExit(f"Download vazio ou incompleto: {filename}")
+                  if sink.prefix != signature_7z:
+                      raise SystemExit(f"Assinatura 7z inválida: {filename}")
+                  if expected_size is not None and sink.size != expected_size:
+                      raise SystemExit(f"Tamanho FTP divergente: {filename}")
+
+                  results[kind] = {
+                      "filename": filename,
+                      "source_url": f"ftp://{host}/{directory}/{filename}",
+                      "downloaded_bytes": sink.size,
+                      "ftp_size_bytes": expected_size,
+                      "sha256": sink.digest.hexdigest(),
+                      "signature_7z_valid": True,
+                  }
+
+          report = {
+              "checked_at_utc": datetime.now(UTC).isoformat(),
+              "competence": competence,
+              "source": "official_mte_ftp",
+              "raw_microdata_persisted": False,
+              "archive_integrity_tested": False,
+              "content_reconciled": False,
+              "files": results,
+          }
+          print(json.dumps(report, indent=2, ensure_ascii=False))
+          print(
+              "Fluxos recebidos e SHA-256 calculados. "
+              "Ainda não é validação de CRC, layout ou conteúdo estatístico."
+          )
+          PY

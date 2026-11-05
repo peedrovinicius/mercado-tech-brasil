@@ -4,7 +4,9 @@ import json
 import time
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from ftplib import all_errors
+from hashlib import sha256
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -121,16 +123,37 @@ def write_download_manifest(
     artifacts: Iterable[DownloadArtifact],
     destination: Path,
 ) -> None:
-    payload = {
-        "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
-        "transport_repository": HF_REPOSITORY,
-        "files": [
+    items = list(artifacts)
+    transports = {item.transport for item in items}
+    if transports == {"ftp_mte"}:
+        repository = f"ftp://{FTP_HOST}/{BASE_DIR}/"
+    elif transports == {"https_huggingface_mirror"}:
+        repository = HF_REPOSITORY
+    elif not transports:
+        repository = None
+    else:
+        repository = "mixed"
+
+    file_entries = []
+    for item in items:
+        digest = sha256()
+        with item.path.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+        file_entries.append(
             {
                 **asdict(item),
                 "path": item.path.name,
+                "size_bytes": item.path.stat().st_size,
+                "sha256": digest.hexdigest(),
+                "ingested_at_utc": datetime.now(UTC).isoformat(),
             }
-            for item in artifacts
-        ],
+        )
+
+    payload = {
+        "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
+        "transport_repository": repository,
+        "files": file_entries,
     }
     destination.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2),
@@ -143,6 +166,8 @@ def download_month_resilient(
     yearmonth: str,
     destination_dir: Path,
     file_types: Iterable[str] = ("MOV", "FOR", "EXC"),
+    *,
+    official_only: bool = False,
 ) -> list[DownloadArtifact]:
     requested = tuple(kind.upper().strip() for kind in file_types)
 
@@ -152,6 +177,11 @@ def download_month_resilient(
             destination_dir,
             file_types=requested,
         )
+        if official_only and not paths:
+            raise RuntimeError(
+                f"Microdados {yearmonth}: arquivo FTP oficial ausente "
+                f"para os tipos {requested}."
+            )
         artifacts = []
         for path in paths:
             upper = path.name.upper()
@@ -171,6 +201,11 @@ def download_month_resilient(
             )
         return artifacts
     except FTP_DOWNLOAD_ERRORS as ftp_error:
+        if official_only:
+            raise RuntimeError(
+                f"Microdados {yearmonth}: FTP oficial do MTE indisponível; "
+                "fallback não oficial desativado."
+            ) from ftp_error
         try:
             return download_month_https(
                 yearmonth,
