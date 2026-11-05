@@ -58,6 +58,7 @@ def _write_adjustment(
     *,
     ingest_competence: str,
     effective_competence: str,
+    include_base: bool = True,
 ) -> None:
     pl.DataFrame(
         {
@@ -66,6 +67,12 @@ def _write_adjustment(
     ).write_parquet(
         silver / f"caged_tech_for_{ingest_competence}.parquet"
     )
+    if include_base:
+        # Fonte MOV sintética usada apenas para indicar que a
+        # reconstrução histórica tinha todos os insumos necessários.
+        pl.DataFrame({"competence": [effective_competence]}).write_parquet(
+            silver / f"caged_tech_{effective_competence}.parquet"
+        )
 
 
 def test_expected_historical_change_is_packaged(tmp_path: Path):
@@ -214,3 +221,41 @@ def test_revision_package_requires_unchanged_published_baseline(tmp_path: Path):
             gold_dir=gold,
             package_root=package_root,
         )
+
+
+
+def test_historical_adjustments_without_published_silver_cannot_pass(
+    tmp_path: Path,
+):
+    gold, silver, package_root, baseline = _published_fixture(tmp_path)
+    _write_adjustment(
+        silver,
+        ingest_competence="202502",
+        effective_competence="202501",
+        include_base=False,
+    )
+
+    result = evaluate_history_revisions(
+        ingest_competence="202502",
+        baseline_path=baseline,
+        gold_dir=gold,
+        silver_dir=silver,
+        package_root=package_root,
+    )
+    assert result["passed"] is False
+    assert result["changed_published_competencies"] == []
+    assert result["missing_rebuild_baselines"] == ["202501"]
+    assert result["packaged_files"] == []
+
+
+def test_no_adjustment_may_pass_without_historical_silver(tmp_path: Path):
+    gold, silver, package_root, baseline = _published_fixture(tmp_path)
+    result = evaluate_history_revisions(
+        ingest_competence="202502",
+        baseline_path=baseline,
+        gold_dir=gold,
+        silver_dir=silver,
+        package_root=package_root,
+    )
+    assert result["passed"] is True
+    assert result["missing_rebuild_baselines"] == []
