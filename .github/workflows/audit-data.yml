@@ -97,6 +97,8 @@ jobs:
                       competence,
                       archive_dir,
                       file_types=(kind,),
+                      # Competências novas não devem usar espelho externo.
+                      official_only=competence >= "202609",
                   )
                   artifacts.extend(found)
                   for item in found:
