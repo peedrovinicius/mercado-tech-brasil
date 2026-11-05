@@ -114,6 +114,41 @@ jobs:
           retry_official python -m src.cli sync-population "${COMPETENCE:0:4}"
           retry_official python -m src.cli sync-ipca "$COMPETENCE" "$IPCA_BASE" --base "$IPCA_BASE"
 
+      - name: Validate IBGE municipality coverage
+        run: |
+          python - <<'PY'
+          from src.core.settings import settings
+          from src.reference.municipalities import load_municipalities
+          from src.reference.population import load_population_cache
+
+          municipalities = load_municipalities(
+              settings.municipalities_cache_path
+          )
+          population = load_population_cache(settings.population_cache_path)
+          if population.get("source") != "IBGE SIDRA":
+              raise SystemExit("Fonte populacional não é IBGE SIDRA.")
+          expected = {
+              code[:6] for code in population["municipalities"]
+          }
+          actual = set(municipalities)
+          if len(expected) != len(population["municipalities"]):
+              raise SystemExit(
+                  "Prefixos IBGE ambíguos na referência populacional."
+              )
+          missing = expected - actual
+          unexpected = actual - expected
+          print(
+              f"IBGE: municipios={len(actual)} "
+              f"populacao={len(expected)} "
+              f"faltando={len(missing)} extras={len(unexpected)}"
+          )
+          if missing or unexpected:
+              raise SystemExit(
+                  "Referência municipal divergente da população IBGE. "
+                  "A auditoria não pode prosseguir com cobertura parcial."
+              )
+          PY
+
       - name: Download official competence
         run: |
           python - <<'PY'
