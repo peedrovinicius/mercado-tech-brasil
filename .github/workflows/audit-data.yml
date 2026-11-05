@@ -107,7 +107,7 @@ jobs:
                           f"kind={item.kind} transport={item.transport}"
                       )
               except Exception as exc:
-                  if kind == "MOV":
+                  if kind == "MOV" or competence >= "202609":
                       raise
                   print(
                       f"optional adjustment unavailable "
