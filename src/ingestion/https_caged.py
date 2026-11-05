@@ -143,6 +143,8 @@ def download_month_resilient(
     yearmonth: str,
     destination_dir: Path,
     file_types: Iterable[str] = ("MOV", "FOR", "EXC"),
+    *,
+    official_only: bool = False,
 ) -> list[DownloadArtifact]:
     requested = tuple(kind.upper().strip() for kind in file_types)
 
@@ -171,6 +173,11 @@ def download_month_resilient(
             )
         return artifacts
     except FTP_DOWNLOAD_ERRORS as ftp_error:
+        if official_only:
+            raise RuntimeError(
+                f"Microdados {yearmonth}: FTP oficial do MTE indisponível; "
+                "fallback não oficial desativado."
+            ) from ftp_error
         try:
             return download_month_https(
                 yearmonth,
