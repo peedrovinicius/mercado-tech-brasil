@@ -1,12 +1,11 @@
+# Smoke valida a versão já implantada. Não acionar por Release:
+# Render espera os checks de CI passarem antes do deploy; um smoke de
+# pós-deploy dentro desse gate criaria dependência circular.
 name: Production smoke
 
 on:
   schedule:
     - cron: "15 11 * * *"
-  workflow_run:
-    workflows: ["Release"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,7 +17,6 @@ concurrency:
 
 jobs:
   smoke:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 7
 
@@ -56,11 +54,20 @@ jobs:
               if payload.get("publishable") is True:
                   rais_years.append(int(payload["year"]))
 
+          monthly_published = []
+          for path in Path("data/gold").glob("publication-gate-*.json"):
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              if payload.get("publishable") is True:
+                  monthly_published.append(str(payload["competence"]))
+          if not monthly_published or not rais_years:
+              raise SystemExit("Nenhuma release CAGED/RAIS publicável encontrada.")
+
           print(f"version={pyproject['project']['version']}")
-          print(f"monthly={policy['max_competence']}")
+          print(f"monthly={max(monthly_published)}")
+          print(f"policy_max={policy['max_competence']}")
           print(f"rais_year={max(rais_years)}")
           PY
 
       - name: Validate production
         run: |
-          python scripts/smoke_production.py             --base-url "https://mercado-tech-brasil.onrender.com"             --expected-version "${{ steps.expected.outputs.version }}"             --expected-monthly "${{ steps.expected.outputs.monthly }}"             --expected-rais-year "${{ steps.expected.outputs.rais_year }}"
+          python scripts/smoke_production.py             --base-url "https://mercado-tech-brasil.onrender.com"             --expected-version "${{ steps.expected.outputs.version }}"             --expected-monthly "${{ steps.expected.outputs.monthly }}"             --expected-policy-max "${{ steps.expected.outputs.policy_max }}"             --expected-rais-year "${{ steps.expected.outputs.rais_year }}"
