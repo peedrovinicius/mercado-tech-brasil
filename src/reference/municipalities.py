@@ -4,11 +4,11 @@ import gzip
 import io
 import json
 import zipfile
-from hashlib import sha256
-from urllib.parse import urlsplit
 from concurrent.futures import ThreadPoolExecutor
+from hashlib import sha256
 from pathlib import Path
 from urllib.error import URLError
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from src.transform.schema import UF_CODE_TO_SIGLA
