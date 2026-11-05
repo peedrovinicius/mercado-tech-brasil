@@ -121,15 +121,26 @@ def write_download_manifest(
     artifacts: Iterable[DownloadArtifact],
     destination: Path,
 ) -> None:
+    items = list(artifacts)
+    transports = {item.transport for item in items}
+    if transports == {"ftp_mte"}:
+        repository = f"ftp://{FTP_HOST}/{BASE_DIR}/"
+    elif transports == {"https_huggingface_mirror"}:
+        repository = HF_REPOSITORY
+    elif not transports:
+        repository = None
+    else:
+        repository = "mixed"
+
     payload = {
         "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
-        "transport_repository": HF_REPOSITORY,
+        "transport_repository": repository,
         "files": [
             {
                 **asdict(item),
                 "path": item.path.name,
             }
-            for item in artifacts
+            for item in items
         ],
     }
     destination.write_text(
