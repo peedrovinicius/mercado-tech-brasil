@@ -1,4 +1,4 @@
-# Preparação do Novo CAGED — 202609
+# Preparação do Novo CAGED - 202609
 
 Status: **pré-auditoria; NÃO APROVADO PARA PUBLICAÇÃO**.
 
