@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -108,3 +109,22 @@ def test_existing_default_fallback_remains_available(
         tmp_path,
         file_types=("MOV",),
     ) == [expected]
+
+def test_download_manifest_identifies_official_transport(
+    tmp_path: Path,
+) -> None:
+    archive = tmp_path / "CAGEDMOV202609.7z"
+    manifest = tmp_path / "download-manifest.json"
+    artifact = https_caged.DownloadArtifact(
+        path=archive,
+        kind="MOV",
+        transport="ftp_mte",
+        url="ftp://ftp.mtps.gov.br/pdet/microdados/NOVO CAGED/2026/202609/CAGEDMOV202609.7z",
+    )
+
+    https_caged.write_download_manifest([artifact], manifest)
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+
+    assert payload["transport_repository"].startswith("ftp://ftp.mtps.gov.br/")
+    assert payload["files"][0]["transport"] == "ftp_mte"
+    assert payload["files"][0]["path"] == archive.name
