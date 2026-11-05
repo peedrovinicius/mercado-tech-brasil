@@ -154,6 +154,11 @@ def download_month_resilient(
             destination_dir,
             file_types=requested,
         )
+        if official_only and not paths:
+            raise RuntimeError(
+                f"Microdados {yearmonth}: arquivo FTP oficial ausente "
+                f"para os tipos {requested}."
+            )
         artifacts = []
         for path in paths:
             upper = path.name.upper()
