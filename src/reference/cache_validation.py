@@ -61,7 +61,7 @@ def verify_ipca_snapshot(
 
     indices = payload.get("indices")
     if not isinstance(indices, dict):
-        raise ValueError("Índices IPCA ausentes.")
+        raise TypeError("Índices IPCA ausentes.")
     for period in (competence, base_competence):
         if (
             len(period) != 6
