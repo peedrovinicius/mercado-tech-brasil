@@ -125,6 +125,18 @@ def evaluate_history_revisions(
         if competence > ingest_competence
     )
 
+    # Reconciliações históricas exigem o Silver MOV da competência
+    # publicada para que FOR/EXC possam ser efetivamente incorporados.
+    # A ausência não é uma revisão "sem mudanças": é dado insuficiente.
+    missing_rebuild_baselines = sorted(
+        competence
+        for competence in adjustment_competencies & set(baseline_artifacts)
+        if competence != ingest_competence
+        and not (
+            silver_dir / f"caged_tech_{competence}.parquet"
+        ).is_file()
+    )
+
     changed: dict[str, list[dict[str, str | None]]] = {}
     missing_after: list[str] = []
 
@@ -166,7 +178,12 @@ def evaluate_history_revisions(
         allowed.add(ingest_competence)
 
     unexpected = sorted(set(changed) - allowed)
-    passed = not unexpected and not future_adjustments and not missing_after
+    passed = (
+        not unexpected
+        and not future_adjustments
+        and not missing_after
+        and not missing_rebuild_baselines
+    )
 
     package_dir = package_root / ingest_competence / "gold"
     if package_dir.parent.exists():
@@ -223,6 +240,7 @@ def evaluate_history_revisions(
         "changed_published_competencies": sorted(changed),
         "unexpected_changed_competencies": unexpected,
         "future_adjustment_competencies": future_adjustments,
+        "missing_rebuild_baselines": missing_rebuild_baselines,
         "missing_after": sorted(missing_after),
         "changes": changed,
         "overview_changes": overview_changes,
