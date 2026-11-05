@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import time
+from datetime import UTC, datetime
+from hashlib import sha256
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from ftplib import all_errors
@@ -132,16 +134,26 @@ def write_download_manifest(
     else:
         repository = "mixed"
 
-    payload = {
-        "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
-        "transport_repository": repository,
-        "files": [
+    file_entries = []
+    for item in items:
+        digest = sha256()
+        with item.path.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+        file_entries.append(
             {
                 **asdict(item),
                 "path": item.path.name,
+                "size_bytes": item.path.stat().st_size,
+                "sha256": digest.hexdigest(),
+                "ingested_at_utc": datetime.now(UTC).isoformat(),
             }
-            for item in items
-        ],
+        )
+
+    payload = {
+        "official_source": "Novo CAGED / Ministério do Trabalho e Emprego",
+        "transport_repository": repository,
+        "files": file_entries,
     }
     destination.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2),
