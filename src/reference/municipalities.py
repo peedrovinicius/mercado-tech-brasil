@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import gzip
+import io
 import json
+import zipfile
+from hashlib import sha256
+from urllib.parse import urlsplit
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.error import URLError
 from urllib.request import Request, urlopen
+
+from src.transform.schema import UF_CODE_TO_SIGLA
 
 IBGE_MUNICIPALITIES_URL = (
     "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
@@ -38,6 +44,99 @@ def _decode_json_body(body: bytes, *, content_encoding: str = ""):
 # Esse caminho reduz o tamanho de cada resposta quando a listagem nacional expira.
 IBGE_REGIONS = (1, 2, 3, 4, 5)
 MIN_IBGE_MUNICIPALITIES = 5000
+
+IBGE_DTB_URL = (
+    "https://geoftp.ibge.gov.br/organizacao_do_territorio/"
+    "estrutura_territorial/divisao_territorial/2025/DTB_2025.zip"
+)
+IBGE_DTB_SHA256 = "d077a0e48c36cf18bcc96268b4a436200c014c6b8522c1a62d894acaf39dad27"
+IBGE_DTB_MEMBER = "RELATORIO_DTB_BRASIL_2025_MUNICIPIOS.xls"
+IBGE_DTB_MUNICIPALITIES = 5571
+
+
+class MunicipalityDataset(dict[str, dict[str, str]]):
+    def __init__(
+        self,
+        records: dict[str, dict[str, str]],
+        *,
+        source: str,
+        url: str,
+        archive_sha256: str | None = None,
+    ) -> None:
+        super().__init__(records)
+        self.source = source
+        self.url = url
+        self.archive_sha256 = archive_sha256
+
+
+def fetch_municipalities_dtb(*, timeout: int = 70) -> MunicipalityDataset:
+    try:
+        import xlrd
+    except ImportError as exc:
+        raise RuntimeError("Instale xlrd para ler a DTB oficial do IBGE.") from exc
+
+    request = Request(
+        IBGE_DTB_URL,
+        headers={"User-Agent": "mercado-tech-brasil/0.40", "Accept": "application/zip"},
+    )
+    with urlopen(request, timeout=timeout) as response:
+        if urlsplit(response.geturl()).hostname != "geoftp.ibge.gov.br":
+            raise ValueError("Redirecionamento para host não oficial do IBGE.")
+        payload = response.read(8 * 1024 * 1024 + 1)
+    if len(payload) > 8 * 1024 * 1024:
+        raise ValueError("DTB oficial excedeu o limite de 8 MiB.")
+    actual_sha256 = sha256(payload).hexdigest()
+    if actual_sha256 != IBGE_DTB_SHA256:
+        raise ValueError(
+            "SHA-256 da DTB 2025 alterado. Revisão metodológica obrigatória."
+        )
+
+    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+        info = archive.getinfo(IBGE_DTB_MEMBER)
+        if info.file_size > 2 * 1024 * 1024:
+            raise ValueError("Planilha municipal DTB excedeu o limite de 2 MiB.")
+        book = xlrd.open_workbook(file_contents=archive.read(info))
+    sheet = book.sheet_by_name("DTB_Municípios")
+    expected_columns = (
+        "UF", "Código Município Completo", "Nome_Município"
+    )
+    if tuple(str(sheet.cell_value(6, idx)) for idx in (0, 7, 8)) != expected_columns:
+        raise ValueError("Colunas da DTB 2025 diferentes do layout validado.")
+
+    records: dict[str, dict[str, str]] = {}
+    for row in range(7, sheet.nrows):
+        state = str(sheet.cell_value(row, 0)).strip()
+        code = str(sheet.cell_value(row, 7)).strip()
+        name = str(sheet.cell_value(row, 8)).strip()
+        if (
+            len(code) != 7
+            or not code.isdigit()
+            or not name
+            or state not in UF_CODE_TO_SIGLA
+            or state == "99"
+            or code[:2] != state
+        ):
+            raise ValueError(f"Linha municipal inválida na DTB: {row + 1}")
+        prefix = code[:6]
+        if prefix in records:
+            raise ValueError(f"Prefixo CAGED duplicado na DTB: {prefix}")
+        records[prefix] = {
+            "municipio_codigo_ibge": code,
+            "municipio_nome": name,
+            "uf": UF_CODE_TO_SIGLA[state],
+        }
+
+    if len(records) != IBGE_DTB_MUNICIPALITIES:
+        raise ValueError(
+            f"DTB incompleta: {len(records)} municípios; "
+            f"esperados {IBGE_DTB_MUNICIPALITIES}."
+        )
+    return MunicipalityDataset(
+        records,
+        source="IBGE Divisão Territorial Brasileira 2025",
+        url=IBGE_DTB_URL,
+        archive_sha256=actual_sha256,
+    )
 
 
 def _fetch_municipalities_payload(url: str, *, timeout: int) -> object:
@@ -119,12 +218,27 @@ def fetch_municipalities(*, timeout: int = 60) -> dict[str, dict[str, str]]:
             )
         )
         if len(national) >= MIN_IBGE_MUNICIPALITIES:
-            return national
+            return MunicipalityDataset(
+                national,
+                source="IBGE API de Localidades",
+                url=IBGE_MUNICIPALITIES_URL,
+            )
     except (OSError, URLError, TimeoutError, ValueError, TypeError):
         # Erros no endpoint nacional não autorizam dados incompletos.
         pass
 
-    return _fetch_municipalities_by_region(timeout=timeout)
+    try:
+        regional = _fetch_municipalities_by_region(timeout=timeout)
+    except (OSError, URLError, TimeoutError, ValueError, TypeError):
+        regional = None
+
+    if regional is not None:
+        return MunicipalityDataset(
+            regional,
+            source="IBGE API de Localidades (5 regiões)",
+            url=IBGE_MUNICIPALITIES_URL,
+        )
+    return fetch_municipalities_dtb(timeout=timeout)
 
 
 def save_municipalities(
@@ -135,8 +249,15 @@ def save_municipalities(
     destination.write_text(
         json.dumps(
             {
-                "source": "IBGE API de Localidades",
-                "url": IBGE_MUNICIPALITIES_URL,
+                "source": getattr(
+                    municipalities, "source", "IBGE API de Localidades"
+                ),
+                "url": getattr(
+                    municipalities, "url", IBGE_MUNICIPALITIES_URL
+                ),
+                "archive_sha256": getattr(
+                    municipalities, "archive_sha256", None
+                ),
                 "mapping_rule": (
                     "codigo CAGED de 6 dígitos corresponde aos 6 primeiros "
                     "dígitos do código municipal IBGE de 7 dígitos"
