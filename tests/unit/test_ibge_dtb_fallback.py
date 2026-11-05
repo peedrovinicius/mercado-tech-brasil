@@ -10,7 +10,6 @@ import xlrd
 
 from src.reference import municipalities as ibge
 
-
 MUNICIPALITIES = [
     ("11", "1100015", "Alta Floresta D'Oeste"),
     ("23", "2304400", "Fortaleza"),
