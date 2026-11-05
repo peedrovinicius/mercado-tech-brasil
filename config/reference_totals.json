@@ -83,5 +83,15 @@
     "desligamentos": 2128736,
     "saldo": 165827,
     "note": "Totais da competência corrente publicados oficialmente pelo MTE em 29/09/2026. Ajustes posteriores permanecem tratados em FOR e EXC."
+  },
+  "202609": {
+    "source": "Ministério do Trabalho e Emprego: Novo Caged, setembro de 2026",
+    "source_url": "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/novembro/pais-gerou-1-248-mil-empregos-formais-ate-setembro-de-2026",
+    "published_at": "2026-11-04",
+    "reference_kind": "published_monthly_mov",
+    "admissoes": 2214437,
+    "desligamentos": 2093132,
+    "saldo": 121305,
+    "note": "Totais da competência corrente publicados oficialmente pelo MTE em 04/11/2026. A referência ainda exige reconciliação com o microdado MOV; ajustes posteriores são tratados em FOR e EXC."
   }
 }
