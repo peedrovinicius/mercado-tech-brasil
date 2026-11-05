@@ -37,6 +37,7 @@ def validate(
     expected_version: str,
     expected_monthly: str,
     expected_rais_year: int,
+    expected_policy_max: str | None = None,
 ) -> dict[str, object]:
     health, health_headers = _json(base_url, "/api/v1/system/health")
     if health.get("status") != "ok":
@@ -75,7 +76,8 @@ def validate(
         raise RuntimeError("Release state expõe versão divergente.")
     if monthly.get("latest_competence") != expected_monthly:
         raise RuntimeError("Release state expõe competência mensal divergente.")
-    if monthly.get("policy_max_competence") != expected_monthly:
+    policy_expected = expected_policy_max or expected_monthly
+    if monthly.get("policy_max_competence") != policy_expected:
         raise RuntimeError("Cobertura em produção diverge da política esperada.")
     if int(rais.get("latest_published_year") or 0) != expected_rais_year:
         raise RuntimeError("Release state expõe RAIS divergente.")
@@ -121,6 +123,7 @@ def main() -> None:
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--expected-version", required=True)
     parser.add_argument("--expected-monthly", required=True)
+    parser.add_argument("--expected-policy-max")
     parser.add_argument("--expected-rais-year", required=True, type=int)
     parser.add_argument("--attempts", type=int, default=20)
     parser.add_argument("--delay-seconds", type=int, default=15)
@@ -137,6 +140,7 @@ def main() -> None:
                 expected_version=args.expected_version,
                 expected_monthly=args.expected_monthly,
                 expected_rais_year=args.expected_rais_year,
+                expected_policy_max=args.expected_policy_max,
             )
         except (AssertionError, HTTPError, URLError, OSError, ValueError, TypeError, RuntimeError) as exc:
             last_error = exc
