@@ -18,8 +18,16 @@ on:
         default: false
         type: boolean
 
+  pull_request:
+    paths:
+      - "config/reference_totals.json"
+      - "config/monthly_coverage_policy.json"
+
+permissions:
+  contents: read
+
 concurrency:
-  group: audit-data-${{ inputs.competence }}
+  group: audit-data-${{ github.event_name }}-${{ inputs.competence || github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -28,12 +36,26 @@ jobs:
     timeout-minutes: 20
     env:
       COMPETENCE: ${{ inputs.competence }}
-      IPCA_BASE: ${{ inputs.ipca_base }}
-      ALLOW_REAUDIT: ${{ inputs.allow_reaudit }}
+      IPCA_BASE: ${{ inputs.ipca_base || '202607' }}
+      ALLOW_REAUDIT: ${{ inputs.allow_reaudit || false }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Resolve target competence
+        id: target
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            COMPETENCE="$(python3 -c 'import json; from pathlib import Path; print(json.loads(Path("config/monthly_coverage_policy.json").read_text(encoding="utf-8"))["max_competence"])')"
+            echo "COMPETENCE=$COMPETENCE" >> "$GITHUB_ENV"
+          fi
+          if [[ ! "$COMPETENCE" =~ ^[0-9]{6}$ ]]; then
+            echo "Competência inválida: $COMPETENCE"
+            exit 1
+          fi
+          echo "competence=$COMPETENCE" >> "$GITHUB_OUTPUT"
+
 
       - name: Validate inputs
         run: |
@@ -308,16 +330,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: caged-${{ inputs.competence }}-audit
+          name: caged-${{ steps.target.outputs.competence }}-audit
           retention-days: 3
           if-no-files-found: error
           path: |
-            data/gold/*${{ inputs.competence }}*.json
-            data/gold/market-${{ inputs.competence }}.parquet
+            data/gold/*${{ steps.target.outputs.competence }}*.json
+            data/gold/market-${{ steps.target.outputs.competence }}.parquet
             data/gold/trend.json
-            data/bronze/${{ inputs.competence }}/archives/download-manifest.json
-            data/bronze/${{ inputs.competence }}/extracted/*.manifest.json
+            data/bronze/${{ steps.target.outputs.competence }}/archives/download-manifest.json
+            data/bronze/${{ steps.target.outputs.competence }}/extracted/*.manifest.json
             data/reference/ipca.json
             data/reference/municipalities.json
             data/reference/population.json
-            data/revisions/${{ inputs.competence }}/**
+            data/revisions/${{ steps.target.outputs.competence }}/**
