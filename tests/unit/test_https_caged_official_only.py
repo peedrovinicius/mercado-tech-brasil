@@ -27,6 +27,30 @@ def test_official_only_fails_closed_when_mte_ftp_is_unavailable(
         )
 
 
+def test_official_only_rejects_missing_mte_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(
+        https_caged,
+        "download_month",
+        lambda *args, **kwargs: [],
+    )
+
+    def forbidden_mirror(*args: object, **kwargs: object) -> None:
+        pytest.fail("Arquivo ausente: não deve consultar o espelho")
+
+    monkeypatch.setattr(https_caged, "download_month_https", forbidden_mirror)
+
+    with pytest.raises(RuntimeError, match="fallback não oficial desativado"):
+        https_caged.download_month_resilient(
+            "202609",
+            tmp_path,
+            file_types=("EXC",),
+            official_only=True,
+        )
+
+
 def test_official_only_uses_mte_ftp_when_available(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
