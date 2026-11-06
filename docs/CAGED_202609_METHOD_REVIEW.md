@@ -1,6 +1,6 @@
 # Parecer técnico para revisão metodológica: Novo CAGED 202609
 
-**Status: pronto para revisão humana; NÃO APROVADO PARA PUBLICAÇÃO.**
+**Status: REVISÃO HISTÓRICA INCOMPLETA. NÃO APROVADO PARA PUBLICAÇÃO.**
 
 Issue: #87. Competência: setembro de 2026. Revisão independente elaborada sobre o artefato da auditoria da `main`, executada no GitHub Actions em 05/11/2026.
 
@@ -43,6 +43,19 @@ Foi refeita uma conferência dos arquivos Gold derivados: os 27 agregados por UF
 - Série de IPCA: setembro de 2026 com variação oficial de **0,82%**, referência https://www.ibge.gov.br/indicadores/inflacao. Valores internos do índice estão documentados em `data/reference/ipca.json`; os salários reais utilizam base julho de 2026.
 - Revisão histórica estrita executada: `passed=true`, `changed_published_competencies=[]`, `unexpected_changed_competencies=[]`, `packaged_files=[]`.
 - **Ponto de atenção obrigatório:** FOR e EXC contêm registros de competências históricas. A ausência de revisões empacotadas deve ser confrontada com a metodologia de aplicação de ajustes e com a baseline vigente antes da autorização humana; não inferir que ajustes históricos inexistem.
+
+## Correção necessária antes da aprovação (detecção posterior)
+
+A análise do código revelou uma limitação importante na auditoria inicial:
+
+- `command_transform_adjustment` chama `_rebuild_affected_gold`, mas o método **ignora** uma competência histórica quando `data/silver/caged_tech_AAAAMM.parquet` não existe no runner.
+- Na `main`, o diretório `data/silver` não inclui os MOV normalizados das competências históricas de 2026.
+- O relatório `revision-impact-202609.json` detectou ajustes para 15 competências, inclusive de **202601 a 202608**, mas registrou `changed_published_competencies=[]` e `packaged_files=[]`.
+- O validador antigo tratava ausência de alteração como sucesso. **Isso não prova que FOR/EXC históricos foram incorporados** aos dados já publicados.
+
+O PR de correção vinculado à issue #87 passa a **reprovar** uma auditoria quando o ajuste para uma competência já publicada estiver presente e o Silver original dessa competência não estiver disponível. Esta é uma medida de segurança. O próximo passo é **reconstituir os Silver históricos exclusivamente a partir dos microdados oficiais MTE e manifests/hashes conferidos**, reconstruir os Gold afetados, comparar com a baseline, empacotar revisões esperadas e reexecutar a auditoria.
+
+Não registrar `approved=true` nem publicar setembro enquanto esse bloqueio não for resolvido e revisado por um responsável humano.
 
 ## Resultado do gate
 
