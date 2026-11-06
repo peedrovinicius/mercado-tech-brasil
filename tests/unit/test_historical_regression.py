@@ -8,6 +8,7 @@ from src.validation.historical_regression import (
     apply_history_revision_package,
     evaluate_history_revisions,
     snapshot_published_history,
+    validate_history_revision_manifest,
     write_history_snapshot,
 )
 
@@ -259,3 +260,63 @@ def test_no_adjustment_may_pass_without_historical_silver(tmp_path: Path):
     )
     assert result["passed"] is True
     assert result["missing_rebuild_baselines"] == []
+
+
+
+def test_stale_historical_artifact_cannot_authorize_september(
+    tmp_path: Path,
+):
+    report_path = tmp_path / "revision-impact-202609.json"
+    _write_json(
+        report_path,
+        {
+            "version": 1,
+            "passed": True,
+            "missing_rebuild_baselines": [],
+        },
+    )
+
+    with pytest.raises(RuntimeError, match="antigo"):
+        validate_history_revision_manifest(
+            manifest_path=report_path,
+            ingest_competence="202609",
+        )
+
+
+def test_historical_artifact_with_missing_base_cannot_authorize_publish(
+    tmp_path: Path,
+):
+    report_path = tmp_path / "revision-impact-202609.json"
+    _write_json(
+        report_path,
+        {
+            "version": 2,
+            "passed": True,
+            "missing_rebuild_baselines": ["202608"],
+        },
+    )
+
+    with pytest.raises(RuntimeError, match="202608"):
+        validate_history_revision_manifest(
+            manifest_path=report_path,
+            ingest_competence="202609",
+        )
+
+
+def test_complete_strict_historical_artifact_can_be_validated(
+    tmp_path: Path,
+):
+    report_path = tmp_path / "revision-impact-202609.json"
+    _write_json(
+        report_path,
+        {
+            "version": 2,
+            "passed": True,
+            "missing_rebuild_baselines": [],
+        },
+    )
+    result = validate_history_revision_manifest(
+        manifest_path=report_path,
+        ingest_competence="202609",
+    )
+    assert result["passed"] is True
