@@ -73,6 +73,31 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ inputs.audit_run_id }}
 
+      - name: Validate strict history audit from the selected artifact
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          from src.validation.historical_regression import (
+              validate_history_revision_manifest,
+          )
+
+          competence = os.environ["COMPETENCE"]
+          report = validate_history_revision_manifest(
+              manifest_path=Path(
+                  f"data/gold/revision-impact-{competence}.json"
+              ),
+              ingest_competence=competence,
+          )
+          print(
+              "revisão histórica validada: "
+              f"competência={competence} "
+              f"versão={report.get('version')} "
+              f"faltantes={report.get('missing_rebuild_baselines', [])}"
+          )
+          PY
+
       - name: Apply audited historical revisions
         run: |
           python -m src.cli apply-history-revisions "$COMPETENCE" \
