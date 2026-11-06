@@ -230,7 +230,7 @@ def evaluate_history_revisions(
             }
 
     result = {
-        "version": 1,
+        "version": 2,
         "ingest_competence": ingest_competence,
         "generated_at_utc": datetime.now(UTC).isoformat(),
         "passed": passed,
@@ -253,6 +253,31 @@ def evaluate_history_revisions(
     return result
 
 
+def validate_history_revision_manifest(
+    *,
+    manifest_path: Path,
+    ingest_competence: str,
+) -> dict[str, Any]:
+    manifest = _read_json(manifest_path)
+    if manifest.get("passed") is not True:
+        raise RuntimeError(
+            "Manifesto de impacto histórico não foi aprovado na auditoria."
+        )
+    if ingest_competence >= "202609":
+        missing = manifest.get("missing_rebuild_baselines")
+        if manifest.get("version") != 2 or not isinstance(missing, list):
+            raise RuntimeError(
+                "Artefato de auditoria antigo: faltam os controles estritos "
+                "de reconstrução histórica. Reexecutar auditoria."
+            )
+        if missing:
+            raise RuntimeError(
+                "Revisões históricas pendentes de Silver original: "
+                + ", ".join(str(item) for item in missing)
+            )
+    return manifest
+
+
 def apply_history_revision_package(
     *,
     ingest_competence: str,
@@ -260,12 +285,10 @@ def apply_history_revision_package(
     package_root: Path,
 ) -> list[Path]:
     manifest_path = gold_dir / f"revision-impact-{ingest_competence}.json"
-    manifest = _read_json(manifest_path)
-
-    if manifest.get("passed") is not True:
-        raise RuntimeError(
-            "Manifesto de impacto histórico não foi aprovado na auditoria."
-        )
+    manifest = validate_history_revision_manifest(
+        manifest_path=manifest_path,
+        ingest_competence=ingest_competence,
+    )
 
     raw_files = manifest.get("packaged_files")
     if not isinstance(raw_files, list):
