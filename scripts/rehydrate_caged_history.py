@@ -266,7 +266,7 @@ def rehydrate_published_history(
                     str(item["file"])
                 )
             print(
-                "DIAGNÓSTICO HISTÓRICO — publicação bloqueada:",
+                "DIAGNÓSTICO HISTÓRICO - publicação bloqueada:",
                 json.dumps(
                     {
                         "arquivos_com_sha_diferente_por_competencia": by_month,
