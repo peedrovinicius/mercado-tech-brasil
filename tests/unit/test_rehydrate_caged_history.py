@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from scripts.rehydrate_caged_history import (
-    _compare_published_artifacts,
     _compare_overview_metrics,
+    _compare_published_artifacts,
     _expected_manifests,
     _verify_extracted,
 )
