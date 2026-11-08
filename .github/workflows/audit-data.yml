@@ -22,6 +22,9 @@ on:
     paths:
       - "config/reference_totals.json"
       - "config/monthly_coverage_policy.json"
+      - "scripts/rehydrate_caged_history.py"
+      - "tests/unit/test_rehydrate_caged_history.py"
+      - ".github/workflows/audit-data.yml"
 
 permissions:
   contents: read
@@ -33,7 +36,7 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 75
     env:
       COMPETENCE: ${{ inputs.competence }}
       IPCA_BASE: ${{ inputs.ipca_base || '202607' }}
@@ -207,6 +210,15 @@ jobs:
               archive_dir / "download-manifest.json",
           )
           PY
+
+      - name: Rehydrate historical Silver from official MTE sources
+        run: |
+          if [[ "$COMPETENCE" < "202609" ]]; then
+            echo "Reconstituição histórica exigida a partir de 202609."
+            exit 0
+          fi
+          python -m scripts.rehydrate_caged_history "$COMPETENCE" \
+            --baseline /tmp/published-history.json
 
       - name: Process and audit
         run: |
