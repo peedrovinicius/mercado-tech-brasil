@@ -118,6 +118,41 @@ def _compare_published_artifacts(
     return differences
 
 
+
+def _compare_overview_metrics(
+    baseline: dict[str, Any], gold_dir: Path
+) -> list[dict[str, Any]]:
+    """Distinguish historical numeric regressions from file hash changes."""
+    original = baseline.get("overview_metrics")
+    if not isinstance(original, dict):
+        raise ValueError("Snapshot sem métricas históricas.")
+
+    differences: list[dict[str, Any]] = []
+    for competence, published in sorted(original.items()):
+        if not isinstance(published, dict):
+            raise ValueError(f"Métricas inválidas na baseline: {competence}")
+        current_path = gold_dir / f"overview-{competence}.json"
+        if not current_path.is_file():
+            differences.append({
+                "competence": competence,
+                "error": "overview reconstruído ausente",
+            })
+            continue
+        current = _read_json(current_path)
+        changed = {
+            key: {"published": previous, "reconstructed": current.get(key)}
+            for key, previous in published.items()
+            if current.get(key) != previous
+        }
+        if changed:
+            differences.append({
+                "competence": competence,
+                "changed_metrics": changed,
+            })
+    return differences
+
+
+
 def rehydrate_published_history(
     *, ingest_competence: str, baseline_path: Path
 ) -> dict[str, Any]:
@@ -138,6 +173,7 @@ def rehydrate_published_history(
         "published_competencies": competencies,
         "processed": [],
         "baseline_differences": [],
+        "baseline_metric_differences": [],
         "passed": False,
     }
 
@@ -221,7 +257,26 @@ def rehydrate_published_history(
 
         differences = _compare_published_artifacts(baseline, settings.gold_path)
         report["baseline_differences"] = differences
-        if differences:
+        metrics = _compare_overview_metrics(baseline, settings.gold_path)
+        report["baseline_metric_differences"] = metrics
+        if differences or metrics:
+            by_month: dict[str, list[str]] = {}
+            for item in differences:
+                by_month.setdefault(str(item["competence"]), []).append(
+                    str(item["file"])
+                )
+            print(
+                "DIAGNÓSTICO HISTÓRICO — publicação bloqueada:",
+                json.dumps(
+                    {
+                        "arquivos_com_sha_diferente_por_competencia": by_month,
+                        "indicadores_alterados": metrics,
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                flush=True,
+            )
             raise RuntimeError(
                 "Reconstrução histórica diverge da baseline publicada; "
                 "análise metodológica obrigatória antes da competência nova."
