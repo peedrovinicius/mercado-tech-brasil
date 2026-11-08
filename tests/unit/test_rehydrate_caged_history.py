@@ -7,6 +7,7 @@ import pytest
 
 from scripts.rehydrate_caged_history import (
     _compare_published_artifacts,
+    _compare_overview_metrics,
     _expected_manifests,
     _verify_extracted,
 )
@@ -112,3 +113,53 @@ def test_baseline_path_traversal_is_rejected(tmp_path: Path) -> None:
     baseline = {"artifacts": {"202608": {"../secret.txt": "invalid"}}}
     with pytest.raises(ValueError, match="Caminho inválido"):
         _compare_published_artifacts(baseline, tmp_path)
+
+
+def test_metric_diagnostics_distinguish_numeric_changes(tmp_path: Path) -> None:
+    gold = tmp_path / "gold"
+    gold.mkdir()
+    original = {
+        "overview_metrics": {
+            "202607": {
+                "admissions": 100,
+                "dismissals": 85,
+                "balance": 15,
+                "salary_median_admissions_real": 3000.0,
+            }
+        }
+    }
+    _write_json(
+        gold / "overview-202607.json",
+        {
+            "admissions": 100,
+            "dismissals": 85,
+            "balance": 15,
+            "salary_median_admissions_real": 3000.0,
+        },
+    )
+    assert _compare_overview_metrics(original, gold) == []
+
+    _write_json(
+        gold / "overview-202607.json",
+        {
+            "admissions": 101,
+            "dismissals": 85,
+            "balance": 16,
+            "salary_median_admissions_real": 3000.0,
+        },
+    )
+    changes = _compare_overview_metrics(original, gold)
+    assert len(changes) == 1
+    assert changes[0]["competence"] == "202607"
+    assert changes[0]["changed_metrics"]["balance"] == {
+        "published": 15,
+        "reconstructed": 16,
+    }
+
+
+def test_missing_overview_blocks_comparison(tmp_path: Path) -> None:
+    original = {"overview_metrics": {"202608": {"balance": 10}}}
+    changes = _compare_overview_metrics(original, tmp_path)
+    assert changes == [
+        {"competence": "202608", "error": "overview reconstruído ausente"}
+    ]
