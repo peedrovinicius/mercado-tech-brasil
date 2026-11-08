@@ -413,6 +413,7 @@ jobs:
           if-no-files-found: error
           path: |
             data/gold/*${{ steps.target.outputs.competence }}*.json
+            data/gold/rehydration-${{ steps.target.outputs.competence }}.json
             data/gold/market-${{ steps.target.outputs.competence }}.parquet
             data/gold/trend.json
             data/bronze/${{ steps.target.outputs.competence }}/archives/download-manifest.json
